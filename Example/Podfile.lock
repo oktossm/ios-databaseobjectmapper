@@ -1,0 +1,24 @@
+PODS:
+  - DatabaseObjectsMapper (0.1.0):
+    - RealmSwift (~> 3.0)
+  - Realm (3.1.1):
+    - Realm/Headers (= 3.1.1)
+  - Realm/Headers (3.1.1)
+  - RealmSwift (3.1.1):
+    - Realm (= 3.1.1)
+
+DEPENDENCIES:
+  - DatabaseObjectsMapper (from `../`)
+
+EXTERNAL SOURCES:
+  DatabaseObjectsMapper:
+    :path: ../
+
+SPEC CHECKSUMS:
+  DatabaseObjectsMapper: 440e5aae21f6e962597e45582153e96d45f8dfb4
+  Realm: 42d1c38a5b1bbcc828b48a7ce702cb86fc68adf4
+  RealmSwift: d31937ca6a6ee54acde64ec839523c0a3c04924b
+
+PODFILE CHECKSUM: 2ec4dce94e801823dcac92866f284979c05b4e84
+
+COCOAPODS: 1.4.0
