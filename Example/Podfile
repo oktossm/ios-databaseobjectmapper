@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'DatabaseObjectsMapper_Example' do
+  pod 'DatabaseObjectsMapper', :path => '../'
+
+  target 'DatabaseObjectsMapper_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
