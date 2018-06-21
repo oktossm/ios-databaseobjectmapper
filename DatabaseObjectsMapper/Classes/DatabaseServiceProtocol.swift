@@ -37,10 +37,10 @@ public enum DatabaseFilterType {
 
 
 public struct DatabaseObserveUpdate<T> {
-    let values: Array<T>
-    let deletions: [Int]
-    let insertions: [Int]
-    let modifications: [Int]
+    public let values: Array<T>
+    public let deletions: [Int]
+    public let insertions: [Int]
+    public let modifications: [Int]
 }
 
 
@@ -84,14 +84,18 @@ public protocol DatabaseServiceProtocol {
     func update<T: DatabaseMappable>(objects: [T])
 
     /// Updates object of given type by primary key if its already exists. Updates only properties listed in updates.
-    func update<T: DatabaseMappable>(objectOf type: T.Type, withPrimaryKey key: PrimaryKeyValue, updates: T.DatabaseUpdates)
+    func update<T: DatabaseMappable>(objectOf type: T.Type,
+                                     withPrimaryKey key: PrimaryKeyContainer,
+                                     updates: T.DatabaseUpdates)
 
     /// Updates relationships of object of given type by primary key if its already exists. Updates only relationships listed in updates.
-    func update<T: DatabaseMappable>(objectOf type: T.Type, withPrimaryKey key: PrimaryKeyValue, relationships: [DatabaseRelationshipUpdate])
+    func update<T: DatabaseMappable>(objectOf type: T.Type,
+                                     withPrimaryKey key: PrimaryKeyContainer,
+                                     relationships: [DatabaseRelationshipUpdate])
 
     /// Updates properties and relationships of object of given type by primary key if its already exists.
     func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                     withPrimaryKey key: PrimaryKeyValue,
+                                     withPrimaryKey key: PrimaryKeyContainer,
                                      updates: T.DatabaseUpdates,
                                      relationships: [DatabaseRelationshipUpdate])
 
@@ -125,16 +129,16 @@ public protocol DatabaseServiceProtocol {
                                     updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
 
     /// Fetches object of given type and primary key. Object or nil returns async in callback.
-    func fetch<T: DatabaseMappable>(objectOf type: T.Type, withPrimaryKey key: PrimaryKeyValue, callback: @escaping (T?) -> Void)
+    func fetch<T: DatabaseMappable>(objectOf type: T.Type, withPrimaryKey key: PrimaryKeyContainer, callback: @escaping (T?) -> Void)
 
     /// Fetches object of given type and primary key. Returns object.
-    func syncFetch<T: DatabaseMappable>(objectOf type: T.Type, withPrimaryKey key: PrimaryKeyValue) -> T?
+    func syncFetch<T: DatabaseMappable>(objectOf type: T.Type, withPrimaryKey key: PrimaryKeyContainer) -> T?
 
     /// Fetches object of given type and primary key. Object or nil returns async in callback.
     /// Next updates send in `updates` closure.
     /// - returns: `DatabaseUpdatesToken` to stop observing `updates`.
     func fetch<T: DatabaseMappable>(objectOf type: T.Type,
-                                    withPrimaryKey key: PrimaryKeyValue,
+                                    withPrimaryKey key: PrimaryKeyContainer,
                                     callback: @escaping (T?) -> Void,
                                     updates: @escaping (DatabaseObjectUpdate<T>) -> Void) -> DatabaseUpdatesToken
 }

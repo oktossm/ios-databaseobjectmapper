@@ -17,7 +17,10 @@ public enum DatabaseRelationshipUpdate {
 
 public protocol DatabaseRelationshipMappable {
     /// The primary key of the instance. This used when retrieving values from a database.
-    var primaryKey: PrimaryKeyValue { get }
+    var primaryKey: PrimaryKeyContainer { get }
+
+    /// The primary key value of the instance. This used when retrieving values from a database.
+    func primaryKeyValue() -> Any?
 
     /// Creates an instance of a `DatabaseType` type from a `DatabaseRelationshipMappable`.
     /// - parameter userInfo: User info can be passed here.
@@ -25,20 +28,22 @@ public protocol DatabaseRelationshipMappable {
 
     /// Name of the DatabaseType. This used when retrieving values from a database.
     func databaseTypeName() -> String
-
-    /// Returns all relationships for a `DatabaseRelationshipMappable` instance.
-    func allRelationships() -> [DatabaseRelationshipUpdate]
 }
 
 
-public extension DatabaseRelationshipMappable {
+public extension DatabaseRelationshipMappable where Self: DatabaseMappable {
     public func primaryKeyValue() -> Any? {
-        return self.primaryKey.objcValue
+        return self.primaryKeyValue.objcValue
+    }
+
+    func createRelationObject(userInfo: Any?) throws -> Any {
+        let object = try self.createObject(userInfo: userInfo)
+        return object
     }
 }
 
 
-extension PrimaryKeyValue {
+extension PrimaryKeyContainer {
     var objcValue: AnyObject? {
         switch self {
         case .none: return nil

@@ -168,7 +168,7 @@ extension NSManagedObjectContext {
     public func deleteAllEntities() {
 
         if let entitiesByName = persistentStoreCoordinator?.managedObjectModel.entitiesByName {
-            for (name, entityDescription) in entitiesByName {
+            for (name, _) in entitiesByName {
 
                 let request = NSFetchRequest<NSFetchRequestResult>(entityName: name)
 
@@ -236,14 +236,15 @@ extension NSManagedObjectContext {
     ///   - entity: NSManagedObject entity for detect type
     ///   - primaryKey: key to find object
     /// - Returns: object or nil
-    func findFirst<A: NSManagedObject>(withPrimaryKey key: PrimaryKeyValue) -> A? {
-        return self.findFirst(with: NSPredicate(format: "%K = %@", argumentArray: [key.key, key.value]))
+    func findFirst<A: NSManagedObject>(withPrimaryKey key: PrimaryKeyContainer) -> A? {
+        guard let value = key.value else { return nil }
+        return self.findFirst(with: NSPredicate(format: "%K = %@", argumentArray: [key.key, value]))
     }
 
-    func findAll<A: NSManagedObject>(withPrimaryKeys keys: [PrimaryKeyValue]) -> [PrimaryKeyValue: A] {
-        guard let key = keys.first, key != .none else { return [PrimaryKeyValue: A]() }
+    func findAll<A: NSManagedObject>(withPrimaryKeys keys: [PrimaryKeyContainer]) -> [PrimaryKeyContainer: A] {
+        guard let key = keys.first, key != .none else { return [PrimaryKeyContainer: A]() }
         let values: [A] = self.findAll(with: NSPredicate(format: "%K IN %@", argumentArray: [key.key, keys.map { $0.value }]))
-        var result = [PrimaryKeyValue: A]()
+        var result = [PrimaryKeyContainer: A]()
         switch key {
         case .int:
             for value in values {

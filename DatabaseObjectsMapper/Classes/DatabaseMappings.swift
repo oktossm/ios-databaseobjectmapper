@@ -6,36 +6,36 @@
 import Foundation
 
 
-public extension DatabaseMappable where DatabaseType == RealmContainer {
+public extension DatabaseMappable where DatabaseType: RealmContainer {
     public static func databaseType() -> DatabaseType.Type {
-        return RealmContainer.self
+        return DatabaseType.self
     }
 }
 
 
-//public extension DatabaseMappable where DatabaseType == CoreDataContainer {
-//    public static func databaseType() -> DatabaseType.Type {
-//        return CoreDataContainer.self
-//    }
-//}
+public extension DatabaseMappable where DatabaseType: CoreDataContainer {
+    public static func databaseType() -> DatabaseType.Type {
+        return DatabaseType.self
+    }
+}
 
 
-//extension CoreDataContainer: DatabaseContainerProtocol {
-//    public var encoded: Data {
-//        get {
-//            return self.data ?? Data()
-//        }
-//        set {
-//            self.data = newValue
-//        }
-//    }
-//
-//    public func set(typeName: String, primaryKey: PrimaryKeyValue, data: Data) {
-//        self.typeName = typeName
-//        self.id = CoreDataContainer.primaryKeyValue(for: typeName, primaryKeyType: primaryKey)
-//        self.data = data
-//    }
-//}
+extension CoreDataContainer: DatabaseContainerProtocol {
+    public var encoded: Data {
+        get {
+            return self.data
+        }
+        set {
+            self.data = newValue
+        }
+    }
+
+    public func update(for typeName: String, primaryKey: PrimaryKeyContainer, data: Data) {
+        self.typeName = typeName
+        self.id = CoreDataContainer.primaryKeyMapping(for: typeName, primaryKey: primaryKey).value as? String ?? ""
+        self.data = data
+    }
+}
 
 
 extension RealmContainer: DatabaseContainerProtocol {
@@ -48,22 +48,17 @@ extension RealmContainer: DatabaseContainerProtocol {
         }
     }
 
-    public func set(typeName: String, primaryKey: PrimaryKeyValue, data: Data) {
+    public func update(for typeName: String, primaryKey: PrimaryKeyContainer, data: Data) {
         self.typeName = typeName
         self.data = data
-        self.id = RealmContainer.primaryKeyValue(for: typeName, primaryKeyType: primaryKey)
+
+        if self.realm == nil {
+            self.id = (RealmContainer.primaryKeyMapping(for: typeName, primaryKey: primaryKey).value as? String) ?? ""
+        }
     }
 }
+
 
 extension CodingUserInfoKey {
     static let context: CodingUserInfoKey = CodingUserInfoKey(rawValue: "context")!
-}
-
-
-/// Conditional conformances is not implemented yet. We need to add default implementation.
-/// Specific implementation can be found in `extension Array where Element: DictionaryElementRepresentable`
-extension Array: DatabasePropertyUpdates {
-    public func dictionaryRepresentation() -> [String: Any?] {
-        return [String: Any?]()
-    }
 }

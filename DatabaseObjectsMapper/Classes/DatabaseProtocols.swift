@@ -7,7 +7,7 @@ import CoreData
 import RealmSwift
 
 
-public enum PrimaryKeyValue {
+public enum PrimaryKeyContainer: Equatable, Hashable {
     case none
     case int(value: Int, key: String)
     case string(value: String, key: String)
@@ -29,47 +29,29 @@ public enum PrimaryKeyValue {
     }
 }
 
-extension PrimaryKeyValue: Hashable {
-    public var hashValue: Int {
-        switch self {
-        case .none:
-            return 1.hashValue
-        case .int(let data):
-            let hash = 2
-            let valHash = data.value.hashValue
-            let keyHash = data.key.hashValue
-            return hash ^ valHash ^ keyHash
-        case .string(let data):
-            let hash = 3
-            let valHash = data.value.hashValue
-            let keyHash = data.key.hashValue
-            return hash ^ valHash ^ keyHash
-        }
-    }
-}
-
-
-extension PrimaryKeyValue: Equatable {}
-public func == (lhs: PrimaryKeyValue, rhs: PrimaryKeyValue) -> Bool {
-    switch (lhs, rhs) {
-    case (.none, .none):
-        return true
-    case (.int(let lhs), .int(let rhs)):
-        if lhs.value != rhs.value { return false }
-        if lhs.key != rhs.key { return false }
-        return true
-    case (.string(let lhs), .string(let rhs)):
-        if lhs.value != rhs.value { return false }
-        if lhs.key != rhs.key { return false }
-        return true
-    default: return false
-    }
-}
-
 
 public protocol DatabaseTypeProtocol {
     /// `Data` stored in DatabaseType for `DatabaseMappable` decoding.
     var encoded: Data { get set }
+
+    /// The primary key path. This used when retrieving values from a database.
+    static var primaryKeyPath: String? { get }
+
+    /// The primary key mapped value. This used when retrieving values from a database. Database type can modify primary key before using it.
+    /// For example default containers add type name to store objects of different types.
+    /// Default implementation returns non modified key
+    static func primaryKeyMapping(for type: String, primaryKey: PrimaryKeyContainer) -> PrimaryKeyContainer
+}
+
+
+public extension DatabaseTypeProtocol {
+    static var primaryKeyPath: String {
+        return "id"
+    }
+
+    static func primaryKeyMapping(for type: String, primaryKey: PrimaryKeyContainer) -> PrimaryKeyContainer {
+        return primaryKey
+    }
 }
 
 
@@ -89,11 +71,7 @@ public protocol DatabaseMappable: Codable {
     static func databaseType() -> DatabaseType.Type
 
     /// The primary key of the instance. This used when retrieving values from a database.
-    static var primaryKeyPath: String { get }
-    var primaryKey: PrimaryKeyValue { get }
-
-    /// The primary key value. This used when retrieving values from a database.
-    static func primaryKeyValue(for primaryKey: PrimaryKeyValue) -> Any?
+    var primaryKey: PrimaryKeyContainer { get }
 
     /// Creates an instance of a `DatabaseType` type from a `DatabaseMappable`.
     /// - parameter userInfo: User info can be passed here.
@@ -107,20 +85,23 @@ public protocol DatabaseMappable: Codable {
     /// - parameter data: Data that stores the `JSON` encoded type.
     static func create(from data: Data) throws -> Self
 
-    /// Creates a `Data` from a `DatabaseMappable` instance.
+    /// Returns `Data` for `DatabaseMappable` instance.
     func encoded() throws -> Data
 
-    /// Returns a `Updates` for a `DatabaseMappable` instance.
+    /// Returns `Updates` for `DatabaseMappable` instance.
     func allUpdates() -> DatabaseUpdates
+
+    /// Returns updated self.
+    func updated(_ _updates: DatabaseUpdates) -> Self
 
     /// Updates an instance of a `DatabaseType` type using a `DatabaseUpdates`.
     /// - parameter object: DatabaseType that should be updated.
     /// - parameter primaryKey: PrimaryKeyValue of object.
     /// - parameter updates: DatabaseUpdates updates array.
     /// - parameter data: Data that stores the `JSON` encoded type.
-    static func update(_ object: DatabaseType, primaryKey: PrimaryKeyValue, data: Data, updates: DatabaseUpdates)
+    func update(_ object: DatabaseType, primaryKey: PrimaryKeyContainer, data: Data, updates: DatabaseUpdates)
 
-    /// Used for type fetching for example in case when single DatabaseType can store multiple different types.
+    /// Used for type fetching for example in case when single DatabaseType can store multiple different types (used by DatabaseContainerProtocol).
     static func internalPredicate() -> NSPredicate?
 }
 
@@ -138,62 +119,52 @@ public extension DatabaseMappable {
         return try JSONEncoder().encode(self)
     }
 
-    public static var primaryKeyPath: String {
-        return ""
-    }
-    public var primaryKey: PrimaryKeyValue {
+    public var primaryKey: PrimaryKeyContainer {
         return .none
     }
 
-    public static func primaryKeyValue(for primaryKey: PrimaryKeyValue) -> Any? {
-        return primaryKey.value
+    var primaryKeyValue: PrimaryKeyContainer {
+        return Self.primaryKeyMapped(for: self.primaryKey)
+    }
+
+    static func primaryKeyMapped(for primaryKey: PrimaryKeyContainer) -> PrimaryKeyContainer {
+        return Self.DatabaseType.primaryKeyMapping(for: self.typeName, primaryKey: primaryKey)
     }
 
     public func update(_ object: DatabaseType) {
         guard let data = try? self.encoded() else { return }
-        Self.update(object, primaryKey: self.primaryKey, data: data, updates: self.allUpdates())
-    }
-
-    public func allRelationships() -> [DatabaseRelationshipUpdate] {
-        return []
+        self.update(object, primaryKey: self.primaryKey, data: data, updates: self.allUpdates())
     }
 
     public static func internalPredicate() -> NSPredicate? {
         return nil
     }
+
+    public static var typeName: String {
+        return String(describing: Self.self)
+    }
+
+    public func databaseTypeName() -> String {
+        return String(describing: Self.DatabaseType.self)
+    }
 }
 
 
 public protocol DatabaseContainerProtocol: DatabaseTypeProtocol {
-    /// Database container need to store `Data`, primaryKey `PrimaryKeyValue`, and typeName.
-    func set(typeName: String, primaryKey: PrimaryKeyValue, data: Data)
+    /// Database container need to store `Data`, primaryKey `PrimaryKey`, and typeName.
+    func update(for typeName: String, primaryKey: PrimaryKeyContainer, data: Data)
 }
 
 
 extension DatabaseContainerProtocol {
-    public static func primaryKeyValue(for typeName: String, primaryKeyType: PrimaryKeyValue) -> String {
-        switch primaryKeyType {
+    public static func primaryKeyMapping(for type: String, primaryKey: PrimaryKeyContainer) -> PrimaryKeyContainer {
+        switch primaryKey {
         case .none:
-            return typeName + UUID().uuidString
+            return .string(value: type + UUID().uuidString, key: self.primaryKeyPath ?? "")
         case .int(let val, _):
-            return typeName + String(val)
+            return .string(value: type + String(val), key: self.primaryKeyPath ?? "")
         case .string(let val, _):
-            return typeName + val
+            return .string(value: type + val, key: self.primaryKeyPath ?? "")
         }
-    }
-}
-
-
-public extension DatabaseMappable where DatabaseType: DatabaseContainerProtocol {
-    public static func update(_ object: DatabaseType, primaryKey: PrimaryKeyValue, data: Data, updates: DatabaseUpdates) {
-        object.set(typeName: Self.typeName, primaryKey: primaryKey, data: data)
-    }
-
-    public static func internalPredicate() -> NSPredicate? {
-        return NSPredicate(format: "typeName == %@", argumentArray: [Self.typeName])
-    }
-
-    public static var typeName: String {
-        return String(describing: Self.self)
     }
 }

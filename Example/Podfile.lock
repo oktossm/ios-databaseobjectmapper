@@ -1,24 +1,43 @@
 PODS:
   - DatabaseObjectsMapper (0.1.0):
     - RealmSwift (~> 3.0)
-  - Realm (3.1.1):
-    - Realm/Headers (= 3.1.1)
-  - Realm/Headers (3.1.1)
-  - RealmSwift (3.1.1):
-    - Realm (= 3.1.1)
+  - Realm (3.7.3):
+    - Realm/Headers (= 3.7.3)
+  - Realm/Headers (3.7.3)
+  - RealmSwift (3.7.3):
+    - Realm (= 3.7.3)
+  - Sourcery (0.13.1)
+  - SourceryAdditions (0.1.1)
 
 DEPENDENCIES:
   - DatabaseObjectsMapper (from `../`)
+  - Sourcery
+  - SourceryAdditions (from `https://bitbucket.org/MikhailMulyar/sourceryadditions.git`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Realm
+    - RealmSwift
+    - Sourcery
 
 EXTERNAL SOURCES:
   DatabaseObjectsMapper:
-    :path: ../
+    :path: "../"
+  SourceryAdditions:
+    :git: https://bitbucket.org/MikhailMulyar/sourceryadditions.git
+
+CHECKOUT OPTIONS:
+  SourceryAdditions:
+    :commit: 5635a1cc516d9d8f0e33c6e8146bde0263f5f006
+    :git: https://bitbucket.org/MikhailMulyar/sourceryadditions.git
 
 SPEC CHECKSUMS:
-  DatabaseObjectsMapper: 440e5aae21f6e962597e45582153e96d45f8dfb4
-  Realm: 42d1c38a5b1bbcc828b48a7ce702cb86fc68adf4
-  RealmSwift: d31937ca6a6ee54acde64ec839523c0a3c04924b
+  DatabaseObjectsMapper: 92b4524a5f1eef782369ec04bfadc30ab8390a78
+  Realm: f366e954e3330d4915a319e96cc04e2ee09a9ef2
+  RealmSwift: 56f111b1dd439973fbe1c066b067ac4702285441
+  Sourcery: 9ef51b8777516f204d82996441f293813158d0d7
+  SourceryAdditions: 91ea262d7acabe8d933483a877aa51d791110794
 
-PODFILE CHECKSUM: 2ec4dce94e801823dcac92866f284979c05b4e84
+PODFILE CHECKSUM: 70a80db218f33b97b3e82354d3f5ebf14f9afbb8
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.2

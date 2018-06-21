@@ -6,6 +6,9 @@
 import CoreData
 
 
+public typealias CoreDataObject = NSManagedObject
+
+
 public class CoreDataService {
 
     private var storage: CoreDataStorage
@@ -17,267 +20,191 @@ public class CoreDataService {
         return self.storage.rootContext
     }
 
-    init() {
-        self.storage = CoreDataStorage()
+    public init(storage: CoreDataStorage = CoreDataStorage()) {
+        self.storage = storage
     }
 
     deinit {
 
     }
+}
 
-    func deleteAll() {
+
+extension CoreDataService {
+    public func deleteAll() {
         try? self.storage.destroyStore()
         self.storage = CoreDataStorage()
     }
 
     /// Uniqueness Constraints should be set up in Entity model
-    func store<T: DatabaseMappable>(object: T, update: Bool) where T.DatabaseType: NSManagedObject {
+    public func store<T: DatabaseMappable>(object: T, update: Bool = true) where T.DatabaseType: CoreDataObject {
         self.store(objects: [object], update: update)
     }
 
     /// Uniqueness Constraints should be set up in Entity model
-    func store<T: DatabaseMappable>(objects: [T], update: Bool) where T.DatabaseType: NSManagedObject {
+    public func store<T: DatabaseMappable>(objects: [T], update: Bool = true) where T.DatabaseType: CoreDataObject {
         self.writeContext.perform {
+            [weak self] in
+            guard let s = self else { return }
             guard objects.isEmpty == false else { return }
-            let oldObjects: [PrimaryKeyValue: T.DatabaseType] = self.writeContext.findAll(withPrimaryKeys: objects.map { $0.primaryKey })
+            let oldObjects: [PrimaryKeyContainer: T.DatabaseType] = s.writeContext.findAll(withPrimaryKeys: objects.map { $0.primaryKeyValue })
             objects.forEach {
                 item in
-                let hasOldObject = oldObjects.keys.contains(item.primaryKey)
-                if update || !hasOldObject, let object = try? item.createObject(userInfo: self.writeContext) {
+                let hasOldObject = oldObjects.keys.contains(item.primaryKeyValue)
+                if !hasOldObject, let object = try? item.createObject(userInfo: s.writeContext) {
                     do {
                         try object.validateForInsert()
                     } catch let error as NSError {
                         print(error)
                     }
+                } else if update, let object = oldObjects[item.primaryKeyValue] {
+                    item.update(object)
                 }
             }
-            self.storage.saveContexts(contextWithObject: self.writeContext)
+            s.storage.saveContexts(contextWithObject: s.writeContext)
         }
     }
 
-    func update<T: DatabaseMappable>(object: T) where T.DatabaseType: NSManagedObject {
+    public func update<T: DatabaseMappable>(object: T) where T.DatabaseType: CoreDataObject {
         self.update(objects: [object])
     }
 
-    func update<T: DatabaseMappable>(objects: [T]) where T.DatabaseType: NSManagedObject {
+    public func update<T: DatabaseMappable>(objects: [T]) where T.DatabaseType: CoreDataObject {
         self.writeContext.perform {
-            let managed: [PrimaryKeyValue: T.DatabaseType] = self.writeContext.findAll(withPrimaryKeys: objects.map { $0.primaryKey })
+            [weak self] in
+            guard let s = self else { return }
+            let managed: [PrimaryKeyContainer: T.DatabaseType] = s.writeContext.findAll(withPrimaryKeys: objects.map { $0.primaryKeyValue })
             objects.forEach {
-                guard let m = managed[$0.primaryKey] else { return }
+                guard let m = managed[$0.primaryKeyValue] else { return }
                 $0.update(m)
             }
-            self.storage.saveContexts(contextWithObject: self.writeContext)
+            s.storage.saveContexts(contextWithObject: s.writeContext)
         }
     }
 
-    func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                     withPrimaryKey key: PrimaryKeyValue,
-                                     updates: T.DatabaseUpdates) where T.DatabaseType: NSManagedObject {
+    public func update<T: DatabaseMappable>(objectOf type: T.Type,
+                                            withPrimaryKey key: PrimaryKeyContainer,
+                                            updates: T.DatabaseUpdates) where T.DatabaseType: CoreDataObject {
         self.writeContext.perform {
-            let managed: T.DatabaseType? = self.writeContext.findFirst(withPrimaryKey: key)
-            updates.dictionaryRepresentation().forEach {
-                key, value in
-                managed?.setValue(value, forKey: key)
-            }
-            self.storage.saveContexts(contextWithObject: self.writeContext)
+            [weak self] in
+            guard let s = self,
+                  let managed: T.DatabaseType = s.writeContext.findFirst(withPrimaryKey: T.primaryKeyMapped(for: key)) else { return }
+            guard var model = try? T.createMappable(from: managed) else { return }
+            model = model.updated(updates)
+            model.update(managed)
+            s.storage.saveContexts(contextWithObject: s.writeContext)
         }
     }
 
-    func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                     withPrimaryKey key: PrimaryKeyValue,
-                                     relationships: [DatabaseRelationshipUpdate]) where T.DatabaseType: NSManagedObject {
+    public func update<T: DatabaseMappable>(objectOf type: T.Type,
+                                            withPrimaryKey key: PrimaryKeyContainer,
+                                            relationships: [DatabaseRelationshipUpdate]) where T.DatabaseType: CoreDataObject {
         self.writeContext.perform {
-            guard let managed: T.DatabaseType = self.writeContext.findFirst(withPrimaryKey: key) else { return }
-
-            self.update(managed, with: relationships)
-
-            self.storage.saveContexts(contextWithObject: self.writeContext)
+            [weak self] in
+            guard let s = self, let managed: T.DatabaseType = s.writeContext.findFirst(withPrimaryKey: T.primaryKeyMapped(for: key)) else { return }
+            T.update(managed, with: relationships, in: s.writeContext)
+            s.storage.saveContexts(contextWithObject: s.writeContext)
         }
     }
 
-    func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                     withPrimaryKey key: PrimaryKeyValue,
-                                     updates: T.DatabaseUpdates,
-                                     relationships: [DatabaseRelationshipUpdate]) where T.DatabaseType: NSManagedObject {
+    public func update<T: DatabaseMappable>(objectOf type: T.Type,
+                                            withPrimaryKey key: PrimaryKeyContainer,
+                                            updates: T.DatabaseUpdates,
+                                            relationships: [DatabaseRelationshipUpdate]) where T.DatabaseType: CoreDataObject {
         self.writeContext.perform {
-            guard let managed: T.DatabaseType = self.writeContext.findFirst(withPrimaryKey: key) else { return }
-            updates.dictionaryRepresentation().forEach { managed.setValue($0.value, forKey: $0.key) }
-            self.update(managed, with: relationships)
+            [weak self] in
+            guard let s = self,
+                  let managed: T.DatabaseType = s.writeContext.findFirst(withPrimaryKey: T.primaryKeyMapped(for: key)) else { return }
 
-            self.storage.saveContexts(contextWithObject: self.writeContext)
+            guard var model = try? T.createMappable(from: managed) else { return }
+            model = model.updated(updates)
+            model.update(managed)
+
+            T.update(managed, with: relationships, in: s.writeContext)
+
+            s.storage.saveContexts(contextWithObject: s.writeContext)
         }
     }
 
-    private func update(_ managed: NSManagedObject, with relationships: [DatabaseRelationshipUpdate]) {
-        for relationship in relationships {
-            switch relationship {
-            case .toOne(let key, let object, let create):
-                let relationObject: NSManagedObject
-                if create {
-                    guard let rObject = (try? object?.createRelationObject(userInfo: self.writeContext)) as? NSManagedObject else {
-                        managed.setValue(nil, forKey: key)
-                        continue
-                    }
-                    relationObject = rObject
-                } else {
-                    guard let typeName = object?.databaseTypeName(),
-                          let primaryKey = object?.primaryKeyValue(),
-                          let primaryKeyName = object?.primaryKey.key else {
-                        managed.setValue(nil, forKey: key)
-                        continue
-                    }
-                    let request = NSFetchRequest<NSFetchRequestResult>(entityName: typeName)
-                    request.predicate = NSPredicate(format: "%K = %@", argumentArray: [primaryKeyName, primaryKey])
-                    guard let values = try? self.writeContext.fetch(request), let first = values.first as? NSManagedObject else { continue }
-                    relationObject = first
-                }
-
-                managed.setValue(relationObject, forKey: key)
-
-                if let internalRelationships = object?.allRelationships(), internalRelationships.isEmpty == false {
-                    self.update(relationObject, with: internalRelationships)
-                }
-            case .toManySet(let key, let objects, let create):
-                guard let objects = objects else {
-                    managed.setValue(nil, forKey: key)
-                    continue
-                }
-                self.addRelationships(objects, to: managed, for: key, initialSet: NSSet(), create: create)
-            case .toManyAdd(let key, let objects, let create):
-                guard let set = managed.value(forKey: key) as? NSSet else { continue }
-                self.addRelationships(objects, to: managed, for: key, initialSet: set, create: create)
-            case .toManyRemove(let key, let objects):
-                guard let set = (managed.value(forKey: key) as? NSSet)?.mutableCopy() as? NSMutableSet else { continue }
-                guard let primaryKeyName = objects.first?.primaryKey.key, let typeName = objects.first?.databaseTypeName() else { continue }
-                let request = NSFetchRequest<NSFetchRequestResult>(entityName: typeName)
-                request.predicate = NSPredicate(format: "%K IN %@", argumentArray: [primaryKeyName, objects.map { $0.primaryKeyValue() }])
-                guard let values = try? self.writeContext.fetch(request) else { continue }
-                values.forEach { set.remove($0) }
-                managed.setValue(set, forKey: key)
-            }
-        }
-    }
-
-    private func addRelationships(_ relationships: [DatabaseRelationshipMappable],
-                                  to managed: NSManagedObject,
-                                  for key: String,
-                                  initialSet: NSSet,
-                                  create: Bool) {
-        if create {
-            let values = relationships.flatMap {
-                object -> (NSManagedObject, [DatabaseRelationshipUpdate])? in
-                let relation = (try? object.createRelationObject(userInfo: self.writeContext)) as? NSManagedObject
-                return relation.flatMap { ($0, object.allRelationships()) }
-            }
-            for value in values {
-                self.update(value.0, with: value.1)
-            }
-            managed.setValue(initialSet.addingObjects(from: values), forKey: key)
-        } else {
-            guard let primaryKey = relationships.first?.primaryKey,
-                  let primaryKeyName = relationships.first?.primaryKey.key,
-                  let typeName = relationships.first?.databaseTypeName() else { return }
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: typeName)
-            request.predicate = NSPredicate(format: "%K IN %@", argumentArray: [primaryKeyName, relationships.map { $0.primaryKeyValue() }])
-            guard let values = try? self.writeContext.fetch(request) else { return }
-
-            let relations = relationships.reduce(into: [PrimaryKeyValue: [DatabaseRelationshipUpdate]]()) {
-                result, mappable in
-                result[mappable.primaryKey] = mappable.allRelationships()
-            }
-
-            switch primaryKey {
-            case .int:
-                for value in values {
-                    guard let relation = value as? NSManagedObject,
-                          let keyValue = relation.value(forKey: primaryKey.key) as? Int,
-                          let updates = relations[.int(value: keyValue, key: primaryKey.key)] else { return }
-                    self.update(relation, with: updates)
-                }
-            case .string:
-                for value in values {
-                    guard let relation = value as? NSManagedObject,
-                          let keyValue = relation.value(forKey: primaryKey.key) as? String,
-                          let updates = relations[.string(value: keyValue, key: primaryKey.key)] else { return }
-                    self.update(relation, with: updates)
-                }
-            default:
-                break
-            }
-
-            managed.setValue(initialSet.addingObjects(from: values), forKey: key)
-        }
-    }
-
-    func delete<T: DatabaseMappable>(object: T) where T.DatabaseType: NSManagedObject {
+    public func delete<T: DatabaseMappable>(object: T) where T.DatabaseType: CoreDataObject {
         self.delete(objects: [object])
     }
 
-    func delete<T: DatabaseMappable>(objects: [T]) where T.DatabaseType: NSManagedObject {
+    public func delete<T: DatabaseMappable>(objects: [T]) where T.DatabaseType: CoreDataObject {
         self.writeContext.perform {
-            let managed: [PrimaryKeyValue: T.DatabaseType] = self.writeContext.findAll(withPrimaryKeys: objects.map { $0.primaryKey })
+            [weak self] in
+            guard let s = self else { return }
+            let managed: [PrimaryKeyContainer: T.DatabaseType] = s.writeContext.findAll(withPrimaryKeys: objects.map { $0.primaryKeyValue })
             for m in managed.values {
-                self.writeContext.delete(m)
+                s.writeContext.delete(m)
             }
-            self.storage.saveContexts(contextWithObject: self.writeContext)
+            s.storage.saveContexts(contextWithObject: s.writeContext)
         }
     }
 
-    func deleteAll<T: DatabaseMappable>(objectsOf type: T.Type) where T.DatabaseType: NSManagedObject {
+    public func deleteAll<T: DatabaseMappable>(objectsOf type: T.Type) where T.DatabaseType: CoreDataObject {
         self.writeContext.perform {
-            try? T.DatabaseType.delete(in: self.writeContext) {
+            [weak self] in
+            guard let s = self else { return }
+            try? T.DatabaseType.delete(in: s.writeContext) {
                 request in
                 request.predicate = T.internalPredicate()
             }
-            self.storage.saveContexts(contextWithObject: self.writeContext)
+            s.storage.saveContexts(contextWithObject: s.writeContext)
         }
     }
 
-    func fetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                    with filter: DatabaseFilterType,
-                                    with sort: DatabaseSortType,
-                                    callback: @escaping (Array<T>) -> Void) where T.DatabaseType: NSManagedObject {
+    public func fetch<T: DatabaseMappable>(objectsOf type: T.Type,
+                                           with filter: DatabaseFilterType = .unfiltered,
+                                           with sort: DatabaseSortType = .unsorted,
+                                           callback: @escaping (Array<T>) -> Void) where T.DatabaseType: CoreDataObject {
         self.readContext.perform {
+            [weak self] in
+            guard let s = self else { return }
             let predicate: NSPredicate?
             if let p = filter.predicate, let t = T.internalPredicate() {
                 predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [p, t])
             } else {
                 predicate = T.internalPredicate() ?? filter.predicate
             }
-            let objects: [T.DatabaseType] = self.readContext.findAll(with: predicate, sortDescriptors: sort.sortDescriptors)
+            let objects: [T.DatabaseType] = s.readContext.findAll(with: predicate, sortDescriptors: sort.sortDescriptors)
 
-            callback(objects.flatMap { try? T.createMappable(from: $0) })
+            callback(objects.compactMap { try? T.createMappable(from: $0) })
         }
     }
 
-    func syncFetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                        with filter: DatabaseFilterType = .unfiltered,
-                                        with sort: DatabaseSortType = .unsorted) -> Array<T> where T.DatabaseType: NSManagedObject {
+    public func syncFetch<T: DatabaseMappable>(objectsOf type: T.Type,
+                                               with filter: DatabaseFilterType = .unfiltered,
+                                               with sort: DatabaseSortType = .unsorted) -> Array<T> where T.DatabaseType: CoreDataObject {
         var result = [T]()
 
         self.readContext.performAndWait {
+            [weak self] in
+            guard let s = self else { return }
             let predicate: NSPredicate?
             if let p = filter.predicate, let t = T.internalPredicate() {
                 predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [p, t])
             } else {
                 predicate = T.internalPredicate() ?? filter.predicate
             }
-            let objects: [T.DatabaseType] = self.readContext.findAll(with: predicate, sortDescriptors: sort.sortDescriptors)
+            let objects: [T.DatabaseType] = s.readContext.findAll(with: predicate, sortDescriptors: sort.sortDescriptors)
 
-            result = objects.flatMap { try? T.createMappable(from: $0) }
+            result = objects.compactMap { try? T.createMappable(from: $0) }
         }
 
         return result
     }
 
-    func fetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                    with filter: DatabaseFilterType,
-                                    with sort: DatabaseSortType,
-                                    callback: @escaping (Array<T>) -> Void,
-                                    updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.DatabaseType: NSManagedObject {
+    public func fetch<T: DatabaseMappable>(objectsOf type: T.Type,
+                                           with filter: DatabaseFilterType = .unfiltered,
+                                           with sort: DatabaseSortType = .unsorted,
+                                           callback: @escaping (Array<T>) -> Void,
+                                           updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.DatabaseType: CoreDataObject {
         let token = DatabaseUpdatesToken {}
 
         self.readContext.perform {
+            [weak self] in
+            guard let s = self else { return }
 
             if token.isInvalidated { return }
 
@@ -294,10 +221,10 @@ public class CoreDataService {
                 [NSSortDescriptor(key: $0 as? String, ascending: false)]
             }
 
-            let observer = FetchRequestObserver<T.DatabaseType>(fetchRequest: request, context: self.readContext)
+            let observer = FetchRequestObserver<T.DatabaseType>(fetchRequest: request, context: s.readContext)
             let objects: [T.DatabaseType]? = observer.fetchedResultsController.fetchedObjects
 
-            callback(objects?.flatMap { try? T.createMappable(from: $0) } ?? [T]())
+            callback(objects?.compactMap { try? T.createMappable(from: $0) } ?? [T]())
 
             observer.observer = {
                 (update: DatabaseObserveUpdate<T.DatabaseType>) in
@@ -319,23 +246,27 @@ public class CoreDataService {
         return token
     }
 
-    func fetch<T: DatabaseMappable>(objectOf type: T.Type,
-                                    withPrimaryKey key: PrimaryKeyValue,
-                                    callback: @escaping (T?) -> Void) where T.DatabaseType: NSManagedObject {
+    public func fetch<T: DatabaseMappable>(objectOf type: T.Type,
+                                           withPrimaryKey key: PrimaryKeyContainer,
+                                           callback: @escaping (T?) -> Void) where T.DatabaseType: CoreDataObject {
         self.readContext.perform {
-            let object: T.DatabaseType? = self.readContext.findFirst(withPrimaryKey: key)
+            [weak self] in
+            guard let s = self else { return }
+            let object: T.DatabaseType? = s.readContext.findFirst(withPrimaryKey: T.primaryKeyMapped(for: key))
 
             callback(object.flatMap { try? T.createMappable(from: $0) })
         }
     }
 
-    func syncFetch<T: DatabaseMappable>(objectOf type: T.Type,
-                                        withPrimaryKey key: PrimaryKeyValue) -> T? where T.DatabaseType: NSManagedObject {
+    public func syncFetch<T: DatabaseMappable>(objectOf type: T.Type,
+                                               withPrimaryKey key: PrimaryKeyContainer) -> T? where T.DatabaseType: CoreDataObject {
 
         var result: T? = nil
 
         self.readContext.performAndWait {
-            let object: T.DatabaseType? = self.readContext.findFirst(withPrimaryKey: key)
+            [weak self] in
+            guard let s = self else { return }
+            let object: T.DatabaseType? = s.readContext.findFirst(withPrimaryKey: T.primaryKeyMapped(for: key))
 
             result = object.flatMap { try? T.createMappable(from: $0) }
         }
@@ -343,17 +274,19 @@ public class CoreDataService {
         return result
     }
 
-    func fetch<T: DatabaseMappable>(objectOf type: T.Type,
-                                    withPrimaryKey key: PrimaryKeyValue,
-                                    callback: @escaping (T?) -> Void,
-                                    updates: @escaping (DatabaseObjectUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.DatabaseType: NSManagedObject {
+    public func fetch<T: DatabaseMappable>(objectOf type: T.Type,
+                                           withPrimaryKey key: PrimaryKeyContainer,
+                                           callback: @escaping (T?) -> Void,
+                                           updates: @escaping (DatabaseObjectUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.DatabaseType: CoreDataObject {
         let token = DatabaseUpdatesToken {}
 
         self.readContext.perform {
+            [weak self] in
+            guard let s = self else { return }
 
             if token.isInvalidated { return }
 
-            let object: T.DatabaseType? = self.readContext.findFirst(withPrimaryKey: key)
+            let object: T.DatabaseType? = s.readContext.findFirst(withPrimaryKey: T.primaryKeyMapped(for: key))
 
             callback(object.flatMap { try? T.createMappable(from: $0) })
 
@@ -382,5 +315,4 @@ public class CoreDataService {
 
         return token
     }
-
 }

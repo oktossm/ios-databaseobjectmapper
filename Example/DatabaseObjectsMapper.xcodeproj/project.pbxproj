@@ -14,7 +14,19 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
-		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		607FACEC1AFB9204008FA782 /* RealmContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* RealmContainerTests.swift */; };
+		DDEDB018389E6FB3783D7A22 /* TestContainers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBCF9194ED939A77D0384 /* TestContainers.swift */; };
+		DDEDB07EB0BCFB8F5D3155B3 /* AutoObjectDiff.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBF9C8737DD301E6A3912 /* AutoObjectDiff.generated.swift */; };
+		DDEDB4E3C9429B91A4EAE8E8 /* TestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB10073B1A1D08B373772 /* TestModel.swift */; };
+		DDEDB6F765EA25921C45110E /* AutoCodable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB8B89C76135D86C072E3 /* AutoCodable.generated.swift */; };
+		DDEDB908FB06BF4DFFC6C859 /* AutoEquatable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBF367C8EC53DDBDE14B1 /* AutoEquatable.generated.swift */; };
+		DDEDB9EBC5F136E508E435E4 /* AutoLenses.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBD8D2384511B23E0A258 /* AutoLenses.generated.swift */; };
+		DDEDBDF7F54D05405A47622A /* AutoInitializable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB37F2F0BF1D6FBF2CFC3 /* AutoInitializable.generated.swift */; };
+		DDEDBE28BA1B649F2B3EA195 /* CustomRealmContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBE207E8E87F178B2601B /* CustomRealmContainerTests.swift */; };
+		DDEDBE671A87D2CADDB247C1 /* AutoHashable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBDEB2B7895A95DBF6F66 /* AutoHashable.generated.swift */; };
+		DDEDBF096EB7738D3C403A12 /* CoreDataContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBD4758318979199E1C1B /* CoreDataContainerTests.swift */; };
+		DDEDBF4B6A4C849D1A991F54 /* AutoCases.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB9D0230BE414E652419E /* AutoCases.generated.swift */; };
+		EFB7E10A20D8041C0099B879 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EFB7E10820D8041C0099B879 /* CoreDataModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,11 +52,23 @@
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		607FACE51AFB9204008FA782 /* DatabaseObjectsMapper_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DatabaseObjectsMapper_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
+		607FACEB1AFB9204008FA782 /* RealmContainerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmContainerTests.swift; sourceTree = "<group>"; };
 		712F917019EBC8049798AE6A /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		85ADCD8E0FEA47ECEF76AD96 /* Pods-DatabaseObjectsMapper_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Tests/Pods-DatabaseObjectsMapper_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		A41B29EFD857217878D7EBDB /* Pods-DatabaseObjectsMapper_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Tests/Pods-DatabaseObjectsMapper_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		B6E67A8AC5BC5D2B96C56917 /* Pods-DatabaseObjectsMapper_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example.release.xcconfig"; sourceTree = "<group>"; };
+		DDEDB10073B1A1D08B373772 /* TestModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestModel.swift; sourceTree = "<group>"; };
+		DDEDB37F2F0BF1D6FBF2CFC3 /* AutoInitializable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoInitializable.generated.swift; sourceTree = "<group>"; };
+		DDEDB8B89C76135D86C072E3 /* AutoCodable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoCodable.generated.swift; sourceTree = "<group>"; };
+		DDEDB9D0230BE414E652419E /* AutoCases.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoCases.generated.swift; sourceTree = "<group>"; };
+		DDEDBCF9194ED939A77D0384 /* TestContainers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestContainers.swift; sourceTree = "<group>"; };
+		DDEDBD4758318979199E1C1B /* CoreDataContainerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataContainerTests.swift; sourceTree = "<group>"; };
+		DDEDBD8D2384511B23E0A258 /* AutoLenses.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoLenses.generated.swift; sourceTree = "<group>"; };
+		DDEDBDEB2B7895A95DBF6F66 /* AutoHashable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoHashable.generated.swift; sourceTree = "<group>"; };
+		DDEDBE207E8E87F178B2601B /* CustomRealmContainerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRealmContainerTests.swift; sourceTree = "<group>"; };
+		DDEDBF367C8EC53DDBDE14B1 /* AutoEquatable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoEquatable.generated.swift; sourceTree = "<group>"; };
+		DDEDBF9C8737DD301E6A3912 /* AutoObjectDiff.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoObjectDiff.generated.swift; sourceTree = "<group>"; };
+		EFB7E10920D8041C0099B879 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
 		F9790FEDA143443DB9769952 /* Pods_DatabaseObjectsMapper_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DatabaseObjectsMapper_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FDC08408EF90EDA2322924A2 /* DatabaseObjectsMapper.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = DatabaseObjectsMapper.podspec; path = ../DatabaseObjectsMapper.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 /* End PBXFileReference section */
@@ -108,6 +132,9 @@
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
+				DDEDBF87E1707E9D77C035DA /* Models */,
+				DDEDBD1A6EE98632B2B0EEAD /* Sourcery */,
+				EFB7E10820D8041C0099B879 /* CoreDataModel.xcdatamodeld */,
 			);
 			name = "Example for DatabaseObjectsMapper";
 			path = DatabaseObjectsMapper;
@@ -124,8 +151,10 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				607FACEB1AFB9204008FA782 /* Tests.swift */,
+				607FACEB1AFB9204008FA782 /* RealmContainerTests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
+				DDEDBE207E8E87F178B2601B /* CustomRealmContainerTests.swift */,
+				DDEDBD4758318979199E1C1B /* CoreDataContainerTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -159,6 +188,37 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		DDEDB212E4A9FEAF38A7EAAD /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				DDEDB9D0230BE414E652419E /* AutoCases.generated.swift */,
+				DDEDBD8D2384511B23E0A258 /* AutoLenses.generated.swift */,
+				DDEDB8B89C76135D86C072E3 /* AutoCodable.generated.swift */,
+				DDEDBDEB2B7895A95DBF6F66 /* AutoHashable.generated.swift */,
+				DDEDBF367C8EC53DDBDE14B1 /* AutoEquatable.generated.swift */,
+				DDEDBF9C8737DD301E6A3912 /* AutoObjectDiff.generated.swift */,
+				DDEDB37F2F0BF1D6FBF2CFC3 /* AutoInitializable.generated.swift */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		DDEDBD1A6EE98632B2B0EEAD /* Sourcery */ = {
+			isa = PBXGroup;
+			children = (
+				DDEDB212E4A9FEAF38A7EAAD /* Generated */,
+			);
+			path = Sourcery;
+			sourceTree = "<group>";
+		};
+		DDEDBF87E1707E9D77C035DA /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				DDEDB10073B1A1D08B373772 /* TestModel.swift */,
+				DDEDBCF9194ED939A77D0384 /* TestContainers.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -171,7 +231,6 @@
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
 				14CF13D5CFF2ED260375C6BB /* [CP] Embed Pods Frameworks */,
-				72FB5832D02501F906DBBFE1 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -190,8 +249,6 @@
 				607FACE11AFB9204008FA782 /* Sources */,
 				607FACE21AFB9204008FA782 /* Frameworks */,
 				607FACE31AFB9204008FA782 /* Resources */,
-				33F733783CCE3002FB315078 /* [CP] Embed Pods Frameworks */,
-				AB88F27953311E649D509055 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -274,61 +331,18 @@
 				"${BUILT_PRODUCTS_DIR}/DatabaseObjectsMapper/DatabaseObjectsMapper.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SourceryAdditions/SourceryAdditions.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DatabaseObjectsMapper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SourceryAdditions.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		33F733783CCE3002FB315078 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DatabaseObjectsMapper_Tests/Pods-DatabaseObjectsMapper_Tests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		72FB5832D02501F906DBBFE1 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		AB88F27953311E649D509055 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DatabaseObjectsMapper_Tests/Pods-DatabaseObjectsMapper_Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E644FB32A9A79340F5C74A09 /* [CP] Check Pods Manifest.lock */ = {
@@ -376,6 +390,16 @@
 			files = (
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				EFB7E10A20D8041C0099B879 /* CoreDataModel.xcdatamodeld in Sources */,
+				DDEDB4E3C9429B91A4EAE8E8 /* TestModel.swift in Sources */,
+				DDEDBF4B6A4C849D1A991F54 /* AutoCases.generated.swift in Sources */,
+				DDEDB9EBC5F136E508E435E4 /* AutoLenses.generated.swift in Sources */,
+				DDEDB6F765EA25921C45110E /* AutoCodable.generated.swift in Sources */,
+				DDEDBE671A87D2CADDB247C1 /* AutoHashable.generated.swift in Sources */,
+				DDEDB908FB06BF4DFFC6C859 /* AutoEquatable.generated.swift in Sources */,
+				DDEDB07EB0BCFB8F5D3155B3 /* AutoObjectDiff.generated.swift in Sources */,
+				DDEDBDF7F54D05405A47622A /* AutoInitializable.generated.swift in Sources */,
+				DDEDB018389E6FB3783D7A22 /* TestContainers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,7 +407,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
+				607FACEC1AFB9204008FA782 /* RealmContainerTests.swift in Sources */,
+				DDEDBE28BA1B649F2B3EA195 /* CustomRealmContainerTests.swift in Sources */,
+				DDEDBF096EB7738D3C403A12 /* CoreDataContainerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +578,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A41B29EFD857217878D7EBDB /* Pods-DatabaseObjectsMapper_Tests.debug.xcconfig */;
 			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -566,6 +593,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DatabaseObjectsMapper_Example.app/DatabaseObjectsMapper_Example";
 			};
 			name = Debug;
 		};
@@ -573,6 +601,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 85ADCD8E0FEA47ECEF76AD96 /* Pods-DatabaseObjectsMapper_Tests.release.xcconfig */;
 			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -583,6 +612,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DatabaseObjectsMapper_Example.app/DatabaseObjectsMapper_Example";
 			};
 			name = Release;
 		};
@@ -617,6 +647,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		EFB7E10820D8041C0099B879 /* CoreDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				EFB7E10920D8041C0099B879 /* CoreDataModel.xcdatamodel */,
+			);
+			currentVersion = EFB7E10920D8041C0099B879 /* CoreDataModel.xcdatamodel */;
+			path = CoreDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 607FACC81AFB9204008FA782 /* Project object */;
 }

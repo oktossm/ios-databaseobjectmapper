@@ -94,7 +94,7 @@ public class CoreDataStorage {
     private var externalObserver: NSObjectProtocol?
     private var internalObserver: NSObjectProtocol?
 
-    internal init(store: CoreDataStore = .named("CoreData.sqlite"), model: CoreDataObjectModel = .merged(nil), migrate: Bool = true) {
+    public init(store: CoreDataStore = .named("CoreData.sqlite"), model: CoreDataObjectModel = .merged(nil), migrate: Bool = true) {
         self.store = store
         self.model = model
         self.migrate = migrate
@@ -234,17 +234,17 @@ public class CoreDataStorage {
                             try self?.rootContext.save()
                         } catch let error as NSError {
                             // Writing NSManagedObjectContext save error
-                            CoreDataStorage.printError("Writing NSManagedObjectContext save error: \(error.userInfo)")
+                            CoreDataStorage.printError("Writing NSManagedObjectContext save error: \(String(describing: error.userInfo))")
                         } catch let exception as NSException {
-                            CoreDataStorage.printError("Background NSManagedObjectContext save exception: \(exception.userInfo)")
+                            CoreDataStorage.printError("Background NSManagedObjectContext save exception: \(String(describing: exception.userInfo))")
                         }
                     }
                 }
             } catch let error as NSError {
                 // Background NSManagedObjectContext save error
-                CoreDataStorage.printError("Background NSManagedObjectContext save error: \(error.userInfo)")
+                CoreDataStorage.printError("Background NSManagedObjectContext save error: \(String(describing: error.userInfo))")
             } catch let exception as NSException {
-                CoreDataStorage.printError("Background NSManagedObjectContext save exception: \(exception.userInfo)")
+                CoreDataStorage.printError("Background NSManagedObjectContext save exception: \(String(describing: exception.userInfo))")
             }
         }
         return

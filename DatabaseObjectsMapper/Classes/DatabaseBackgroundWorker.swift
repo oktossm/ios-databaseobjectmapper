@@ -6,17 +6,34 @@
 import Foundation
 
 
-internal class DatabaseBackgroundWorker: NSObject {
-
-    private var thread: Thread!
-
+internal class DatabaseWorker: NSObject {
     typealias Block = @convention(block) () -> Void
+
+    internal func execute(block: @escaping Block) {
+        DispatchQueue.main.async {
+            block()
+        }
+    }
+
+    internal func start(_ block: @escaping () -> Void) {
+        self.execute(block: block)
+    }
+
+    internal func stop() {
+
+    }
+}
+
+
+internal class DatabaseBackgroundWorker: DatabaseWorker {
+
+    var thread: Thread!
 
     @objc private func run(block: Block) {
         block()
     }
 
-    internal func execute(block: Block) {
+    override internal func execute(block: @escaping Block) {
         perform(#selector(run(block:)),
                 on: thread,
                 with: block,
@@ -24,8 +41,8 @@ internal class DatabaseBackgroundWorker: NSObject {
                 modes: [RunLoopMode.defaultRunLoopMode.rawValue])
     }
 
-    internal func start(_ block: @escaping () -> Void) {
-        let threadName = "mm.databaseService.databaseServiceWorkThread"
+    override internal func start(_ block: @escaping () -> Void) {
+        let threadName = "mm.databaseService.workThread"
 
         thread = Thread {
             [weak self] in
@@ -43,7 +60,7 @@ internal class DatabaseBackgroundWorker: NSObject {
         self.execute(block: block)
     }
 
-    internal func stop() {
+    override internal func stop() {
         thread.cancel()
     }
 }

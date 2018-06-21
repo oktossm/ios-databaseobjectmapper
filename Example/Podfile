@@ -1,11 +1,16 @@
+platform :ios, '10.0'
+source 'https://bitbucket.org/mmulyar/mmpods.git'
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://bitbucket.org/MikhailMulyar/oktospods.git'
+
 use_frameworks!
 
 target 'DatabaseObjectsMapper_Example' do
   pod 'DatabaseObjectsMapper', :path => '../'
+  pod 'Sourcery'
+  pod 'SourceryAdditions', :git => 'https://bitbucket.org/MikhailMulyar/sourceryadditions.git'
 
   target 'DatabaseObjectsMapper_Tests' do
     inherit! :search_paths
-
-    
   end
 end

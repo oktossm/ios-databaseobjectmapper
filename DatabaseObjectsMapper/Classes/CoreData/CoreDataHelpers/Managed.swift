@@ -115,7 +115,7 @@ extension Managed where Self: NSManagedObject {
         let batchRequest = NSBatchDeleteRequest(fetchRequest: request)
         batchRequest.resultType = .resultTypeObjectIDs
         let result = try context.execute(batchRequest) as? NSBatchDeleteResult
-        let objectIDArray = result?.result as? [NSManagedObjectID]
+        guard let objectIDArray = result?.result as? [NSManagedObjectID] else { return }
         let changes = [NSDeletedObjectsKey: objectIDArray]
         NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context.parent ?? context])
     }
@@ -140,7 +140,7 @@ extension Managed where Self: NSManagedObject {
     public static func materializedObject(in context: NSManagedObjectContext,
                                           matching predicate: NSPredicate? = nil,
                                           sortDescriptors: [NSSortDescriptor]? = nil) -> Self? {
-        var objects = [Self]()
+        var objects = [Any]()
         for object in context.registeredObjects where !object.isFault {
             guard let result = object as? Self, (predicate?.evaluate(with: result) ?? true) else { continue }
             objects.append(result)
