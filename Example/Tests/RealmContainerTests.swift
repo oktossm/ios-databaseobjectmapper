@@ -6,11 +6,7 @@ import DatabaseObjectsMapper
 
 class RealmContainerTests: XCTestCase {
 
-    var service: RealmService!
-
-    override func setUp() {
-        super.setUp()
-
+    lazy var service: RealmService = {
         let config = Realm.Configuration(
                 // Set the new schema version. This must be greater than the previously used
                 // version (if you've never set a schema version before, the version is 0).
@@ -38,7 +34,13 @@ class RealmContainerTests: XCTestCase {
         let _ = try! Realm()
         // swiftlint:enable force_try
 
-        service = RealmService()
+        return RealmService()
+    }()
+
+    var token: DatabaseUpdatesToken?
+
+    override func setUp() {
+        super.setUp()
         service.deleteAll()
     }
 
@@ -55,12 +57,16 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let fetched = self.service.syncFetch(objectOf: TestModel.self, withPrimaryKey: .int(value: 1, key: "id"))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            guard let fetched = self.service.syncFetch(objectOf: TestModel.self, withPrimaryKey: .int(value: 1, key: "id")) else {
+                XCTFail()
+                expectation.fulfill()
+                return
+            }
             let all = self.service.syncFetch(objectsOf: TestModel.self)
 
             XCTAssertTrue(all.count == 1)
-            XCTAssertTrue(testModel == fetched)
+            XCTAssertTrue(testModel == fetched, "\(fetched)")
 
             expectation.fulfill()
         }
@@ -76,11 +82,11 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let fetched = self.service.syncFetch(objectsOf: TestSimpleModel.self)
 
             XCTAssertTrue(fetched.count == 2)
-            XCTAssertTrue(fetched.contains { $0 != model } == false)
+            XCTAssertTrue(fetched.contains { $0 != model } == false, "\(fetched)")
 
             expectation.fulfill()
         }
@@ -96,11 +102,11 @@ class RealmContainerTests: XCTestCase {
         service.update(object: testModel2)
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let fetched = self.service.syncFetch(objectOf: TestModel.self, withPrimaryKey: .int(value: 1, key: "id"))
 
             XCTAssertTrue(testModel2 == fetched)
-            XCTAssertTrue(testModel != fetched)
+            XCTAssertTrue(testModel != fetched, "\(fetched!)")
 
             expectation.fulfill()
         }
@@ -116,7 +122,7 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let all = self.service.syncFetch(objectsOf: TestModel.self)
 
             XCTAssertTrue(all.sorted { $0.id < $1.id } == [testModel, testModel2])
@@ -138,10 +144,10 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let all = self.service.syncFetch(objectsOf: TestModel.self)
 
-            XCTAssertTrue(all.sorted { $0.id < $1.id } == [testModel3, testModel4])
+            XCTAssertTrue(all.sorted { $0.id < $1.id } == [testModel3, testModel4], "\(all)")
 
             expectation.fulfill()
         }
@@ -159,10 +165,10 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let all = self.service.syncFetch(objectsOf: TestModel.self)
 
-            XCTAssertTrue(all == [testModel2])
+            XCTAssertTrue(all == [testModel2], "\(all)")
 
             expectation.fulfill()
         }
@@ -178,10 +184,10 @@ class RealmContainerTests: XCTestCase {
         service.delete(objects: [testModel])
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let all = self.service.syncFetch(objectsOf: TestModel.self)
 
-            XCTAssertTrue(all == [testModel2])
+            XCTAssertTrue(all == [testModel2], "\(all)")
 
             expectation.fulfill()
         }
@@ -196,11 +202,11 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.service.fetch(objectOf: TestModel.self, withPrimaryKey: testModel.primaryKey) {
                 model in
 
-                XCTAssertTrue(testModel == model)
+                XCTAssertTrue(testModel == model, "\(model!)")
 
                 expectation.fulfill()
             }
@@ -218,11 +224,11 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.service.fetch(objectsOf: TestModel.self) {
                 all in
 
-                XCTAssertTrue(all.sorted { $0.id < $1.id } == [testModel, testModel2])
+                XCTAssertTrue(all.sorted { $0.id < $1.id } == [testModel, testModel2], "\(all)")
                 expectation.fulfill()
             }
         }
@@ -237,26 +243,22 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let token = self.service.fetch(objectOf: TestModel.self, withPrimaryKey: testModel.primaryKey, callback: {
-                model in
-
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.token = self.service.fetch(objectOf: TestModel.self, withPrimaryKey: testModel.primaryKey, callback: {
+                _ in
+                self.service.update(objectOf: TestModel.self, withPrimaryKey: testModel.primaryKey, updates: [TestModel.Updates.count(5)])
             }, updates: {
                 update in
 
                 switch update {
                 case .update(let newModel):
-                    XCTAssertTrue(newModel.count == 5)
-                    expectation.fulfill()
-                case .delete:break
+                    XCTAssertTrue(newModel.count == 5, "\(newModel)")
+                case .delete:
+                    XCTFail("\(update)")
                 }
+                expectation.fulfill()
+                self.token?.invalidate()
             })
-
-            self.service.update(objectOf: TestModel.self, withPrimaryKey: testModel.primaryKey, updates: [TestModel.Updates.count(5)])
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                token.invalidate()
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
@@ -268,27 +270,22 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let token = self.service.fetch(objectOf: TestModel.self, withPrimaryKey: testModel.primaryKey, callback: {
-                model in
-
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.token = self.service.fetch(objectOf: TestModel.self, withPrimaryKey: testModel.primaryKey, callback: {
+                _ in
+                self.service.delete(object: testModel)
             }, updates: {
                 update in
 
                 switch update {
                 case .update:
-                    XCTAssertTrue(false)
+                    XCTFail()
                 case .delete:
-                    XCTAssertTrue(true)
-                    expectation.fulfill()
+                    XCTAssertTrue(true, "\(update)")
                 }
+                expectation.fulfill()
+                self.token?.invalidate()
             })
-
-            self.service.delete(object: testModel)
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                token.invalidate()
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
@@ -301,23 +298,17 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            var token: DatabaseUpdatesToken?
-            token = self.service.fetch(objectsOf: TestModel.self, with: .unfiltered, with: .unsorted, callback: {
-                models in
-
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.token = self.service.fetch(objectsOf: TestModel.self, with: .unfiltered, with: .unsorted, callback: {
+                _ in
+                self.service.store(objects: [testModel2])
             }, updates: {
                 updates in
 
-                token?.invalidate()
-
-                XCTAssertTrue(updates.insertions.count == 1)
+                XCTAssertTrue(updates.insertions.count == 1, "\(updates)")
                 expectation.fulfill()
+                self.token?.invalidate()
             })
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.service.store(objects: [testModel2])
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
@@ -330,23 +321,19 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            var token: DatabaseUpdatesToken?
-            token = self.service.fetch(objectsOf: TestModel.self, with: .unfiltered, with: .unsorted, callback: {
-                models in
-
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.token = self.service.fetch(objectsOf: TestModel.self, with: .unfiltered, with: .unsorted, callback: {
+                _ in
+                self.service.delete(object: testModel2)
             }, updates: {
                 updates in
 
-                token?.invalidate()
-
-                XCTAssertTrue(updates.deletions.count == 1)
-                expectation.fulfill()
+                if updates.insertions.isEmpty {
+                    XCTAssertTrue(updates.deletions.count == 1, "\(updates)")
+                    expectation.fulfill()
+                }
+                self.token?.invalidate()
             })
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.service.delete(object: testModel2)
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
@@ -359,25 +346,20 @@ class RealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let testModel3 = TestModel(id: 2, index: 2, name: "pr", count: 2, superCount: 8, urls: nil, subModel: nil, children: nil)
-            var token: DatabaseUpdatesToken?
-            token = self.service.fetch(objectsOf: TestModel.self, with: .unfiltered, with: .unsorted, callback: {
-                models in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 
+            let testModel3 = TestModel(id: 2, index: 2, name: "pr", count: 2, superCount: 8, urls: nil, subModel: nil, children: nil)
+            self.token = self.service.fetch(objectsOf: TestModel.self, with: .unfiltered, with: .unsorted, callback: {
+                models in
+                self.service.update(object: testModel3)
             }, updates: {
                 updates in
 
-                token?.invalidate()
-
                 XCTAssertTrue(updates.modifications.count == 1)
-                XCTAssertTrue(updates.values.contains(testModel3))
+                XCTAssertTrue(updates.values.contains(testModel3), "\(updates)")
                 expectation.fulfill()
+                self.token?.invalidate()
             })
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.service.update(object: testModel3)
-            }
         }
         wait(for: [expectation], timeout: 1)
     }

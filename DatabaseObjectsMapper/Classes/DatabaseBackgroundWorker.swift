@@ -27,7 +27,23 @@ internal class DatabaseWorker: NSObject {
 
 internal class DatabaseBackgroundWorker: DatabaseWorker {
 
-    var thread: Thread!
+    lazy var thread: Thread = {
+        let threadName = "mm.databaseService.workThread"
+
+        let thread = Thread {
+            [weak self] in
+            while (self != nil && !self!.thread.isCancelled) {
+                RunLoop.current.run(
+                        mode: RunLoopMode.defaultRunLoopMode,
+                        before: Date.distantPast)
+            }
+            Thread.exit()
+        }
+        thread.qualityOfService = .utility
+        thread.name = "\(threadName)-\(UUID().uuidString)"
+        thread.start()
+        return thread
+    }()
 
     @objc private func run(block: Block) {
         block()
@@ -42,21 +58,6 @@ internal class DatabaseBackgroundWorker: DatabaseWorker {
     }
 
     override internal func start(_ block: @escaping () -> Void) {
-        let threadName = "mm.databaseService.workThread"
-
-        thread = Thread {
-            [weak self] in
-            while (self != nil && !self!.thread.isCancelled) {
-                RunLoop.current.run(
-                        mode: RunLoopMode.defaultRunLoopMode,
-                        before: Date.distantPast)
-            }
-            Thread.exit()
-        }
-        thread.qualityOfService = .utility
-        thread.name = "\(threadName)-\(UUID().uuidString)"
-        thread.start()
-
         self.execute(block: block)
     }
 

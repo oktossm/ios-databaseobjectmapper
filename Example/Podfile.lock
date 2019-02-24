@@ -1,12 +1,12 @@
 PODS:
   - DatabaseObjectsMapper (0.1.0):
     - RealmSwift (~> 3.0)
-  - Realm (3.7.3):
-    - Realm/Headers (= 3.7.3)
-  - Realm/Headers (3.7.3)
-  - RealmSwift (3.7.3):
-    - Realm (= 3.7.3)
-  - Sourcery (0.13.1)
+  - Realm (3.13.1):
+    - Realm/Headers (= 3.13.1)
+  - Realm/Headers (3.13.1)
+  - RealmSwift (3.13.1):
+    - Realm (= 3.13.1)
+  - Sourcery (0.15.0)
   - SourceryAdditions (0.1.1)
 
 DEPENDENCIES:
@@ -33,11 +33,11 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   DatabaseObjectsMapper: 92b4524a5f1eef782369ec04bfadc30ab8390a78
-  Realm: f366e954e3330d4915a319e96cc04e2ee09a9ef2
-  RealmSwift: 56f111b1dd439973fbe1c066b067ac4702285441
-  Sourcery: 9ef51b8777516f204d82996441f293813158d0d7
+  Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
+  RealmSwift: 8a1e6a02b7a08cd17a31e3115143fb69fe5f3fb9
+  Sourcery: 5895672cae353cdbfa95f3f4aaeb75a664d76f6a
   SourceryAdditions: 91ea262d7acabe8d933483a877aa51d791110794
 
 PODFILE CHECKSUM: 70a80db218f33b97b3e82354d3f5ebf14f9afbb8
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.5.3

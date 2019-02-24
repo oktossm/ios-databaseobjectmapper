@@ -12,7 +12,15 @@ import DatabaseObjectsMapper
 
 class CoreDataContainerTests: XCTestCase {
 
-    var service: CoreDataService = CoreDataService()
+    lazy var service: CoreDataService = createService()
+
+    var token: DatabaseUpdatesToken?
+
+    func createService() -> CoreDataService {
+        let setup = setUpInMemoryManagedObjectContext()
+        let service = CoreDataService(storage: CoreDataStorage(store: .custom(setup.1, setup.0), model: .merged([Bundle.main]), migrate: false))
+        return service
+    }
 
     func setUpInMemoryManagedObjectContext() -> (NSManagedObjectContext, NSPersistentStoreCoordinator) {
         let managedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
@@ -34,10 +42,7 @@ class CoreDataContainerTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        service.deleteAll()
-        service = CoreDataService()
-        //        let setup = setUpInMemoryManagedObjectContext()
-        //        service = CoreDataService(storage: CoreDataStorage(store: .custom(setup.1, setup.0), model: .merged([Bundle.main]), migrate: false))
+        service = createService()
     }
 
     override func tearDown() {
@@ -196,9 +201,9 @@ class CoreDataContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let token = self.service.fetch(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, callback: {
-                model in
-
+            self.token = self.service.fetch(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, callback: {
+                _ in
+                self.service.update(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, updates: [TestCDModel.Updates.count(5)])
             }, updates: {
                 update in
 
@@ -208,13 +213,8 @@ class CoreDataContainerTests: XCTestCase {
                     expectation.fulfill()
                 case .delete:break
                 }
+                self.token?.invalidate()
             })
-
-            self.service.update(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, updates: [TestCDModel.Updates.count(5)])
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                token.invalidate()
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
@@ -227,9 +227,9 @@ class CoreDataContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let token = self.service.fetch(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, callback: {
-                model in
-
+            self.token = self.service.fetch(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, callback: {
+                _ in
+                self.service.delete(object: testModel)
             }, updates: {
                 update in
 
@@ -240,13 +240,8 @@ class CoreDataContainerTests: XCTestCase {
                     XCTAssertTrue(true)
                     expectation.fulfill()
                 }
+                self.token?.invalidate()
             })
-
-            self.service.delete(object: testModel)
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                token.invalidate()
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
@@ -260,22 +255,16 @@ class CoreDataContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            var token: DatabaseUpdatesToken?
-            token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
-                models in
-
+            self.token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
+                _ in
+                self.service.store(objects: [testModel2])
             }, updates: {
                 updates in
 
-                token?.invalidate()
-
                 XCTAssertTrue(updates.insertions.count == 1)
                 expectation.fulfill()
+                self.token?.invalidate()
             })
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.service.store(objects: [testModel2])
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
@@ -289,22 +278,16 @@ class CoreDataContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            var token: DatabaseUpdatesToken?
-            token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
-                models in
-
+            self.token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
+                _ in
+                self.service.delete(object: testModel2)
             }, updates: {
                 updates in
 
-                token?.invalidate()
-
                 XCTAssertTrue(updates.deletions.count == 1)
                 expectation.fulfill()
+                self.token?.invalidate()
             })
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.service.delete(object: testModel2)
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
@@ -319,23 +302,17 @@ class CoreDataContainerTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             let testModel3 = TestCDModel(id: 2, index: 5, name: "br", count: 23, superCount: 64, urls: nil, subModel: nil, children: nil)
-            var token: DatabaseUpdatesToken?
-            token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
-                models in
-
+            self.token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
+                _ in
+                self.service.update(object: testModel3)
             }, updates: {
                 updates in
-
-                token?.invalidate()
 
                 XCTAssertTrue(updates.modifications.count == 1)
                 XCTAssertTrue(updates.values.contains(testModel3))
                 expectation.fulfill()
+                self.token?.invalidate()
             })
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.service.update(object: testModel3)
-            }
         }
         wait(for: [expectation], timeout: 1)
     }

@@ -17,7 +17,7 @@ open class RealmContainer: Object {
     /// The unique identifpier for the data. This property is used as the primary key.
     @objc public dynamic var id = ""
     
-    open override static func primaryKey() -> String? {
+    open override class func primaryKey() -> String? {
         return "id"
     }
 

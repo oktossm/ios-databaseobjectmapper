@@ -12,15 +12,13 @@ public typealias RealmObject = Object
 public class RealmService {
 
     private let writeWorker: DatabaseRealmBackgroundWorker
-    private let readWorkers: [DatabaseRealmBackgroundWorker]
+    private var readWorkers: [DatabaseRealmBackgroundWorker]
+    private let configuration: Realm.Configuration
 
     public init(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
+        self.configuration = configuration
         self.writeWorker = DatabaseRealmBackgroundWorker(configuration: configuration)
-        self.readWorkers = [DatabaseRealmBackgroundWorker(configuration: configuration),
-                            DatabaseRealmBackgroundWorker(configuration: configuration),
-                            DatabaseRealmBackgroundWorker(configuration: configuration),
-                            DatabaseRealmBackgroundWorker(configuration: configuration),
-                            DatabaseRealmBackgroundWorker(configuration: configuration)]
+        self.readWorkers = []
     }
 
     deinit {
@@ -29,9 +27,12 @@ public class RealmService {
     }
 
     func nextWorker() -> DatabaseRealmBackgroundWorker {
-        let index = arc4random_uniform(UInt32(self.readWorkers.count))
-        print(index)
-        return self.readWorkers[Int(index)]
+        if let worker = self.readWorkers.first(where: { !$0.isWorking }) {
+            return worker
+        }
+        let newWorker = DatabaseRealmBackgroundWorker(configuration: configuration)
+        self.readWorkers.append(newWorker)
+        return newWorker
     }
 }
 
@@ -145,7 +146,7 @@ extension RealmService {
 
         worker.execute {
             realmOperator in
-            let values = realmOperator.values(ofType: type).filter(filter).sort(sort).flatMap({ try? T.createMappable(from: $0) })
+            let values = realmOperator.values(ofType: type).filter(filter).sort(sort).compactMap({ try? T.createMappable(from: $0) })
             let result: Array<T> = Array(values)
             DispatchQueue.main.async {
                 callback(result)
@@ -158,7 +159,7 @@ extension RealmService {
                                                with sort: DatabaseSortType = .unsorted) -> Array<T> where T.DatabaseType: RealmObject {
         let realm = try! Realm()
         let syncOperator = RealmOperator(realm: realm)
-        let values = syncOperator.values(ofType: type).filter(filter).sort(sort).flatMap({ try? T.createMappable(from: $0) })
+        let values = syncOperator.values(ofType: type).filter(filter).sort(sort).compactMap({ try? T.createMappable(from: $0) })
         return Array(values)
     }
 
@@ -183,13 +184,13 @@ extension RealmService {
 
                 switch change {
                 case let .initial(newResults):
-                    let values = Array(newResults.flatMap({ try? T.createMappable(from: $0) }))
+                    let values = Array(newResults.compactMap({ try? T.createMappable(from: $0) }))
                     let result: Array<T> = Array(values)
                     DispatchQueue.main.async {
                         callback(result)
                     }
                 case let .update(newResults, deletions, insertions, modifications):
-                    let values = Array(newResults.flatMap({ try? T.createMappable(from: $0) }))
+                    let values = Array(newResults.compactMap({ try? T.createMappable(from: $0) }))
                     DispatchQueue.main.async {
                         let update = DatabaseObserveUpdate(values: values,
                                                            deletions: deletions,
@@ -287,24 +288,27 @@ class DatabaseRealmBackgroundWorker: DatabaseBackgroundWorker {
 
     private let configuration: Realm.Configuration
 
+    private var runningCount = 0
+    private let runningCountQueue = DispatchQueue(label: "mm.databaseService.runningCountQueue", qos: .utility)
+
+    var isWorking: Bool {
+        return runningCount > 0
+    }
+
     init(configuration: Realm.Configuration) {
         self.configuration = configuration
-
         super.init()
-
-        self.start {
-            _ = self.realm
-            _ = self.realmOperator
-        }
     }
 
     typealias RealmBlock = @convention(block) (RealmOperator) -> Void
 
     @objc private func run(realmBlock: RealmBlock) {
         realmBlock(self.realmOperator)
+        runningCountQueue.async { self.runningCount -= 1 }
     }
 
     internal func execute(realmBlock: @escaping RealmBlock) {
+        runningCountQueue.async { self.runningCount += 1 }
         perform(#selector(run(realmBlock:)),
                 on: thread,
                 with: realmBlock,
