@@ -9,7 +9,7 @@ import RealmSwift
 public typealias RealmObject = Object
 
 
-public class RealmService {
+open class RealmService {
 
     private let writeWorker: DatabaseRealmBackgroundWorker
     private var readWorkers: [DatabaseRealmBackgroundWorker]
@@ -38,6 +38,8 @@ public class RealmService {
 
 
 extension RealmService {
+    // MARK: Managing
+
     public func deleteAll() {
         self.writeWorker.execute {
             realmOperator in
@@ -48,126 +50,139 @@ extension RealmService {
         }
     }
 
-    public func store<T: DatabaseMappable>(object: T, update: Bool = true) where T.DatabaseType: RealmObject {
-        self.store(objects: [object])
+    public func simpleSave<T: DatabaseMappable>(model: T) where T.Container: RealmObject {
+        self.simpleSave(models: [model])
     }
 
-    public func store<T: DatabaseMappable>(objects: [T], update: Bool = true) where T.DatabaseType: RealmObject {
+    public func simpleSave<T: DatabaseMappable>(models: [T]) where T.Container: RealmObject {
         self.writeWorker.execute {
             realmOperator in
             try? realmOperator.write {
                 transaction in
-                try? transaction.add(objects, update: update)
+                try? transaction.add(models, update: false)
             }
         }
     }
 
-    public func update<T: DatabaseMappable>(object: T) where T.DatabaseType: RealmObject {
-        self.update(objects: [object])
+    public func save<T: UniquelyMappable>(model: T, update: Bool = true) where T.Container: RealmObject {
+        self.save(models: [model])
     }
 
-    public func update<T: DatabaseMappable>(objects: [T]) where T.DatabaseType: RealmObject {
+    public func save<T: UniquelyMappable>(models: [T], update: Bool = true) where T.Container: RealmObject {
         self.writeWorker.execute {
             realmOperator in
             try? realmOperator.write {
                 transaction in
-                try? transaction.update(objects)
+                try? transaction.add(models, update: update)
             }
         }
     }
 
-    public func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                            withPrimaryKey key: PrimaryKeyContainer,
-                                            updates: T.DatabaseUpdates) where T.DatabaseType: RealmObject {
+    public func save<T: UniquelyMappable, R: UniquelyMappable>(model: T,
+                                                               update: Bool = true,
+                                                               relation: Relation<R>,
+                                                               with relationUpdate: Relation<R>.Update)
+            where T.Container: RealmObject, R.Container: RealmObject {
         self.writeWorker.execute {
             realmOperator in
             try? realmOperator.write {
                 transaction in
-                transaction.update(objectOf: type, withPrimaryKey: key, updates: updates)
+                try? transaction.add([model], update: update)
+                transaction.updateRelation(relation, in: model, with: relationUpdate)
             }
         }
     }
 
-    public func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                            withPrimaryKey key: PrimaryKeyContainer,
-                                            relationships: [DatabaseRelationshipUpdate]) where T.DatabaseType: RealmObject {
+
+    public func update<T: UniquelyMappable>(model: T) where T.Container: RealmObject {
+        self.update(models: [model])
+    }
+
+    public func update<T: UniquelyMappable>(models: [T]) where T.Container: RealmObject {
         self.writeWorker.execute {
             realmOperator in
             try? realmOperator.write {
                 transaction in
-                transaction.update(objectOf: type, withPrimaryKey: key, relationships: relationships)
+                try? transaction.update(models)
             }
         }
     }
 
-    public func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                            withPrimaryKey key: PrimaryKeyContainer,
-                                            updates: T.DatabaseUpdates,
-                                            relationships: [DatabaseRelationshipUpdate]) where T.DatabaseType: RealmObject {
+    public func update<T: UniquelyMappable>(modelOf type: T.Type, with key: T.ID, updates: [String: Any?]) where T.Container: RealmObject {
         self.writeWorker.execute {
             realmOperator in
             try? realmOperator.write {
                 transaction in
-                transaction.update(objectOf: type, withPrimaryKey: key, updates: updates)
-                transaction.update(objectOf: type, withPrimaryKey: key, relationships: relationships)
+                transaction.update(modelOf: type, with: key, updates: updates)
             }
         }
     }
 
-    public func delete<T: DatabaseMappable>(object: T) where T.DatabaseType: RealmObject {
-        self.delete(objects: [object])
-    }
-
-    public func delete<T: DatabaseMappable>(objects: [T]) where T.DatabaseType: RealmObject {
+    public func updateRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T, with update: Relation<R>.Update)
+            where T.Container: RealmObject, R.Container: RealmObject {
         self.writeWorker.execute {
             realmOperator in
             try? realmOperator.write {
                 transaction in
-                transaction.delete(objects)
+                transaction.updateRelation(relation, in: model, with: update)
             }
         }
     }
 
-    public func deleteAll<T: DatabaseMappable>(objectsOf type: T.Type) where T.DatabaseType: RealmObject {
+    public func delete<T: UniquelyMappable>(model: T) where T.Container: RealmObject {
+        self.delete(models: [model])
+    }
+
+    public func delete<T: UniquelyMappable>(models: [T]) where T.Container: RealmObject {
         self.writeWorker.execute {
             realmOperator in
             try? realmOperator.write {
                 transaction in
-                transaction.deleteAll(objectsOf: type)
+                transaction.delete(models)
             }
         }
     }
 
-    public func fetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                           with filter: DatabaseFilterType = .unfiltered,
+    public func deleteAll<T: DatabaseMappable>(modelsOf type: T.Type) where T.Container: RealmObject {
+        self.writeWorker.execute {
+            realmOperator in
+            try? realmOperator.write {
+                transaction in
+                transaction.deleteAll(modelsOf: type)
+            }
+        }
+    }
+
+    // MARK: Fetching
+
+    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
                                            with sort: DatabaseSortType = .unsorted,
-                                           callback: @escaping (Array<T>) -> Void) where T.DatabaseType: RealmObject {
+                                           callback: @escaping ([T]) -> Void) where T.Container: RealmObject {
         let worker = self.nextWorker()
 
         worker.execute {
             realmOperator in
-            let values = realmOperator.values(ofType: type).filter(filter).sort(sort).compactMap({ try? T.createMappable(from: $0) })
-            let result: Array<T> = Array(values)
+            let values = realmOperator.values(ofType: T.self).filter(filter).sort(sort).compactMap({ try? T.mappable(for: $0) })
+            let result: [T] = Array(values)
             DispatchQueue.main.async {
                 callback(result)
             }
         }
     }
 
-    public func syncFetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                               with filter: DatabaseFilterType = .unfiltered,
-                                               with sort: DatabaseSortType = .unsorted) -> Array<T> where T.DatabaseType: RealmObject {
+    public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+                                               with sort: DatabaseSortType = .unsorted) -> [T] where T.Container: RealmObject {
         let realm = try! Realm()
         let syncOperator = RealmOperator(realm: realm)
-        let values = syncOperator.values(ofType: type).filter(filter).sort(sort).compactMap({ try? T.createMappable(from: $0) })
+        let values = syncOperator.values(ofType: T.self).filter(filter).sort(sort).compactMap({ try? T.mappable(for: $0) })
         return Array(values)
     }
 
-    public func fetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                           with filter: DatabaseFilterType = .unfiltered,
+    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
                                            with sort: DatabaseSortType = .unsorted,
-                                           callback: @escaping (Array<T>) -> Void,
-                                           updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.DatabaseType: RealmObject {
+                                           callback: @escaping ([T]) -> Void,
+                                           updates: @escaping (DatabaseObserveUpdate<T>) -> Void)
+                    -> DatabaseUpdatesToken where T.Container: RealmObject {
         let token = DatabaseUpdatesToken {}
 
         let worker = self.nextWorker()
@@ -177,20 +192,20 @@ extension RealmService {
 
             if token.isInvalidated { return }
 
-            let results = realmOperator.values(ofType: type).filter(filter).sort(sort)
+            let results = realmOperator.values(ofType: T.self).filter(filter).sort(sort)
 
             let rToken = results.observe {
                 change in
 
                 switch change {
                 case let .initial(newResults):
-                    let values = Array(newResults.compactMap({ try? T.createMappable(from: $0) }))
-                    let result: Array<T> = Array(values)
+                    let values = Array(newResults.compactMap({ try? T.mappable(for: $0) }))
+                    let result: [T] = Array(values)
                     DispatchQueue.main.async {
                         callback(result)
                     }
                 case let .update(newResults, deletions, insertions, modifications):
-                    let values = Array(newResults.compactMap({ try? T.createMappable(from: $0) }))
+                    let values = Array(newResults.compactMap({ try? T.mappable(for: $0) }))
                     DispatchQueue.main.async {
                         let update = DatabaseObserveUpdate(values: values,
                                                            deletions: deletions,
@@ -209,33 +224,28 @@ extension RealmService {
         return token
     }
 
-    public func fetch<T: DatabaseMappable>(objectOf type: T.Type,
-                                           withPrimaryKey key: PrimaryKeyContainer,
-                                           callback: @escaping (T?) -> Void) where T.DatabaseType: RealmObject {
+    public func fetch<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void) where T.Container: RealmObject {
 
         let worker = self.nextWorker()
 
         worker.execute {
             realmOperator in
-            let value = realmOperator.value(ofType: type, withPrimaryKey: key).flatMap({ try? T.createMappable(from: $0) })
+            let value = realmOperator.value(ofType: T.self, with: key).flatMap({ try? T.mappable(for: $0) })
             DispatchQueue.main.async {
                 callback(value)
             }
         }
     }
 
-    public func syncFetch<T: DatabaseMappable>(objectOf type: T.Type,
-                                               withPrimaryKey key: PrimaryKeyContainer) -> T? where T.DatabaseType: RealmObject {
+    public func syncFetchUnique<T: UniquelyMappable>(with key: T.ID) -> T? where T.Container: RealmObject {
         let realm = try! Realm()
         let syncOperator = RealmOperator(realm: realm)
-        let value = syncOperator.value(ofType: type, withPrimaryKey: key).flatMap({ try? T.createMappable(from: $0) })
+        let value = syncOperator.value(ofType: T.self, with: key).flatMap({ try? T.mappable(for: $0) })
         return value
     }
 
-    public func fetch<T: DatabaseMappable>(objectOf type: T.Type,
-                                           withPrimaryKey key: PrimaryKeyContainer,
-                                           callback: @escaping (T?) -> Void,
-                                           updates: @escaping (DatabaseObjectUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.DatabaseType: RealmObject {
+    public func fetch<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void, updates: @escaping (DatabaseModelUpdate<T>) -> Void)
+                    -> DatabaseUpdatesToken where T.Container: RealmObject {
 
         let token = DatabaseUpdatesToken {}
 
@@ -246,8 +256,8 @@ extension RealmService {
 
             if token.isInvalidated { return }
 
-            let value = realmOperator.value(ofType: type, withPrimaryKey: key)
-            let object: T? = value.flatMap { try? T.createMappable(from: $0) }
+            let value = realmOperator.value(ofType: T.self, with: key)
+            let object: T? = value.flatMap { try? T.mappable(for: $0) }
             DispatchQueue.main.async {
                 callback(object)
             }
@@ -256,13 +266,13 @@ extension RealmService {
                 change in
                 switch change {
                 case .change:
-                    guard let object = value.flatMap({ try? T.createMappable(from: $0) }) else { return }
+                    guard let object = value.flatMap({ try? T.mappable(for: $0) }) else { return }
                     DispatchQueue.main.async {
-                        updates(DatabaseObjectUpdate.update(object: object))
+                        updates(DatabaseModelUpdate.update(model: object))
                     }
                 case .deleted:
                     DispatchQueue.main.async {
-                        updates(DatabaseObjectUpdate.delete)
+                        updates(DatabaseModelUpdate.delete)
                     }
                 case .error:
                     break
@@ -270,6 +280,107 @@ extension RealmService {
             }
 
             token.invalidation = { rToken?.invalidate() }
+        }
+
+        return token
+    }
+
+    // MARK: Relations
+
+    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                        in model: T,
+                                                                        with filter: DatabaseFilterType = .unfiltered,
+                                                                        with sort: DatabaseSortType = .unsorted,
+                                                                        callback: @escaping ([R]) -> Void)
+            where T.Container: Object, R.Container: Object {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            guard let values = realmOperator.relationValues(relation, in: model)?
+                                            .filter(filter)
+                                            .sort(sort)
+                                            .compactMap({ try? R.mappable(for: $0) }) else {
+                DispatchQueue.main.async {
+                    callback([])
+                }
+                return
+            }
+            let result: Array<R> = Array(values)
+            DispatchQueue.main.async {
+                relation.cachedValue = result
+                callback(result)
+            }
+        }
+    }
+
+    public func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                            in model: T,
+                                                                            with filter: DatabaseFilterType = .unfiltered,
+                                                                            with sort: DatabaseSortType = .unsorted) -> [R]
+            where T.Container: Object, R.Container: Object {
+        let realm = try! Realm()
+        let syncOperator = RealmOperator(realm: realm)
+        guard let values = syncOperator.relationValues(relation, in: model)?
+                                       .filter(filter)
+                                       .sort(sort)
+                                       .compactMap({ try? R.mappable(for: $0) }) else {
+            return []
+        }
+        let result = Array(values)
+        relation.cachedValue = result
+        return result
+    }
+
+    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                        in model: T,
+                                                                        with filter: DatabaseFilterType = .unfiltered,
+                                                                        with sort: DatabaseSortType = .unsorted,
+                                                                        callback: @escaping ([R]) -> Void,
+                                                                        updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
+            where T.Container: Object, R.Container: Object {
+        let token = DatabaseUpdatesToken {}
+
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+
+            if token.isInvalidated { return }
+
+            guard let results = realmOperator.relationValues(relation, in: model)?.filter(filter).sort(sort) else {
+                DispatchQueue.main.async {
+                    callback([])
+                }
+                return
+            }
+
+            let rToken = results.observe {
+                change in
+
+                switch change {
+                case let .initial(newResults):
+                    let values = Array(newResults.compactMap({ try? R.mappable(for: $0) }))
+                    let result: [R] = Array(values)
+                    DispatchQueue.main.async {
+                        relation.cachedValue = result
+                        callback(result)
+                    }
+                case let .update(newResults, deletions, insertions, modifications):
+                    let values = Array(newResults.compactMap({ try? R.mappable(for: $0) }))
+                    DispatchQueue.main.async {
+                        let update = DatabaseObserveUpdate(values: values,
+                                                           deletions: deletions,
+                                                           insertions: insertions,
+                                                           modifications: modifications)
+                        relation.cachedValue = values
+                        updates(update)
+                    }
+                case .error: break
+                }
+            }
+
+            token.invalidation = { rToken.invalidate() }
         }
 
         return token
@@ -313,6 +424,6 @@ class DatabaseRealmBackgroundWorker: DatabaseBackgroundWorker {
                 on: thread,
                 with: realmBlock,
                 waitUntilDone: false,
-                modes: [RunLoopMode.defaultRunLoopMode.rawValue])
+                modes: [RunLoop.Mode.default.rawValue])
     }
 }

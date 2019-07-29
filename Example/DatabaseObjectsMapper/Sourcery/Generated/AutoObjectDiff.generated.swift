@@ -1,40 +1,26 @@
-// Generated using Sourcery 0.12.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.15.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 // MARK: - AutoObjectDiff
 import Foundation
+import DatabaseObjectsMapper
 
 // swiftlint:disable file_length
-fileprivate func compareOptionals<T>(lhs: T?, rhs: T?, compare: (_ lhs: T, _ rhs: T) -> Bool) -> Bool {
-    switch (lhs, rhs) {
-    case let (lValue?, rValue?):
-        return compare(lValue, rValue)
-    case (nil, nil):
-        return true
-    default:
-        return false
-    }
-}
-
-fileprivate func compareArrays<T>(lhs: [T], rhs: [T], compare: (_ lhs: T, _ rhs: T) -> Bool) -> Bool {
-    guard lhs.count == rhs.count else { return false }
-    for (idx, lhsItem) in lhs.enumerated() {
-        guard compare(lhsItem, rhs[idx]) else { return false }
-    }
-
-    return true
-}
 
 public protocol DictionaryElementRepresentable {
     var key: String { get }
     var value: Any? { get }
+    init?(key: String, value: Any?)
 }
 
 extension Array where Element: DictionaryElementRepresentable {
     public func dictionaryRepresentation() -> [String: Any?] {
         var dict = [String: Any?]()
-        self.forEach { dict[$0.key] = $0.value }
+        self.forEach { dict.updateValue($0.value, forKey: $0.key) }
         return dict
+    }
+    public init?(dictionary: [String: Any?]) {
+        self.init(dictionary.compactMap { key, value in Element(key: key, value: value) })
     }
 }
 
@@ -47,20 +33,18 @@ extension TestCDModel {
         case index(Int?)
         case name(String)
         case count(Int)
-        case superCount(Int)
+        case someCount(Int)
         case urls([URL]?)
-        case subModel(TestSubModel?)
-        case children([TestModel]?)
+        case subModel(Relation<TestSubModel>)
         var key: String {
             switch self {
                 case .id: return "id"
                 case .index: return "index"
                 case .name: return "name"
                 case .count: return "count"
-                case .superCount: return "superCount"
+                case .someCount: return "someCount"
                 case .urls: return "urls"
                 case .subModel: return "subModel"
-                case .children: return "children"
             }
         }
         var value: Any? {
@@ -69,29 +53,67 @@ extension TestCDModel {
             case .index(let newValue): return newValue
             case .name(let newValue): return newValue
             case .count(let newValue): return newValue
-            case .superCount(let newValue): return newValue
+            case .someCount(let newValue): return newValue
             case .urls(let newValue): return newValue
             case .subModel(let newValue): return newValue
-            case .children(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "id":
+                if let value = value as? Int {
+                    self = .id(value)
+                } else { return nil }
+            case "index":
+                if let value = value as? Int? {
+                    self = .index(value)
+                } else { return nil }
+            case "name":
+                if let value = value as? String {
+                    self = .name(value)
+                } else { return nil }
+            case "count":
+                if let value = value as? Int {
+                    self = .count(value)
+                } else { return nil }
+            case "someCount":
+                if let value = value as? Int {
+                    self = .someCount(value)
+                } else { return nil }
+            case "urls":
+                if let value = value as? [URL]? {
+                    self = .urls(value)
+                } else { return nil }
+            case "subModel":
+                if let value = value as? Relation<TestSubModel> {
+                    self = .subModel(value)
+                } else { return nil }
+            default: return nil
             }
         }
     }
-    static func updatesDict(_ _updates: [Updates]) -> [String: Any?] {
-        var dict = [String: Any?]()
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
         _updates.forEach { dict[$0.key] = $0.value }
         return dict
     }
+
     func allUpdates() -> [Updates] {
         var updates = [Updates]()
         updates.append(.id(id))
         updates.append(.index(index))
         updates.append(.name(name))
         updates.append(.count(count))
-        updates.append(.superCount(superCount))
+        updates.append(.someCount(someCount))
         updates.append(.urls(urls))
         updates.append(.subModel(subModel))
-        updates.append(.children(children))
         return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestCDModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
     }
     func updated(_ _update: Updates) -> TestCDModel {
         switch _update {
@@ -103,14 +125,12 @@ extension TestCDModel {
                 return TestCDModel.nameLens.set(newValue, self)
             case .count(let newValue):
                 return TestCDModel.countLens.set(newValue, self)
-            case .superCount(let newValue):
-                return TestCDModel.superCountLens.set(newValue, self)
+            case .someCount(let newValue):
+                return TestCDModel.someCountLens.set(newValue, self)
             case .urls(let newValue):
                 return TestCDModel.urlsLens.set(newValue, self)
             case .subModel(let newValue):
                 return TestCDModel.subModelLens.set(newValue, self)
-            case .children(let newValue):
-                return TestCDModel.childrenLens.set(newValue, self)
         }
     }
     func updated(_ _updates: [Updates]) -> TestCDModel {
@@ -119,13 +139,80 @@ extension TestCDModel {
     func difference(from _model: TestCDModel) -> [Updates] {
         var updates = [Updates]()
         if id != _model.id { updates.append(.id(id)) }
-        if compareOptionals(lhs: index, rhs: _model.index, compare: ==) == false { updates.append(.index(index)) }
+        if index != _model.index { updates.append(.index(index)) }
         if name != _model.name { updates.append(.name(name)) }
         if count != _model.count { updates.append(.count(count)) }
-        if superCount != _model.superCount { updates.append(.superCount(superCount)) }
-        if compareOptionals(lhs: urls, rhs: _model.urls, compare: ==) == false { updates.append(.urls(urls)) }
-        if compareOptionals(lhs: subModel, rhs: _model.subModel, compare: ==) == false { updates.append(.subModel(subModel)) }
-        if compareOptionals(lhs: children, rhs: _model.children, compare: ==) == false { updates.append(.children(children)) }
+        if someCount != _model.someCount { updates.append(.someCount(someCount)) }
+        if urls != _model.urls { updates.append(.urls(urls)) }
+        if subModel != _model.subModel { updates.append(.subModel(subModel)) }
+        return updates
+    }
+}
+// MARK: TestCDSimpleModel ObjectDiff
+extension TestCDSimpleModel {
+
+    enum Updates: DictionaryElementRepresentable {
+        case title(String)
+        case count(Int)
+        var key: String {
+            switch self {
+                case .title: return "title"
+                case .count: return "count"
+            }
+        }
+        var value: Any? {
+            switch self {
+            case .title(let newValue): return newValue
+            case .count(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "title":
+                if let value = value as? String {
+                    self = .title(value)
+                } else { return nil }
+            case "count":
+                if let value = value as? Int {
+                    self = .count(value)
+                } else { return nil }
+            default: return nil
+            }
+        }
+    }
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
+        _updates.forEach { dict[$0.key] = $0.value }
+        return dict
+    }
+
+    func allUpdates() -> [Updates] {
+        var updates = [Updates]()
+        updates.append(.title(title))
+        updates.append(.count(count))
+        return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestCDSimpleModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
+    }
+    func updated(_ _update: Updates) -> TestCDSimpleModel {
+        switch _update {
+            case .title(let newValue):
+                return TestCDSimpleModel.titleLens.set(newValue, self)
+            case .count(let newValue):
+                return TestCDSimpleModel.countLens.set(newValue, self)
+        }
+    }
+    func updated(_ _updates: [Updates]) -> TestCDSimpleModel {
+        return _updates.reduce(self) { (value, update) in value.updated(update) }
+    }
+    func difference(from _model: TestCDSimpleModel) -> [Updates] {
+        var updates = [Updates]()
+        if title != _model.title { updates.append(.title(title)) }
+        if count != _model.count { updates.append(.count(count)) }
         return updates
     }
 }
@@ -137,20 +224,18 @@ extension TestModel {
         case index(Int?)
         case name(String)
         case count(Int)
-        case superCount(Int)
+        case someCount(Int)
         case urls([URL]?)
         case subModel(TestSubModel?)
-        case children([TestModel]?)
         var key: String {
             switch self {
                 case .id: return "id"
                 case .index: return "index"
                 case .name: return "name"
                 case .count: return "count"
-                case .superCount: return "superCount"
+                case .someCount: return "someCount"
                 case .urls: return "urls"
                 case .subModel: return "subModel"
-                case .children: return "children"
             }
         }
         var value: Any? {
@@ -159,29 +244,67 @@ extension TestModel {
             case .index(let newValue): return newValue
             case .name(let newValue): return newValue
             case .count(let newValue): return newValue
-            case .superCount(let newValue): return newValue
+            case .someCount(let newValue): return newValue
             case .urls(let newValue): return newValue
             case .subModel(let newValue): return newValue
-            case .children(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "id":
+                if let value = value as? Int {
+                    self = .id(value)
+                } else { return nil }
+            case "index":
+                if let value = value as? Int? {
+                    self = .index(value)
+                } else { return nil }
+            case "name":
+                if let value = value as? String {
+                    self = .name(value)
+                } else { return nil }
+            case "count":
+                if let value = value as? Int {
+                    self = .count(value)
+                } else { return nil }
+            case "someCount":
+                if let value = value as? Int {
+                    self = .someCount(value)
+                } else { return nil }
+            case "urls":
+                if let value = value as? [URL]? {
+                    self = .urls(value)
+                } else { return nil }
+            case "subModel":
+                if let value = value as? TestSubModel? {
+                    self = .subModel(value)
+                } else { return nil }
+            default: return nil
             }
         }
     }
-    static func updatesDict(_ _updates: [Updates]) -> [String: Any?] {
-        var dict = [String: Any?]()
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
         _updates.forEach { dict[$0.key] = $0.value }
         return dict
     }
+
     func allUpdates() -> [Updates] {
         var updates = [Updates]()
         updates.append(.id(id))
         updates.append(.index(index))
         updates.append(.name(name))
         updates.append(.count(count))
-        updates.append(.superCount(superCount))
+        updates.append(.someCount(someCount))
         updates.append(.urls(urls))
         updates.append(.subModel(subModel))
-        updates.append(.children(children))
         return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
     }
     func updated(_ _update: Updates) -> TestModel {
         switch _update {
@@ -193,14 +316,12 @@ extension TestModel {
                 return TestModel.nameLens.set(newValue, self)
             case .count(let newValue):
                 return TestModel.countLens.set(newValue, self)
-            case .superCount(let newValue):
-                return TestModel.superCountLens.set(newValue, self)
+            case .someCount(let newValue):
+                return TestModel.someCountLens.set(newValue, self)
             case .urls(let newValue):
                 return TestModel.urlsLens.set(newValue, self)
             case .subModel(let newValue):
                 return TestModel.subModelLens.set(newValue, self)
-            case .children(let newValue):
-                return TestModel.childrenLens.set(newValue, self)
         }
     }
     func updated(_ _updates: [Updates]) -> TestModel {
@@ -209,13 +330,102 @@ extension TestModel {
     func difference(from _model: TestModel) -> [Updates] {
         var updates = [Updates]()
         if id != _model.id { updates.append(.id(id)) }
-        if compareOptionals(lhs: index, rhs: _model.index, compare: ==) == false { updates.append(.index(index)) }
+        if index != _model.index { updates.append(.index(index)) }
         if name != _model.name { updates.append(.name(name)) }
         if count != _model.count { updates.append(.count(count)) }
-        if superCount != _model.superCount { updates.append(.superCount(superCount)) }
-        if compareOptionals(lhs: urls, rhs: _model.urls, compare: ==) == false { updates.append(.urls(urls)) }
-        if compareOptionals(lhs: subModel, rhs: _model.subModel, compare: ==) == false { updates.append(.subModel(subModel)) }
-        if compareOptionals(lhs: children, rhs: _model.children, compare: ==) == false { updates.append(.children(children)) }
+        if someCount != _model.someCount { updates.append(.someCount(someCount)) }
+        if urls != _model.urls { updates.append(.urls(urls)) }
+        if subModel != _model.subModel { updates.append(.subModel(subModel)) }
+        return updates
+    }
+}
+// MARK: TestRRModel ObjectDiff
+extension TestRRModel {
+
+    enum Updates: DictionaryElementRepresentable {
+        case id(Int)
+        case name(String)
+        case owner(TestSubModel?)
+        case users(Relation<TestRRModel>)
+        var key: String {
+            switch self {
+                case .id: return "id"
+                case .name: return "name"
+                case .owner: return "owner"
+                case .users: return "users"
+            }
+        }
+        var value: Any? {
+            switch self {
+            case .id(let newValue): return newValue
+            case .name(let newValue): return newValue
+            case .owner(let newValue): return newValue
+            case .users(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "id":
+                if let value = value as? Int {
+                    self = .id(value)
+                } else { return nil }
+            case "name":
+                if let value = value as? String {
+                    self = .name(value)
+                } else { return nil }
+            case "owner":
+                if let value = value as? TestSubModel? {
+                    self = .owner(value)
+                } else { return nil }
+            case "users":
+                if let value = value as? Relation<TestRRModel> {
+                    self = .users(value)
+                } else { return nil }
+            default: return nil
+            }
+        }
+    }
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
+        _updates.forEach { dict[$0.key] = $0.value }
+        return dict
+    }
+
+    func allUpdates() -> [Updates] {
+        var updates = [Updates]()
+        updates.append(.id(id))
+        updates.append(.name(name))
+        updates.append(.owner(owner))
+        updates.append(.users(users))
+        return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestRRModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
+    }
+    func updated(_ _update: Updates) -> TestRRModel {
+        switch _update {
+            case .id(let newValue):
+                return TestRRModel.idLens.set(newValue, self)
+            case .name(let newValue):
+                return TestRRModel.nameLens.set(newValue, self)
+            case .owner(let newValue):
+                return TestRRModel.ownerLens.set(newValue, self)
+            case .users(let newValue):
+                return TestRRModel.usersLens.set(newValue, self)
+        }
+    }
+    func updated(_ _updates: [Updates]) -> TestRRModel {
+        return _updates.reduce(self) { (value, update) in value.updated(update) }
+    }
+    func difference(from _model: TestRRModel) -> [Updates] {
+        var updates = [Updates]()
+        if id != _model.id { updates.append(.id(id)) }
+        if name != _model.name { updates.append(.name(name)) }
+        if owner != _model.owner { updates.append(.owner(owner)) }
+        if users != _model.users { updates.append(.users(users)) }
         return updates
     }
 }
@@ -237,17 +447,37 @@ extension TestSimpleModel {
             case .count(let newValue): return newValue
             }
         }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "title":
+                if let value = value as? String {
+                    self = .title(value)
+                } else { return nil }
+            case "count":
+                if let value = value as? Int {
+                    self = .count(value)
+                } else { return nil }
+            default: return nil
+            }
+        }
     }
-    static func updatesDict(_ _updates: [Updates]) -> [String: Any?] {
-        var dict = [String: Any?]()
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
         _updates.forEach { dict[$0.key] = $0.value }
         return dict
     }
+
     func allUpdates() -> [Updates] {
         var updates = [Updates]()
         updates.append(.title(title))
         updates.append(.count(count))
         return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestSimpleModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
     }
     func updated(_ _update: Updates) -> TestSimpleModel {
         switch _update {
@@ -274,8 +504,10 @@ extension TestSubModel {
         case userId(Int)
         case userName(String)
         case userAvatar(String)
-        case title(String)
+        case title(String?)
         case count(Int)
+        case inverseModel(Relation<TestRRModel>)
+        case directModels(Relation<TestRRModel>)
         var key: String {
             switch self {
                 case .userId: return "userId"
@@ -283,6 +515,8 @@ extension TestSubModel {
                 case .userAvatar: return "userAvatar"
                 case .title: return "title"
                 case .count: return "count"
+                case .inverseModel: return "inverseModel"
+                case .directModels: return "directModels"
             }
         }
         var value: Any? {
@@ -292,14 +526,51 @@ extension TestSubModel {
             case .userAvatar(let newValue): return newValue
             case .title(let newValue): return newValue
             case .count(let newValue): return newValue
+            case .inverseModel(let newValue): return newValue
+            case .directModels(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "userId":
+                if let value = value as? Int {
+                    self = .userId(value)
+                } else { return nil }
+            case "userName":
+                if let value = value as? String {
+                    self = .userName(value)
+                } else { return nil }
+            case "userAvatar":
+                if let value = value as? String {
+                    self = .userAvatar(value)
+                } else { return nil }
+            case "title":
+                if let value = value as? String? {
+                    self = .title(value)
+                } else { return nil }
+            case "count":
+                if let value = value as? Int {
+                    self = .count(value)
+                } else { return nil }
+            case "inverseModel":
+                if let value = value as? Relation<TestRRModel> {
+                    self = .inverseModel(value)
+                } else { return nil }
+            case "directModels":
+                if let value = value as? Relation<TestRRModel> {
+                    self = .directModels(value)
+                } else { return nil }
+            default: return nil
             }
         }
     }
-    static func updatesDict(_ _updates: [Updates]) -> [String: Any?] {
-        var dict = [String: Any?]()
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
         _updates.forEach { dict[$0.key] = $0.value }
         return dict
     }
+
     func allUpdates() -> [Updates] {
         var updates = [Updates]()
         updates.append(.userId(userId))
@@ -307,7 +578,14 @@ extension TestSubModel {
         updates.append(.userAvatar(userAvatar))
         updates.append(.title(title))
         updates.append(.count(count))
+        updates.append(.inverseModel(inverseModel))
+        updates.append(.directModels(directModels))
         return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestSubModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
     }
     func updated(_ _update: Updates) -> TestSubModel {
         switch _update {
@@ -321,6 +599,10 @@ extension TestSubModel {
                 return TestSubModel.titleLens.set(newValue, self)
             case .count(let newValue):
                 return TestSubModel.countLens.set(newValue, self)
+            case .inverseModel(let newValue):
+                return TestSubModel.inverseModelLens.set(newValue, self)
+            case .directModels(let newValue):
+                return TestSubModel.directModelsLens.set(newValue, self)
         }
     }
     func updated(_ _updates: [Updates]) -> TestSubModel {
@@ -333,6 +615,8 @@ extension TestSubModel {
         if userAvatar != _model.userAvatar { updates.append(.userAvatar(userAvatar)) }
         if title != _model.title { updates.append(.title(title)) }
         if count != _model.count { updates.append(.count(count)) }
+        if inverseModel != _model.inverseModel { updates.append(.inverseModel(inverseModel)) }
+        if directModels != _model.directModels { updates.append(.directModels(directModels)) }
         return updates
     }
 }

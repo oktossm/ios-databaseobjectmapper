@@ -175,7 +175,7 @@ public class CoreDataStorage {
             if let error = error {
                 let isMigrationError = error.code == NSPersistentStoreIncompatibleVersionHashError || error.code == NSMigrationMissingSourceModelError
                 if isMigrationError && retry {
-                    _ = try? self?.cleanStoreFilesAfterFailedMigration(store: store)
+                    _ = ((try? self?.cleanStoreFilesAfterFailedMigration(store: store)) as ()??)
                     return try addStore!(store, coordinator, options, false)
                 } else {
                     throw error

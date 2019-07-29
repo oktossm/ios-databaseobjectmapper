@@ -2,12 +2,13 @@ sources:
   - ../../Pods/SourceryAdditions/SourceryAdditions/Classes/SourceryProtocols.swift
   - ../Models
 templates:
-  - ../../Pods/SourceryAdditions/SourceryAdditions/Templates/AutoCodable.stencil
-  - ../../Pods/SourceryAdditions/SourceryAdditions/Templates/AutoEquatable.stencil
-  - ../../Pods/SourceryAdditions/SourceryAdditions/Templates/AutoHashable.stencil
-  - ../../Pods/SourceryAdditions/SourceryAdditions/Templates/AutoLenses.stencil
-  - ../../Pods/SourceryAdditions/SourceryAdditions/Templates/AutoCases.stencil
-  - ../../Pods/SourceryAdditions/SourceryAdditions/Templates/AutoInitializable.stencil
-  - ../../Pods/SourceryAdditions/SourceryAdditions/Templates/AutoObjectDiff.stencil
+  - ../../../../SourceryAdditions/SourceryAdditions/Templates/AutoCodable.stencil
+  - ../../../../SourceryAdditions/SourceryAdditions/Templates/AutoEquatable.stencil
+  - ../../../../SourceryAdditions/SourceryAdditions/Templates/AutoHashable.stencil
+  - ../../../../SourceryAdditions/SourceryAdditions/Templates/AutoLenses.stencil
+  - ../../../../SourceryAdditions/SourceryAdditions/Templates/AutoCases.stencil
+  - ../../../../SourceryAdditions/SourceryAdditions/Templates/AutoInitializable.stencil
+  - ../../../../SourceryAdditions/SourceryAdditions/Templates/AutoObjectDiff.stencil
+  - Templates/AutoDatabaseMappable.stencil
 output:
     Generated/

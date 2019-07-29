@@ -9,102 +9,105 @@ import CoreData
 import DatabaseObjectsMapper
 import SourceryAdditions
 
+public protocol AutoDatabaseMappable {}
 
-struct TestModel: Codable, Equatable, AutoObjectDiff, AutoLenses {
+
+// sourcery: AutoImport=DatabaseObjectsMapper
+struct TestModel: Equatable, AutoObjectDiff, AutoLenses {
     let id: Int
     let index: Int?
     let name: String
     let count: Int
-    let superCount: Int
+    let someCount: Int
     let urls: [URL]?
 
 
     let subModel: TestSubModel?
-    let children: [TestModel]?
 
-    var isSuper: Bool {
+    var isNew: Bool {
         return self.id == 0
     }
 }
 
 
-struct TestSubModel: Codable, Equatable, AutoObjectDiff, AutoLenses {
+struct TestSubModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
     let userId: Int
     let userName: String
     let userAvatar: String
+    let title: String?
+    let count: Int
+    // sourcery: inverseRelation = owner
+    let inverseModel = Relation<TestRRModel>(type: .inverse)
+    let directModels = Relation<TestRRModel>(type: .direct)
+}
+
+
+struct TestSimpleModel: Equatable, AutoObjectDiff, AutoLenses {
     let title: String
     let count: Int
 }
 
 
-struct TestSimpleModel: Codable, Equatable, AutoObjectDiff, AutoLenses {
+struct TestCDSimpleModel: Equatable, AutoObjectDiff, AutoLenses {
     let title: String
     let count: Int
 }
 
 
-struct TestCDModel: Codable, Equatable, AutoObjectDiff, AutoLenses {
+struct TestCDModel: Equatable, AutoObjectDiff, AutoLenses {
     let id: Int
     let index: Int?
     let name: String
     let count: Int
-    let superCount: Int
+    let someCount: Int
     let urls: [URL]?
 
+    let subModel: Relation<TestSubModel>
 
-    let subModel: TestSubModel?
-    let children: [TestModel]?
-
-    var isSuper: Bool {
+    var isNew: Bool {
         return self.id == 0
     }
 }
 
 
-extension TestModel: DatabaseMappable, DatabaseRelationshipMappable {
-    typealias DatabaseType = RealmContainer
-    typealias DatabaseUpdates = [Updates]
+struct TestRRModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
+    let id: Int
+    let name: String
 
-    public var primaryKey: PrimaryKeyContainer {
-        return .int(value: self.id, key: "id")
-    }
+    let owner: TestSubModel?
+    let users = Relation<TestRRModel>(type: .direct)
 }
 
 
-extension TestSubModel: DatabaseMappable, DatabaseRelationshipMappable {
-    typealias DatabaseType = TestContainer
-    typealias DatabaseUpdates = [Updates]
-
-    public var primaryKey: PrimaryKeyContainer {
-        return .int(value: self.userId, key: "userId")
-    }
-
-    public static func databaseType() -> DatabaseType.Type {
-        return TestContainer.self
-    }
+extension TestModel: UniquelyMappable {
+    typealias Container = RealmContainer
+    static var idKey = \TestModel.id
 }
 
 
-extension TestSimpleModel: DatabaseMappable, DatabaseRelationshipMappable {
-    typealias DatabaseType = RealmContainer
-    typealias DatabaseUpdates = [Updates]
-
-    public var primaryKey: PrimaryKeyContainer {
-        return .none
-    }
+extension TestSubModel: UniquelyMappable {
+    typealias Container = TestSubModelContainer
+    static var idKey = \TestSubModel.userId
 }
 
 
-extension TestCDModel: DatabaseMappable, DatabaseRelationshipMappable {
-    typealias DatabaseType = DefaultContainer
-    typealias DatabaseUpdates = [Updates]
-
-    public var primaryKey: PrimaryKeyContainer {
-        return .int(value: self.id, key: "id")
-    }
+extension TestSimpleModel: DatabaseMappable {
+    typealias Container = RealmContainer
 }
 
 
-extension Array: DatabasePropertyUpdates where Element: DictionaryElementRepresentable {
+extension TestCDModel: UniquelyMappable {
+    typealias Container = DefaultContainer
+    static var idKey = \TestCDModel.id
+}
 
+
+extension TestCDSimpleModel: DatabaseMappable {
+    typealias Container = DefaultContainer
+}
+
+
+extension TestRRModel: UniquelyMappable {
+    typealias Container = TestRRModelContainer
+    static var idKey = \TestRRModel.id
 }

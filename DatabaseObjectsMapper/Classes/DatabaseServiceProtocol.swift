@@ -44,9 +44,9 @@ public struct DatabaseObserveUpdate<T> {
 }
 
 
-public enum DatabaseObjectUpdate<T> {
+public enum DatabaseModelUpdate<T> {
     case delete
-    case update(object: T)
+    case update(model: T)
 }
 
 
@@ -68,77 +68,98 @@ public class DatabaseUpdatesToken {
 
 public protocol DatabaseServiceProtocol {
 
-    /// Deletes all objects in database
+    // MARK: Managing
+
+    /// Deletes all models in database
     func deleteAll()
 
-    /// Create and stores new object in database. By default updates if object with same primary key already exists.
-    func store<T: DatabaseMappable>(object: T, update: Bool)
+    /// Create and stores new model in database. Function for non unique models
+    func simpleSave<T: DatabaseMappable>(model: T)
 
-    /// Create and stores new objects in database. By default updates if object with same primary key already exists.
-    func store<T: DatabaseMappable>(objects: [T], update: Bool)
+    /// Create and stores new models in database. Function for non unique models
+    func simpleSave<T: DatabaseMappable>(models: [T])
 
-    /// Fully updates object by primary key if it is already exists. If object not found nothing happens.
-    func update<T: DatabaseMappable>(object: T)
+    /// Create and stores new model in database. By default updates if model with same id already exists.
+    func save<T: UniquelyMappable>(model: T, update: Bool)
 
-    /// Fully updates objects by primary key if they are already exist. If object not found nothing happens.
-    func update<T: DatabaseMappable>(objects: [T])
+    /// Create and stores new model in database. By default updates if model with same id already exists.
+    func save<T: UniquelyMappable, R: UniquelyMappable>(model: T, update: Bool, relation: Relation<R>, with relationUpdate: Relation<R>.Update)
 
-    /// Updates object of given type by primary key if its already exists. Updates only properties listed in updates.
-    func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                     withPrimaryKey key: PrimaryKeyContainer,
-                                     updates: T.DatabaseUpdates)
+    /// Create and stores new models in database. By default updates if model with same id already exists.
+    func save<T: UniquelyMappable>(models: [T], update: Bool)
 
-    /// Updates relationships of object of given type by primary key if its already exists. Updates only relationships listed in updates.
-    func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                     withPrimaryKey key: PrimaryKeyContainer,
-                                     relationships: [DatabaseRelationshipUpdate])
+    /// Fully updates model by id if it is already exists. If model not found nothing happens.
+    func update<T: UniquelyMappable>(model: T)
 
-    /// Updates properties and relationships of object of given type by primary key if its already exists.
-    func update<T: DatabaseMappable>(objectOf type: T.Type,
-                                     withPrimaryKey key: PrimaryKeyContainer,
-                                     updates: T.DatabaseUpdates,
-                                     relationships: [DatabaseRelationshipUpdate])
+    /// Fully updates models by id if they are already exist. If model not found nothing happens.
+    func update<T: UniquelyMappable>(models: [T])
 
-    /// Deletes object by primary key.
-    func delete<T: DatabaseMappable>(object: T)
+    /// Updates model of given type by id if its already exists. Updates only properties listed in updates.
+    func update<T: UniquelyMappable>(modelOf type: T.Type, with key: T.ID, updates: [String: Any?])
 
-    /// Deletes objects by primary key.
-    func delete<T: DatabaseMappable>(objects: [T])
+    ///  Updates model by id if it is already exists with relation updates. If model not found nothing happens.
+    func updateRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T, with update: Relation<R>.Update)
 
-    /// Deletes all objects of given type.
-    func deleteAll<T: DatabaseMappable>(objectsOf type: T.Type)
+    /// Deletes model by id.
+    func delete<T: UniquelyMappable>(model: T)
 
-    /// Fetches objects of given type with optional filter and sorting. Objects returns async in `callback`.
-    func fetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                    with filter: DatabaseFilterType,
-                                    with sort: DatabaseSortType,
-                                    callback: @escaping (Array<T>) -> Void)
+    /// Deletes models by id.
+    func delete<T: UniquelyMappable>(models: [T])
 
-    /// Fetches objects of given type with optional filter and sorting. Returns objects array.
-    func syncFetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                        with filter: DatabaseFilterType,
-                                        with sort: DatabaseSortType) -> Array<T>
+    /// Deletes all models of given type.
+    func deleteAll<T: DatabaseMappable>(modelsOf type: T.Type)
 
-    /// Fetches objects of given type with optional filter and sorting and subscribes on their updates. First fetch returns async in `callback`.
+    // MARK: Fetching
+
+    /// Fetches models of given type with optional filter and sorting. Objects returns async in `callback`.
+    func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType, with sort: DatabaseSortType, callback: @escaping (Array<T>) -> Void)
+
+    /// Fetches models of given type with optional filter and sorting. Returns models array.
+    func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType, with sort: DatabaseSortType) -> Array<T>
+
+    /// Fetches models of given type with optional filter and sorting and subscribes on their updates. First fetch returns async in `callback`.
     /// Next updates send in `updates` closure.
     /// - returns: `DatabaseUpdatesToken` to stop observing `updates`.
-    func fetch<T: DatabaseMappable>(objectsOf type: T.Type,
-                                    with filter: DatabaseFilterType,
+    func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType,
                                     with sort: DatabaseSortType,
                                     callback: @escaping (Array<T>) -> Void,
                                     updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
 
-    /// Fetches object of given type and primary key. Object or nil returns async in callback.
-    func fetch<T: DatabaseMappable>(objectOf type: T.Type, withPrimaryKey key: PrimaryKeyContainer, callback: @escaping (T?) -> Void)
+    /// Fetches model of given type and id. Object or nil returns async in callback.
+    func fetch<T: UniquelyMappable>(modelOf type: T.Type, with key: T.ID, callback: @escaping (T?) -> Void)
 
-    /// Fetches object of given type and primary key. Returns object.
-    func syncFetch<T: DatabaseMappable>(objectOf type: T.Type, withPrimaryKey key: PrimaryKeyContainer) -> T?
+    /// Fetches model of given type and id. Returns model.
+    func syncFetch<T: UniquelyMappable>(modelOf type: T.Type, with key: T.ID) -> T?
 
-    /// Fetches object of given type and primary key. Object or nil returns async in callback.
+    /// Fetches model of given type and id. Object or nil returns async in callback.
     /// Next updates send in `updates` closure.
     /// - returns: `DatabaseUpdatesToken` to stop observing `updates`.
-    func fetch<T: DatabaseMappable>(objectOf type: T.Type,
-                                    withPrimaryKey key: PrimaryKeyContainer,
+    func fetch<T: UniquelyMappable>(with key: T.ID,
                                     callback: @escaping (T?) -> Void,
-                                    updates: @escaping (DatabaseObjectUpdate<T>) -> Void) -> DatabaseUpdatesToken
+                                    updates: @escaping (DatabaseModelUpdate<T>) -> Void) -> DatabaseUpdatesToken
+
+    // MARK: Relations
+
+    /// Fetches relation models of given type with optional filter and sorting. Objects returns async in `callback`.
+    func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                 in model: T,
+                                                                 with filter: DatabaseFilterType,
+                                                                 with sort: DatabaseSortType,
+                                                                 callback: @escaping (Array<R>) -> Void)
+
+    /// Fetches relation models of given type with optional filter and sorting. Returns models array.
+    func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                     in model: T,
+                                                                     with filter: DatabaseFilterType,
+                                                                     with sort: DatabaseSortType) -> Array<R>
+
+    /// Fetches relation models of given type with optional filter and sorting and subscribes on their updates.
+    /// First fetch returns async in `callback`. Next updates send in `updates` closure.
+    /// - returns: `DatabaseUpdatesToken` to stop observing `updates`.
+    func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                 in model: T,
+                                                                 with filter: DatabaseFilterType,
+                                                                 with sort: DatabaseSortType,
+                                                                 callback: @escaping (Array<R>) -> Void,
+                                                                 updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
 }

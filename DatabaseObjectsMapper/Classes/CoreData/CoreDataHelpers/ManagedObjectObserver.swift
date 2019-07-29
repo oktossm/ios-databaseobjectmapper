@@ -37,7 +37,7 @@ public final class ManagedObjectObserver {
 
     // MARK: Private
 
-    fileprivate var token: NSObjectProtocol!
+    fileprivate var token: NSObjectProtocol = NSNull()
     fileprivate var objectHasBeenDeleted: Bool = false
 
     fileprivate func changeType(of object: Managed, in note: ObjectsDidChangeNotification) -> ChangeType? {

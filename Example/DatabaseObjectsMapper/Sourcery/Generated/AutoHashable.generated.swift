@@ -1,8 +1,9 @@
-// Generated using Sourcery 0.12.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.15.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 // MARK: - AutoHashable
 import Foundation
+import DatabaseObjectsMapper
 
 // swiftlint:disable file_length
 // swiftlint:disable line_length

@@ -8,7 +8,7 @@ use_frameworks!
 target 'DatabaseObjectsMapper_Example' do
   pod 'DatabaseObjectsMapper', :path => '../'
   pod 'Sourcery'
-  pod 'SourceryAdditions', :git => 'https://bitbucket.org/MikhailMulyar/sourceryadditions.git'
+  pod 'SourceryAdditions', :path => '../../SourceryAdditions'
 
   target 'DatabaseObjectsMapper_Tests' do
     inherit! :search_paths

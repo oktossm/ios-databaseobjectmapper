@@ -32,5 +32,6 @@ DatabaseObjectsMapper implementation.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = 'CoreData'
-  s.dependency 'RealmSwift', '~> 3.0'
+  s.dependency 'RealmSwift', '~> 3.17.0'
+  s.dependency 'DictionaryCoding', '~> 1.0'
 end

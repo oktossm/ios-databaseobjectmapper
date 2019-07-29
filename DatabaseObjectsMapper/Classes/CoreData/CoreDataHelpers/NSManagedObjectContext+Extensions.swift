@@ -236,28 +236,21 @@ extension NSManagedObjectContext {
     ///   - entity: NSManagedObject entity for detect type
     ///   - primaryKey: key to find object
     /// - Returns: object or nil
-    func findFirst<A: NSManagedObject>(withPrimaryKey key: PrimaryKeyContainer) -> A? {
-        guard let value = key.value else { return nil }
-        return self.findFirst(with: NSPredicate(format: "%K = %@", argumentArray: [key.key, value]))
+    func findFirst<A: DatabaseContainer>(with key: A.ID) -> A? where A: NSManagedObject {
+        guard let keyPath = A.idKey._kvcKeyPathString else { return nil }
+        return self.findFirst(with: NSPredicate(format: "%K = %@", argumentArray: [keyPath, key]))
     }
 
-    func findAll<A: NSManagedObject>(withPrimaryKeys keys: [PrimaryKeyContainer]) -> [PrimaryKeyContainer: A] {
-        guard let key = keys.first, key != .none else { return [PrimaryKeyContainer: A]() }
-        let values: [A] = self.findAll(with: NSPredicate(format: "%K IN %@", argumentArray: [key.key, keys.map { $0.value }]))
-        var result = [PrimaryKeyContainer: A]()
-        switch key {
-        case .int:
+    func findAll<A: DatabaseContainer>(with keys: [A.ID]) -> [A.ID: A] where A: NSManagedObject {
+        guard let keyPath = A.idKey._kvcKeyPathString else { return [A.ID: A]() }
+        let values: [A] = self.findAll(with: NSPredicate(format: "%K IN %@", argumentArray: [keyPath, keys]))
+        var result = [A.ID: A]()
+        if let keyPath = A.idKey._kvcKeyPathString {
             for value in values {
-                guard let keyValue = value.value(forKey: key.key) as? Int else { continue }
-                result[.int(value: keyValue, key: key.key)] = value
+                if let keyPathValue = value.value(forKeyPath: keyPath) as? A.ID {
+                    result[keyPathValue] = value
+                }
             }
-        case .string:
-            for value in values {
-                guard let keyValue = value.value(forKey: key.key) as? String else { continue }
-                result[.string(value: keyValue, key: key.key)] = value
-            }
-        default:
-            break
         }
 
         return result

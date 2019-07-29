@@ -51,16 +51,16 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testSimpleStoreWithKey() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(object: testModel)
-        service.store(object: testModel)
+        service.save(model: testModel)
+        service.save(model: testModel)
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let fetched = self.service.syncFetch(objectOf: TestCDModel.self, withPrimaryKey: .int(value: 1, key: "id"))
-            let all = self.service.syncFetch(objectsOf: TestCDModel.self)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let fetched: TestCDModel? = self.service.syncFetch(with: 1)
+            let all: [TestCDModel] = self.service.syncFetch()
 
             XCTAssertTrue(all.count == 1)
             XCTAssertTrue(testModel == fetched)
@@ -71,16 +71,36 @@ class CoreDataContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func testMultipleStoreWithKey() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+    func testSimpleStoreWithoutKey() {
+        let model = TestCDSimpleModel(title: "count", count: 3)
 
-        service.store(objects: [testModel, testModel2])
+        service.simpleSave(model: model)
+        service.simpleSave(model: model)
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let all = self.service.syncFetch(objectsOf: TestCDModel.self)
+            let fetched: [TestCDSimpleModel] = self.service.syncFetch()
+
+            XCTAssertTrue(fetched.count == 2)
+            XCTAssertTrue(fetched.contains { $0 != model } == false, "\(fetched)")
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testMultipleStoreWithKey() {
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+
+        service.save(models: [testModel, testModel2])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestCDModel] = self.service.syncFetch()
 
             XCTAssertTrue(all.sorted { $0.id < $1.id } == [testModel, testModel2])
 
@@ -91,18 +111,18 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testMultipleUpdate() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel3 = TestCDModel(id: 1, index: 5, name: "br", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel4 = TestCDModel(id: 2, index: 4, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel3 = TestCDModel(id: 1, index: 5, name: "br", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel4 = TestCDModel(id: 2, index: 4, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(objects: [testModel, testModel2])
-        service.update(objects: [testModel3, testModel4])
+        service.save(models: [testModel, testModel2])
+        service.update(models: [testModel3, testModel4])
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let all = self.service.syncFetch(objectsOf: TestCDModel.self)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestCDModel] = self.service.syncFetch()
 
             XCTAssertTrue(all.sorted { $0.id < $1.id } == [testModel3, testModel4])
 
@@ -113,17 +133,39 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testUpdateByKey() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel2 = TestCDModel(id: 1, index: 5, name: "br", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 1, index: 5, name: "br", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(objects: [testModel])
-        service.update(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, updates: testModel2.allUpdates())
+        service.save(models: [testModel])
+        service.update(modelOf: TestCDModel.self, with: testModel.id, updates: testModel2.encodedValue)
 
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let all = self.service.syncFetch(objectsOf: TestCDModel.self)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestCDModel] = self.service.syncFetch()
+
+            XCTAssertTrue(all == [testModel2])
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+
+    func testPartialUpdate() {
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 1, index: nil, name: "br", count: 3, someCount: 4, urls: nil, subModel: .init())
+
+        service.save(models: [testModel])
+        service.update(modelOf: TestCDModel.self, with: testModel.id, updates: testModel2.difference(from: testModel).dictionaryRepresentation())
+
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestCDModel] = self.service.syncFetch()
 
             XCTAssertTrue(all == [testModel2])
 
@@ -134,15 +176,15 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testDelete() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(objects: [testModel, testModel2])
-        service.delete(objects: [testModel])
+        service.save(models: [testModel, testModel2])
+        service.delete(models: [testModel])
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let all = self.service.syncFetch(objectsOf: TestCDModel.self)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestCDModel] = self.service.syncFetch()
 
             XCTAssertTrue(all == [testModel2])
 
@@ -153,15 +195,15 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testPrimaryKeyFetch() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(object: testModel)
+        service.save(model: testModel)
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.service.fetch(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey) {
-                model in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.service.fetch(with: testModel.id) {
+                (model: TestCDModel?) in
 
                 XCTAssertTrue(testModel == model)
 
@@ -173,17 +215,17 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testFetch() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(object: testModel)
-        service.store(object: testModel2)
+        service.save(model: testModel)
+        service.save(model: testModel2)
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.service.fetch(objectsOf: TestCDModel.self) {
-                all in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.service.fetch() {
+                (all: [TestCDModel]) in
 
                 XCTAssertTrue(all.sorted { $0.id < $1.id } == [testModel, testModel2])
                 expectation.fulfill()
@@ -194,16 +236,18 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testFetchUpdate() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(object: testModel)
+        service.save(model: testModel)
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.token = self.service.fetch(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, callback: {
-                _ in
-                self.service.update(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, updates: [TestCDModel.Updates.count(5)])
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.token = self.service.fetch(with: testModel.id, callback: {
+                (_: TestCDModel?) in
+                self.service.update(modelOf: TestCDModel.self,
+                                    with: testModel.id,
+                                    updates: [TestCDModel.Updates.count(5)].dictionaryRepresentation())
             }, updates: {
                 update in
 
@@ -220,16 +264,16 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testFetchDelete() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(object: testModel)
+        service.save(model: testModel)
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.token = self.service.fetch(objectOf: TestCDModel.self, withPrimaryKey: testModel.primaryKey, callback: {
-                _ in
-                self.service.delete(object: testModel)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.token = self.service.fetch(with: testModel.id, callback: {
+                (_: TestCDModel?) in
+                self.service.delete(model: testModel)
             }, updates: {
                 update in
 
@@ -247,17 +291,17 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testMultipleFetchInsert() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(objects: [testModel])
+        service.save(models: [testModel])
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
-                _ in
-                self.service.store(objects: [testModel2])
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
+                (_: [TestCDModel]) in
+                self.service.save(models: [testModel2])
             }, updates: {
                 updates in
 
@@ -270,17 +314,17 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testMultipleFetchDelete() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(objects: [testModel, testModel2])
+        service.save(models: [testModel, testModel2])
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
-                _ in
-                self.service.delete(object: testModel2)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
+                (_: [TestCDModel]) in
+                self.service.delete(model: testModel2)
             }, updates: {
                 updates in
 
@@ -293,18 +337,18 @@ class CoreDataContainerTests: XCTestCase {
     }
 
     func testMultipleFetchUpdate() {
-        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
-        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, superCount: 4, urls: nil, subModel: nil, children: nil)
+        let testModel = TestCDModel(id: 1, index: 3, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
+        let testModel2 = TestCDModel(id: 2, index: 1, name: "fr", count: 3, someCount: 4, urls: nil, subModel: .init())
 
-        service.store(objects: [testModel, testModel2])
+        service.save(models: [testModel, testModel2])
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let testModel3 = TestCDModel(id: 2, index: 5, name: "br", count: 23, superCount: 64, urls: nil, subModel: nil, children: nil)
-            self.token = self.service.fetch(objectsOf: TestCDModel.self, with: .unfiltered, with: .unsorted, callback: {
-                _ in
-                self.service.update(object: testModel3)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let testModel3 = TestCDModel(id: 2, index: 5, name: "br", count: 23, someCount: 64, urls: nil, subModel: .init())
+            self.token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
+                (_: [TestCDModel]) in
+                self.service.update(model: testModel3)
             }, updates: {
                 updates in
 

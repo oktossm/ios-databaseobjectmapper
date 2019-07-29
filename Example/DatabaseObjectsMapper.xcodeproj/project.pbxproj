@@ -18,9 +18,11 @@
 		DDEDB018389E6FB3783D7A22 /* TestContainers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBCF9194ED939A77D0384 /* TestContainers.swift */; };
 		DDEDB07EB0BCFB8F5D3155B3 /* AutoObjectDiff.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBF9C8737DD301E6A3912 /* AutoObjectDiff.generated.swift */; };
 		DDEDB4E3C9429B91A4EAE8E8 /* TestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB10073B1A1D08B373772 /* TestModel.swift */; };
+		DDEDB53F3311D0056334A35C /* RealmRelationshipsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB7767F5C024B83A2F7C7 /* RealmRelationshipsTests.swift */; };
 		DDEDB6F765EA25921C45110E /* AutoCodable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB8B89C76135D86C072E3 /* AutoCodable.generated.swift */; };
 		DDEDB908FB06BF4DFFC6C859 /* AutoEquatable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBF367C8EC53DDBDE14B1 /* AutoEquatable.generated.swift */; };
 		DDEDB9EBC5F136E508E435E4 /* AutoLenses.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBD8D2384511B23E0A258 /* AutoLenses.generated.swift */; };
+		DDEDBD2905684CDF19F9D843 /* AutoDatabaseMappable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBA06290C9AC27E00D204 /* AutoDatabaseMappable.generated.swift */; };
 		DDEDBDF7F54D05405A47622A /* AutoInitializable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB37F2F0BF1D6FBF2CFC3 /* AutoInitializable.generated.swift */; };
 		DDEDBE28BA1B649F2B3EA195 /* CustomRealmContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBE207E8E87F178B2601B /* CustomRealmContainerTests.swift */; };
 		DDEDBE671A87D2CADDB247C1 /* AutoHashable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBDEB2B7895A95DBF6F66 /* AutoHashable.generated.swift */; };
@@ -59,8 +61,10 @@
 		B6E67A8AC5BC5D2B96C56917 /* Pods-DatabaseObjectsMapper_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example.release.xcconfig"; sourceTree = "<group>"; };
 		DDEDB10073B1A1D08B373772 /* TestModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestModel.swift; sourceTree = "<group>"; };
 		DDEDB37F2F0BF1D6FBF2CFC3 /* AutoInitializable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoInitializable.generated.swift; sourceTree = "<group>"; };
+		DDEDB7767F5C024B83A2F7C7 /* RealmRelationshipsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmRelationshipsTests.swift; sourceTree = "<group>"; };
 		DDEDB8B89C76135D86C072E3 /* AutoCodable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoCodable.generated.swift; sourceTree = "<group>"; };
 		DDEDB9D0230BE414E652419E /* AutoCases.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoCases.generated.swift; sourceTree = "<group>"; };
+		DDEDBA06290C9AC27E00D204 /* AutoDatabaseMappable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoDatabaseMappable.generated.swift; sourceTree = "<group>"; };
 		DDEDBCF9194ED939A77D0384 /* TestContainers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestContainers.swift; sourceTree = "<group>"; };
 		DDEDBD4758318979199E1C1B /* CoreDataContainerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataContainerTests.swift; sourceTree = "<group>"; };
 		DDEDBD8D2384511B23E0A258 /* AutoLenses.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoLenses.generated.swift; sourceTree = "<group>"; };
@@ -155,6 +159,7 @@
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 				DDEDBE207E8E87F178B2601B /* CustomRealmContainerTests.swift */,
 				DDEDBD4758318979199E1C1B /* CoreDataContainerTests.swift */,
+				DDEDB7767F5C024B83A2F7C7 /* RealmRelationshipsTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -198,6 +203,7 @@
 				DDEDBF367C8EC53DDBDE14B1 /* AutoEquatable.generated.swift */,
 				DDEDBF9C8737DD301E6A3912 /* AutoObjectDiff.generated.swift */,
 				DDEDB37F2F0BF1D6FBF2CFC3 /* AutoInitializable.generated.swift */,
+				DDEDBA06290C9AC27E00D204 /* AutoDatabaseMappable.generated.swift */,
 			);
 			path = Generated;
 			sourceTree = "<group>";
@@ -272,7 +278,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
@@ -286,6 +292,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -327,8 +334,9 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/DatabaseObjectsMapper/DatabaseObjectsMapper.framework",
+				"${BUILT_PRODUCTS_DIR}/DictionaryCoding/DictionaryCoding.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/SourceryAdditions/SourceryAdditions.framework",
@@ -336,13 +344,14 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DatabaseObjectsMapper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DictionaryCoding.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SourceryAdditions.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E644FB32A9A79340F5C74A09 /* [CP] Check Pods Manifest.lock */ = {
@@ -400,6 +409,7 @@
 				DDEDB07EB0BCFB8F5D3155B3 /* AutoObjectDiff.generated.swift in Sources */,
 				DDEDBDF7F54D05405A47622A /* AutoInitializable.generated.swift in Sources */,
 				DDEDB018389E6FB3783D7A22 /* TestContainers.swift in Sources */,
+				DDEDBD2905684CDF19F9D843 /* AutoDatabaseMappable.generated.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -410,6 +420,7 @@
 				607FACEC1AFB9204008FA782 /* RealmContainerTests.swift in Sources */,
 				DDEDBE28BA1B649F2B3EA195 /* CustomRealmContainerTests.swift in Sources */,
 				DDEDBF096EB7738D3C403A12 /* CoreDataContainerTests.swift in Sources */,
+				DDEDB53F3311D0056334A35C /* RealmRelationshipsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,8 +564,7 @@
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -569,8 +579,7 @@
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

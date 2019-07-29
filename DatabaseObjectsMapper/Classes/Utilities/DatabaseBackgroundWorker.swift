@@ -32,10 +32,8 @@ internal class DatabaseBackgroundWorker: DatabaseWorker {
 
         let thread = Thread {
             [weak self] in
-            while (self != nil && !self!.thread.isCancelled) {
-                RunLoop.current.run(
-                        mode: RunLoopMode.defaultRunLoopMode,
-                        before: Date.distantPast)
+            while let `self` = self, !self.thread.isCancelled {
+                RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantPast)
             }
             Thread.exit()
         }
@@ -54,7 +52,7 @@ internal class DatabaseBackgroundWorker: DatabaseWorker {
                 on: thread,
                 with: block,
                 waitUntilDone: false,
-                modes: [RunLoopMode.defaultRunLoopMode.rawValue])
+                modes: [RunLoop.Mode.default.rawValue])
     }
 
     override internal func start(_ block: @escaping () -> Void) {

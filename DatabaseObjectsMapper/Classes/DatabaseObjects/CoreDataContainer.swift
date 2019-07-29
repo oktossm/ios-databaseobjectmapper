@@ -5,18 +5,22 @@
 import CoreData
 
 
-open class CoreDataContainer: NSManagedObject {
+open class CoreDataContainer: NSManagedObject, SharedDatabaseContainer {
+    public static var idKey: WritableKeyPath<CoreDataContainer, String> = \CoreDataContainer.id
 
-    /// JSON encoded data that should be persisted to a Realm.
-    @NSManaged var data: Data
+    @NSManaged var value: Data?
 
+    public var encodedValue: [String: Any] {
+        get {
+            return value.flatMap { Dictionary<String, Any>(archive: $0) } ?? [:]
+        }
+        set {
+            value = newValue.archived
+        }
+    }
     /// The name of the type that the encoded data is. Used for retrieving all values.
-    @NSManaged var typeName: String
+    @NSManaged public var typeName: String
 
     /// The unique identifier for the data. This property is used as the primary key.
     @NSManaged var id: String
-
-    public static var primaryKeyPath: String? {
-        return "id"
-    }
 }
