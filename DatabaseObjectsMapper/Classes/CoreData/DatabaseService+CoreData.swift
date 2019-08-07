@@ -47,7 +47,7 @@ public extension UniquelyMappable where Container: NSManagedObject {
     }
 
     internal func updateId(for container: Container) {
-        guard let keyPath = Container.idKey._kvcKeyPathString, container.entity.propertiesByName[keyPath] != nil else { return }
+        guard let keyPath = Container.idKey._kvcKeyPathString, container.entity.attributesByName[keyPath] != nil else { return }
         container.setValue(objectKeyValue, forKey: keyPath)
     }
 }
@@ -61,7 +61,7 @@ public extension UniquelyMappable where Container: NSManagedObject & SharedDatab
     }
 
     internal func updateId(for container: Container) {
-        guard let keyPath = Container.idKey._kvcKeyPathString, container.entity.propertiesByName[keyPath] != nil else { return }
+        guard let keyPath = Container.idKey._kvcKeyPathString, container.entity.attributesByName[keyPath] != nil else { return }
         container.setValue(objectKeyValue, forKey: keyPath)
     }
 }
@@ -83,7 +83,7 @@ public extension DatabaseMappable where Container: NSManagedObject {
     internal func updateId(for container: Container) {
         guard let keyPath = Container.idKey._kvcKeyPathString,
               Container.ID.self == String.self,
-              container.entity.propertiesByName[keyPath] != nil else { return }
+              container.entity.attributesByName[keyPath] != nil else { return }
         container.setValue(UUID().uuidString, forKey: keyPath)
     }
 
@@ -108,54 +108,13 @@ public extension DatabaseMappable where Container: NSManagedObject {
             }
         }
     }
-
-    //    internal func update(_ managed: NSManagedObject, with relationships: [String: RelationContainer], in writeContext: NSManagedObjectContext) {
-    //        for (key, relationship) in relationships {
-    //            switch relationship.update {
-    //            case .toOne(let primaryKey):
-    //                guard let primaryKey = primaryKey else {
-    //                    managed.setValue(nil, forKey: key)
-    //                    continue
-    //                }
-    //                guard let values = values(forType: relationship.typeName, with: [primaryKey], in: writeContext) else { continue }
-    //                managed.setValue(values.first, forKey: key)
-    //            case .toOneObject(let object):
-    //                managed.setValue(object, forKey: key)
-    //            case .toManySet(let primaryKeys):
-    //                guard let values = values(forType: relationship.typeName, with: primaryKeys, in: writeContext) else { continue }
-    //                managed.setValue(NSSet(array: values), forKey: key)
-    //            case .toManyAdd(let primaryKeys):
-    //                guard let values = values(forType: relationship.typeName, with: primaryKeys, in: writeContext),
-    //                      let set = managed.value(forKey: key) as? NSSet else { continue }
-    //                managed.setValue(set.addingObjects(from: values), forKey: key)
-    //            case .toManyRemove(let primaryKeys):
-    //                guard let values = values(forType: relationship.typeName, with: primaryKeys, in: writeContext),
-    //                      let set = (managed.value(forKey: key) as? NSSet)?.mutableCopy() as? NSMutableSet else { continue }
-    //                values.forEach { set.remove($0) }
-    //                managed.setValue(set, forKey: key)
-    //            case .toManyAddObjects(let objects):
-    //                guard let set = managed.value(forKey: key) as? NSSet else { continue }
-    //                managed.setValue(set.addingObjects(from: objects), forKey: key)
-    //            case .toManySetObjects(let objects):
-    //                let values = objects.compactMap { return $0 as? NSManagedObject }
-    //                managed.setValue(NSSet(array: values), forKey: key)
-    //            }
-    //        }
-    //    }
-
-    //    internal static func values(forType typeName: String, with keys: [ID], in context: NSManagedObjectContext) -> [Any]? {
-    //        guard let primaryKeyName = keys.first?.key else { return nil }
-    //        let request = NSFetchRequest<NSFetchRequestResult>(entityName: typeName)
-    //        request.predicate = NSPredicate(format: "%K IN %@", argumentArray: [primaryKeyName, keys.map { $0.objcValue }])
-    //        return try? context.fetch(request)
-    //    }
 }
 
 
 public extension DatabaseContainer where Self: NSManagedObject {
     var encodedValue: [String: Any] {
         get {
-            var encoded: [String: Any] = entity.propertiesByName.compactMapValues { value(forKey: $0.name) }
+            var encoded: [String: Any] = entity.attributesByName.compactMapValues { value(forKey: $0.name) }
             entity.relationshipsByName.values.filter { !$0.isToMany }.forEach {
                 if let object = value(forKey: $0.name) as? AnyDatabaseContainer {
                     encoded[$0.name] = object.encodedValue
@@ -165,7 +124,7 @@ public extension DatabaseContainer where Self: NSManagedObject {
         }
         set {
             let keyPath = Container.idKey._kvcKeyPathString
-            let properties = Set(entity.propertiesByName.map { $0.key })
+            let properties = Set(entity.attributesByName.map { $0.key })
 
             newValue.forEach {
                 if $0 != keyPath && properties.contains($0) {

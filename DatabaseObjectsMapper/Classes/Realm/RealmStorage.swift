@@ -30,15 +30,28 @@ extension AnyRealmCollection {
         case .predicate(let predicate): return AnyRealmCollection(self.filter(predicate))
         }
     }
+
+    func limited(_ limit: Index?) -> [Element] {
+        guard let limit = limit else { return Array(self) }
+        return Array(self[0..<Swift.min(self.endIndex, limit)])
+    }
+
+    func limited(in range: Range<Index>?) -> [Element] {
+        guard let range = range else { return Array(self) }
+        guard range.lowerBound < self.endIndex, range.upperBound > self.startIndex else { return [] }
+        let lower = Swift.max(self.startIndex, range.lowerBound)
+        let upper = Swift.min(self.endIndex, range.upperBound)
+        return Array(self[lower..<upper])
+    }
 }
 
 
 extension DatabaseUpdatesToken {
-    public convenience init(notificationToken: NotificationToken) {
-        self.init { notificationToken.invalidate() }
+    convenience init(notificationToken: NotificationToken) {
+        self.init(invalidation: { notificationToken.invalidate() })
     }
 
-    public func setNotificationToken(_ token: NotificationToken) {
+    func setNotificationToken(_ token: NotificationToken) {
         self.invalidation = { token.invalidate() }
     }
 }

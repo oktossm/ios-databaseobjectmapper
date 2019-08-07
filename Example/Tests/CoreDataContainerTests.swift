@@ -59,7 +59,7 @@ class CoreDataContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let fetched: TestCDModel? = self.service.syncFetch(with: 1)
+            let fetched: TestCDModel? = self.service.syncFetchUnique(with: 1)
             let all: [TestCDModel] = self.service.syncFetch()
 
             XCTAssertTrue(all.count == 1)
@@ -202,7 +202,7 @@ class CoreDataContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.service.fetch(with: testModel.id) {
+            self.service.fetchUnique(with: testModel.id) {
                 (model: TestCDModel?) in
 
                 XCTAssertTrue(testModel == model)
@@ -299,7 +299,7 @@ class CoreDataContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
+            self.token = self.service.fetch(with: .unfiltered, sorted: .unsorted, callback: {
                 (_: [TestCDModel]) in
                 self.service.save(models: [testModel2])
             }, updates: {
@@ -322,7 +322,7 @@ class CoreDataContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
+            self.token = self.service.fetch(with: .unfiltered, sorted: .unsorted, callback: {
                 (_: [TestCDModel]) in
                 self.service.delete(model: testModel2)
             }, updates: {
@@ -346,7 +346,7 @@ class CoreDataContainerTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let testModel3 = TestCDModel(id: 2, index: 5, name: "br", count: 23, someCount: 64, urls: nil, subModel: .init())
-            self.token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
+            self.token = self.service.fetch(with: .unfiltered, sorted: .unsorted, callback: {
                 (_: [TestCDModel]) in
                 self.service.update(model: testModel3)
             }, updates: {

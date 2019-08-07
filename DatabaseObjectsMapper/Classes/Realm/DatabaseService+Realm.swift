@@ -114,14 +114,17 @@ public extension DatabaseContainer where Self: Object {
     var encodedValue: [String: Any] {
         get {
             let properties = objectSchema.properties
-            var encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties.filter { $0.objectClassName == nil }
-                                                                                    .compactMap {
-                                                                                        if let value = self[$0.name] {
-                                                                                            return ($0.name, value)
-                                                                                        } else {
-                                                                                            return nil
-                                                                                        }
-                                                                                    })
+            var encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
+                    .filter { $0.objectClassName == nil }
+                    .compactMap {
+                        guard let value = self[$0.name] else {
+                            return nil
+                        }
+                        if $0.type == .data, let data = value as? Data, let archived: [String: Any] = Dictionary(archive: data) {
+                            return ($0.name, archived)
+                        }
+                        return ($0.name, value)
+                    })
             properties.filter { $0.objectClassName != nil && !$0.isArray && $0.type != .linkingObjects }.forEach {
                 if let object = self[$0.name] as? AnyDatabaseContainer {
                     encoded[$0.name] = object.encodedValue
@@ -131,15 +134,19 @@ public extension DatabaseContainer where Self: Object {
         }
         set {
             let keyPath = Container.idKey._kvcKeyPathString
-            let properties = Set(objectSchema.properties.filter { $0.objectClassName == nil }.map { $0.name })
+            let properties = Dictionary(uniqueKeysWithValues: objectSchema.properties.filter { $0.objectClassName == nil }.map { ($0.name, $0) })
 
             newValue.forEach {
-                if $0 != keyPath && properties.contains($0) {
+                guard $0 != keyPath, let property = properties[$0] else { return }
+                if property.type == .data, let dictValue = $1 as? [String: Any] {
+                    // Processing codable properties
+                    self[$0] = dictValue.archived
+                } else {
                     self[$0] = $1
                 }
             }
 
-            properties.filter { newValue[$0] == nil && $0 != keyPath }.forEach { self[$0] = nil }
+            properties.filter { newValue[$0.key] == nil && $0.key != keyPath }.forEach { self[$0.key] = nil }
         }
     }
 }

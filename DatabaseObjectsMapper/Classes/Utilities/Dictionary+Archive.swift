@@ -5,15 +5,14 @@
 
 import Foundation
 
+
 extension Dictionary where Key == String, Value == Any {
     var archived: Data {
-        return NSKeyedArchiver.archivedData(withRootObject: self as NSDictionary)
+        return (try? PropertyListSerialization.data(fromPropertyList: self, format: .binary, options: 0)) ?? Data()
     }
 
     init?(archive: Data) {
-        guard let value = NSKeyedUnarchiver.unarchiveObject(with: archive) as? [String: Any] else {
-            return nil
-        }
+        guard let value = try? PropertyListSerialization.propertyList(from: archive, format: nil) as? [String: Any] else { return nil }
         self = value
     }
 }
