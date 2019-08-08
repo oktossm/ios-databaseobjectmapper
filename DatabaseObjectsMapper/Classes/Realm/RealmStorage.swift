@@ -96,7 +96,7 @@ public struct RealmWriteTransaction {
                                             with key: T.ID,
                                             updates: [String: Any?]) where T.Container: Object {
         let updates: [String: Any?] = updates.mapValues {
-            if let mappable = $0 as? AnyDatabaseMappable & DictionaryCodable {
+            if let mappable = $0 as? DictionaryCodable {
                 return mappable.encodedValue
             } else {
                 return $0

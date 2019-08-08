@@ -137,7 +137,7 @@ class CoreDataContainerTests: XCTestCase {
         let testModel2 = TestCDModel(id: 1, index: 5, name: "br", count: 3, someCount: 4, urls: nil, subModel: .init())
 
         service.save(models: [testModel])
-        service.update(modelOf: TestCDModel.self, with: testModel.id, updates: testModel2.encodedValue)
+        service.update(modelOf: TestCDModel.self, with: testModel.id, updates: testModel2.allUpdates().dictionaryRepresentation())
 
 
         let expectation = XCTestExpectation()

@@ -90,6 +90,30 @@ struct TestRRModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses 
     let users = Relation<TestRRModel>(type: .direct)
 }
 
+struct SomeCodable: Codable, Equatable, Hashable {
+    let key: String
+    let index: Int
+}
+
+
+struct TestCollectionsModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
+    let id: Int
+    let strings: [String]
+    let intValues: [Int64?]?
+    let doubleValues: [Double]?
+    let dates: [Date]?
+    let codable: [SomeCodable]
+    let urls: Array<URL?>
+    let dict: [Int: SomeCodable]
+    let anotherDict: [SomeCodable: Int]
+    let set: Set<URL?>
+    let anotherSet: Set<SomeCodable>?
+}
+
+extension TestCollectionsModel: UniquelyMappable {
+    typealias Container = TestCollectionsModelContainer
+    static var idKey = \TestCollectionsModel.id
+}
 
 extension TestModel: UniquelyMappable {
     typealias Container = RealmContainer

@@ -654,7 +654,7 @@ class CustomRealmContainerTests: XCTestCase {
         service.save(models: [someModel])
         service.update(modelOf: TestSomeModel.self,
                        with: someModel.userId,
-                       updates: ["nestedModel": testModel.encodedValue])
+                       updates: ["nestedModel": testModel])
 
         let expectation = XCTestExpectation()
 
@@ -667,6 +667,36 @@ class CustomRealmContainerTests: XCTestCase {
                 expectation.fulfill()
             }
         }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testCollectionsStoring() {
+        let codable = SomeCodable(key: "k", index: 4)
+        let url = URL(string: "https://google.com")
+        let testModel = TestCollectionsModel(id: 1,
+                                             strings: ["one", "two"],
+                                             intValues: [0, 3],
+                                             doubleValues: nil,
+                                             dates: [Date()],
+                                             codable: [codable],
+                                             urls: [url],
+                                             dict: [1: codable],
+                                             anotherDict: [codable: 2],
+                                             set: [url],
+                                             anotherSet: [codable])
+
+        service.save(model: testModel)
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let fetched: TestCollectionsModel? = self.service.syncFetchUnique(with: testModel.id)
+
+            XCTAssertTrue(testModel == fetched)
+
+            expectation.fulfill()
+        }
+
         wait(for: [expectation], timeout: 1)
     }
 }

@@ -120,8 +120,12 @@ public extension DatabaseContainer where Self: Object {
                         guard let value = self[$0.name] else {
                             return nil
                         }
-                        if $0.type == .data, let data = value as? Data, let archived: [String: Any] = Dictionary(archive: data) {
-                            return ($0.name, archived)
+                        if $0.type == .data, let data = value as? Data {
+                            if let archived: [String: Any] = Dictionary(archive: data) {
+                                return ($0.name, archived)
+                            } else if let archived: [Any] = Array(archive: data) {
+                                return ($0.name, archived)
+                            }
                         }
                         return ($0.name, value)
                     })
@@ -135,12 +139,19 @@ public extension DatabaseContainer where Self: Object {
         set {
             let keyPath = Container.idKey._kvcKeyPathString
             let properties = Dictionary(uniqueKeysWithValues: objectSchema.properties.filter { $0.objectClassName == nil }.map { ($0.name, $0) })
-
             newValue.forEach {
                 guard $0 != keyPath, let property = properties[$0] else { return }
-                if property.type == .data, let dictValue = $1 as? [String: Any] {
+                if property.type == .data {
                     // Processing codable properties
-                    self[$0] = dictValue.archived
+                    if let dictValue = $1 as? [String: Any] {
+                        self[$0] = dictValue.archived
+                    } else if let arrayValue = $1 as? [Any] {
+                        self[$0] = arrayValue.archived
+                    } else {
+                        self[$0] = $1
+                    }
+                } else if let codable = $1 as? DictionaryCodable {
+                    self[$0] = codable.encodedValue
                 } else {
                     self[$0] = $1
                 }

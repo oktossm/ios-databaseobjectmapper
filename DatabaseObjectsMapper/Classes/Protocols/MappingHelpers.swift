@@ -38,3 +38,7 @@ public extension DatabaseMappable {
 extension CodingUserInfoKey {
     static let context: CodingUserInfoKey = CodingUserInfoKey(rawValue: "context")!
 }
+
+extension Array: DictionaryCodable where Element: Codable {}
+extension Set: DictionaryCodable where Element: Codable {}
+extension Dictionary: DictionaryCodable where Key: Codable, Value: Codable {}

@@ -16,3 +16,14 @@ extension Dictionary where Key == String, Value == Any {
         self = value
     }
 }
+
+extension Array where Element == Any {
+    var archived: Data {
+        return (try? PropertyListSerialization.data(fromPropertyList: self, format: .binary, options: 0)) ?? Data()
+    }
+
+    init?(archive: Data) {
+        guard let value = try? PropertyListSerialization.propertyList(from: archive, format: nil) as? [Any] else { return nil }
+        self = value
+    }
+}

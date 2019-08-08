@@ -132,6 +132,107 @@ extension TestCDSimpleModel {
      return BoundLens<TestCDSimpleModel, Int>(instance: self, lens: TestCDSimpleModel.countLens)
   }
 }
+extension TestCollectionsModel {
+  static let idLens = Lens<TestCollectionsModel, Int>(
+    get: { $0.id },
+    set: { id, testCollectionsModel in
+       TestCollectionsModel(id: id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var idLens: BoundLens<TestCollectionsModel, Int> {
+     return BoundLens<TestCollectionsModel, Int>(instance: self, lens: TestCollectionsModel.idLens)
+  }
+  static let stringsLens = Lens<TestCollectionsModel, [String]>(
+    get: { $0.strings },
+    set: { strings, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var stringsLens: BoundLens<TestCollectionsModel, [String]> {
+     return BoundLens<TestCollectionsModel, [String]>(instance: self, lens: TestCollectionsModel.stringsLens)
+  }
+  static let intValuesLens = Lens<TestCollectionsModel, [Int64?]?>(
+    get: { $0.intValues },
+    set: { intValues, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var intValuesLens: BoundLens<TestCollectionsModel, [Int64?]?> {
+     return BoundLens<TestCollectionsModel, [Int64?]?>(instance: self, lens: TestCollectionsModel.intValuesLens)
+  }
+  static let doubleValuesLens = Lens<TestCollectionsModel, [Double]?>(
+    get: { $0.doubleValues },
+    set: { doubleValues, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var doubleValuesLens: BoundLens<TestCollectionsModel, [Double]?> {
+     return BoundLens<TestCollectionsModel, [Double]?>(instance: self, lens: TestCollectionsModel.doubleValuesLens)
+  }
+  static let datesLens = Lens<TestCollectionsModel, [Date]?>(
+    get: { $0.dates },
+    set: { dates, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var datesLens: BoundLens<TestCollectionsModel, [Date]?> {
+     return BoundLens<TestCollectionsModel, [Date]?>(instance: self, lens: TestCollectionsModel.datesLens)
+  }
+  static let codableLens = Lens<TestCollectionsModel, [SomeCodable]>(
+    get: { $0.codable },
+    set: { codable, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var codableLens: BoundLens<TestCollectionsModel, [SomeCodable]> {
+     return BoundLens<TestCollectionsModel, [SomeCodable]>(instance: self, lens: TestCollectionsModel.codableLens)
+  }
+  static let urlsLens = Lens<TestCollectionsModel, Array<URL?>>(
+    get: { $0.urls },
+    set: { urls, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var urlsLens: BoundLens<TestCollectionsModel, Array<URL?>> {
+     return BoundLens<TestCollectionsModel, Array<URL?>>(instance: self, lens: TestCollectionsModel.urlsLens)
+  }
+  static let dictLens = Lens<TestCollectionsModel, [Int: SomeCodable]>(
+    get: { $0.dict },
+    set: { dict, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var dictLens: BoundLens<TestCollectionsModel, [Int: SomeCodable]> {
+     return BoundLens<TestCollectionsModel, [Int: SomeCodable]>(instance: self, lens: TestCollectionsModel.dictLens)
+  }
+  static let anotherDictLens = Lens<TestCollectionsModel, [SomeCodable: Int]>(
+    get: { $0.anotherDict },
+    set: { anotherDict, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: anotherDict, set: testCollectionsModel.set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var anotherDictLens: BoundLens<TestCollectionsModel, [SomeCodable: Int]> {
+     return BoundLens<TestCollectionsModel, [SomeCodable: Int]>(instance: self, lens: TestCollectionsModel.anotherDictLens)
+  }
+  static let setLens = Lens<TestCollectionsModel, Set<URL?>>(
+    get: { $0.set },
+    set: { set, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: set, anotherSet: testCollectionsModel.anotherSet)
+    }
+  )
+  var setLens: BoundLens<TestCollectionsModel, Set<URL?>> {
+     return BoundLens<TestCollectionsModel, Set<URL?>>(instance: self, lens: TestCollectionsModel.setLens)
+  }
+  static let anotherSetLens = Lens<TestCollectionsModel, Set<SomeCodable>?>(
+    get: { $0.anotherSet },
+    set: { anotherSet, testCollectionsModel in
+       TestCollectionsModel(id: testCollectionsModel.id, strings: testCollectionsModel.strings, intValues: testCollectionsModel.intValues, doubleValues: testCollectionsModel.doubleValues, dates: testCollectionsModel.dates, codable: testCollectionsModel.codable, urls: testCollectionsModel.urls, dict: testCollectionsModel.dict, anotherDict: testCollectionsModel.anotherDict, set: testCollectionsModel.set, anotherSet: anotherSet)
+    }
+  )
+  var anotherSetLens: BoundLens<TestCollectionsModel, Set<SomeCodable>?> {
+     return BoundLens<TestCollectionsModel, Set<SomeCodable>?>(instance: self, lens: TestCollectionsModel.anotherSetLens)
+  }
+}
 extension TestModel {
   static let idLens = Lens<TestModel, Int>(
     get: { $0.id },

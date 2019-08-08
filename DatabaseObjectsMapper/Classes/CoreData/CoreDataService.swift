@@ -108,7 +108,7 @@ extension CoreDataService {
                   let managed: T.Container = s.writeContext.findFirst(with: T.idMapping(key)) else { return }
             guard let model = try? T.mappable(for: managed) else { return }
             let updates: [String: Any?] = updates.mapValues {
-                if let mappable = $0 as? AnyDatabaseMappable & DictionaryCodable {
+                if let mappable = $0 as? DictionaryCodable {
                     return mappable.encodedValue
                 } else {
                     return $0

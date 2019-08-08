@@ -11,6 +11,27 @@ import DatabaseObjectsMapper
 
 
 // MARK: - AutoDatabaseMappable for classes, structs
+// MARK: - TestCollectionsModel generated container
+class TestCollectionsModelContainer: Object, DatabaseContainer {
+    public static var idKey: WritableKeyPath<TestCollectionsModelContainer, Int> = \TestCollectionsModelContainer.id
+            public override static func primaryKey() -> String? {
+        return "id"
+    }
+    public override class func indexedProperties() -> [String] {
+        return []
+    }
+    @objc public dynamic var id: Int = 0
+    @objc public dynamic var strings = Data()
+    @objc public dynamic var intValues: Data?
+    @objc public dynamic var doubleValues: Data?
+    @objc public dynamic var dates: Data?
+    @objc public dynamic var codable = Data()
+    @objc public dynamic var urls = Data()
+    @objc public dynamic var dict = Data()
+    @objc public dynamic var anotherDict = Data()
+    @objc public dynamic var set = Data()
+    @objc public dynamic var anotherSet: Data?
+}
 // MARK: - TestRRModel generated container
 class TestRRModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestRRModelContainer, Int> = \TestRRModelContainer.id

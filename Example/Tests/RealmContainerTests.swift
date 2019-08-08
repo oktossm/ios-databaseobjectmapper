@@ -156,7 +156,7 @@ class RealmContainerTests: XCTestCase {
         let testModel2 = TestModel(id: 1, index: 1, name: "fr", count: 2, someCount: 2, urls: nil, someModel: nil)
 
         service.save(models: [testModel])
-        service.update(modelOf: TestModel.self, with: testModel.id, updates: testModel2.encodedValue)
+        service.update(modelOf: TestModel.self, with: testModel.id, updates: testModel2.allUpdates().dictionaryRepresentation())
 
 
         let expectation = XCTestExpectation()

@@ -216,6 +216,173 @@ extension TestCDSimpleModel {
         return updates
     }
 }
+// MARK: TestCollectionsModel ObjectDiff
+extension TestCollectionsModel {
+
+    enum Updates: DictionaryElementRepresentable {
+        case id(Int)
+        case strings([String])
+        case intValues([Int64?]?)
+        case doubleValues([Double]?)
+        case dates([Date]?)
+        case codable([SomeCodable])
+        case urls(Array<URL?>)
+        case dict([Int: SomeCodable])
+        case anotherDict([SomeCodable: Int])
+        case set(Set<URL?>)
+        case anotherSet(Set<SomeCodable>?)
+        var key: String {
+            switch self {
+                case .id: return "id"
+                case .strings: return "strings"
+                case .intValues: return "intValues"
+                case .doubleValues: return "doubleValues"
+                case .dates: return "dates"
+                case .codable: return "codable"
+                case .urls: return "urls"
+                case .dict: return "dict"
+                case .anotherDict: return "anotherDict"
+                case .set: return "set"
+                case .anotherSet: return "anotherSet"
+            }
+        }
+        var value: Any? {
+            switch self {
+            case .id(let newValue): return newValue
+            case .strings(let newValue): return newValue
+            case .intValues(let newValue): return newValue
+            case .doubleValues(let newValue): return newValue
+            case .dates(let newValue): return newValue
+            case .codable(let newValue): return newValue
+            case .urls(let newValue): return newValue
+            case .dict(let newValue): return newValue
+            case .anotherDict(let newValue): return newValue
+            case .set(let newValue): return newValue
+            case .anotherSet(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "id":
+                if let value = value as? Int {
+                    self = .id(value)
+                } else { return nil }
+            case "strings":
+                if let value = value as? [String] {
+                    self = .strings(value)
+                } else { return nil }
+            case "intValues":
+                if let value = value as? [Int64?]? {
+                    self = .intValues(value)
+                } else { return nil }
+            case "doubleValues":
+                if let value = value as? [Double]? {
+                    self = .doubleValues(value)
+                } else { return nil }
+            case "dates":
+                if let value = value as? [Date]? {
+                    self = .dates(value)
+                } else { return nil }
+            case "codable":
+                if let value = value as? [SomeCodable] {
+                    self = .codable(value)
+                } else { return nil }
+            case "urls":
+                if let value = value as? Array<URL?> {
+                    self = .urls(value)
+                } else { return nil }
+            case "dict":
+                if let value = value as? [Int: SomeCodable] {
+                    self = .dict(value)
+                } else { return nil }
+            case "anotherDict":
+                if let value = value as? [SomeCodable: Int] {
+                    self = .anotherDict(value)
+                } else { return nil }
+            case "set":
+                if let value = value as? Set<URL?> {
+                    self = .set(value)
+                } else { return nil }
+            case "anotherSet":
+                if let value = value as? Set<SomeCodable>? {
+                    self = .anotherSet(value)
+                } else { return nil }
+            default: return nil
+            }
+        }
+    }
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
+        _updates.forEach { dict[$0.key] = $0.value }
+        return dict
+    }
+
+    func allUpdates() -> [Updates] {
+        var updates = [Updates]()
+        updates.append(.id(id))
+        updates.append(.strings(strings))
+        updates.append(.intValues(intValues))
+        updates.append(.doubleValues(doubleValues))
+        updates.append(.dates(dates))
+        updates.append(.codable(codable))
+        updates.append(.urls(urls))
+        updates.append(.dict(dict))
+        updates.append(.anotherDict(anotherDict))
+        updates.append(.set(set))
+        updates.append(.anotherSet(anotherSet))
+        return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestCollectionsModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
+    }
+    func updated(_ _update: Updates) -> TestCollectionsModel {
+        switch _update {
+            case .id(let newValue):
+                return TestCollectionsModel.idLens.set(newValue, self)
+            case .strings(let newValue):
+                return TestCollectionsModel.stringsLens.set(newValue, self)
+            case .intValues(let newValue):
+                return TestCollectionsModel.intValuesLens.set(newValue, self)
+            case .doubleValues(let newValue):
+                return TestCollectionsModel.doubleValuesLens.set(newValue, self)
+            case .dates(let newValue):
+                return TestCollectionsModel.datesLens.set(newValue, self)
+            case .codable(let newValue):
+                return TestCollectionsModel.codableLens.set(newValue, self)
+            case .urls(let newValue):
+                return TestCollectionsModel.urlsLens.set(newValue, self)
+            case .dict(let newValue):
+                return TestCollectionsModel.dictLens.set(newValue, self)
+            case .anotherDict(let newValue):
+                return TestCollectionsModel.anotherDictLens.set(newValue, self)
+            case .set(let newValue):
+                return TestCollectionsModel.setLens.set(newValue, self)
+            case .anotherSet(let newValue):
+                return TestCollectionsModel.anotherSetLens.set(newValue, self)
+        }
+    }
+    func updated(_ _updates: [Updates]) -> TestCollectionsModel {
+        return _updates.reduce(self) { (value, update) in value.updated(update) }
+    }
+    func difference(from _model: TestCollectionsModel) -> [Updates] {
+        var updates = [Updates]()
+        if id != _model.id { updates.append(.id(id)) }
+        if strings != _model.strings { updates.append(.strings(strings)) }
+        if intValues != _model.intValues { updates.append(.intValues(intValues)) }
+        if doubleValues != _model.doubleValues { updates.append(.doubleValues(doubleValues)) }
+        if dates != _model.dates { updates.append(.dates(dates)) }
+        if codable != _model.codable { updates.append(.codable(codable)) }
+        if urls != _model.urls { updates.append(.urls(urls)) }
+        if dict != _model.dict { updates.append(.dict(dict)) }
+        if anotherDict != _model.anotherDict { updates.append(.anotherDict(anotherDict)) }
+        if set != _model.set { updates.append(.set(set)) }
+        if anotherSet != _model.anotherSet { updates.append(.anotherSet(anotherSet)) }
+        return updates
+    }
+}
 // MARK: TestModel ObjectDiff
 extension TestModel {
 
