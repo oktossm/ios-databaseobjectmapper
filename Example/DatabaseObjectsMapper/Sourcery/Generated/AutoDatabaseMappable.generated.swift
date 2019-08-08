@@ -12,7 +12,7 @@ import DatabaseObjectsMapper
 
 // MARK: - AutoDatabaseMappable for classes, structs
 // MARK: - TestCollectionsModel generated container
-class TestCollectionsModelContainer: Object, DatabaseContainer {
+internal class TestCollectionsModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestCollectionsModelContainer, Int> = \TestCollectionsModelContainer.id
             public override static func primaryKey() -> String? {
         return "id"
@@ -32,8 +32,28 @@ class TestCollectionsModelContainer: Object, DatabaseContainer {
     @objc public dynamic var set = Data()
     @objc public dynamic var anotherSet: Data?
 }
+
+extension TestCollectionsModel: KeyPathConvertible {
+    static func key(for keyPath: PartialKeyPath<TestCollectionsModel>) -> String {
+        switch keyPath {
+        case \TestCollectionsModel.id: return "id"
+        case \TestCollectionsModel.strings: return "strings"
+        case \TestCollectionsModel.intValues: return "intValues"
+        case \TestCollectionsModel.doubleValues: return "doubleValues"
+        case \TestCollectionsModel.dates: return "dates"
+        case \TestCollectionsModel.codable: return "codable"
+        case \TestCollectionsModel.urls: return "urls"
+        case \TestCollectionsModel.dict: return "dict"
+        case \TestCollectionsModel.anotherDict: return "anotherDict"
+        case \TestCollectionsModel.set: return "set"
+        case \TestCollectionsModel.anotherSet: return "anotherSet"
+        default:
+            fatalError("Unhandled key path")
+        }
+    }
+}
 // MARK: - TestRRModel generated container
-class TestRRModelContainer: Object, DatabaseContainer {
+internal class TestRRModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestRRModelContainer, Int> = \TestRRModelContainer.id
             public override static func primaryKey() -> String? {
         return "id"
@@ -46,8 +66,21 @@ class TestRRModelContainer: Object, DatabaseContainer {
     @objc public dynamic var owner: TestSomeModelContainer?
     let users = List<TestRRModelContainer>()
 }
+
+extension TestRRModel: KeyPathConvertible {
+    static func key(for keyPath: PartialKeyPath<TestRRModel>) -> String {
+        switch keyPath {
+        case \TestRRModel.id: return "id"
+        case \TestRRModel.name: return "name"
+        case \TestRRModel.owner: return "owner"
+        case \TestRRModel.users: return "users"
+        default:
+            fatalError("Unhandled key path")
+        }
+    }
+}
 // MARK: - TestSomeModel generated container
-class TestSomeModelContainer: Object, DatabaseContainer {
+internal class TestSomeModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestSomeModelContainer, Int> = \TestSomeModelContainer.userId
             public override static func primaryKey() -> String? {
         return "userId"
@@ -63,4 +96,21 @@ class TestSomeModelContainer: Object, DatabaseContainer {
     let inverseModel = LinkingObjects(fromType: TestRRModelContainer.self, property: "owner")
     let directModels = List<TestRRModelContainer>()
     @objc public dynamic var nestedModel: Data?
+}
+
+extension TestSomeModel: KeyPathConvertible {
+    static func key(for keyPath: PartialKeyPath<TestSomeModel>) -> String {
+        switch keyPath {
+        case \TestSomeModel.userId: return "userId"
+        case \TestSomeModel.userName: return "userName"
+        case \TestSomeModel.userAvatar: return "userAvatar"
+        case \TestSomeModel.title: return "title"
+        case \TestSomeModel.count: return "count"
+        case \TestSomeModel.inverseModel: return "inverseModel"
+        case \TestSomeModel.directModels: return "directModels"
+        case \TestSomeModel.nestedModel: return "nestedModel"
+        default:
+            fatalError("Unhandled key path")
+        }
+    }
 }
