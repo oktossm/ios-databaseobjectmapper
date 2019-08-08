@@ -50,7 +50,7 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testSimpleStoreWithKey() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
 
         service.save(model: testModel)
         service.save(model: testModel)
@@ -58,8 +58,8 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let fetched: TestSubModel? = self.service.syncFetch(with: testModel.userId)
-            let all: [TestSubModel] = self.service.syncFetch()
+            let fetched: TestSomeModel? = self.service.syncFetchUnique(with: testModel.userId)
+            let all: [TestSomeModel] = self.service.syncFetch()
 
             XCTAssertTrue(all.count == 1)
             XCTAssertTrue(testModel == fetched)
@@ -71,15 +71,15 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testMultipleStoreWithKey() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
         service.save(models: [testModel, testModel2])
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let all: [TestSubModel] = self.service.syncFetch()
+            let all: [TestSomeModel] = self.service.syncFetch()
 
             XCTAssertTrue(all.sorted { $0.userId < $1.userId } == [testModel, testModel2])
 
@@ -90,10 +90,10 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testMultipleUpdate() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
-        let testModel3 = TestSubModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3)
-        let testModel4 = TestSubModel(userId: 2, userName: "ki", userAvatar: "ad", title: "pl", count: 3)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "ad", title: "pl", count: 3, nestedModel: nil)
 
         service.save(models: [testModel, testModel2])
         service.update(models: [testModel3, testModel4])
@@ -101,7 +101,7 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let all: [TestSubModel] = self.service.syncFetch()
+            let all: [TestSomeModel] = self.service.syncFetch()
 
             XCTAssertTrue(all.sorted { $0.userId < $1.userId } == [testModel3, testModel4])
 
@@ -112,17 +112,17 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testUpdateByKey() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3, nestedModel: nil)
 
         service.save(models: [testModel])
-        service.update(modelOf: TestSubModel.self, with: testModel.userId, updates: testModel2.encodedValue)
+        service.update(modelOf: TestSomeModel.self, with: testModel.userId, updates: testModel2.encodedValue)
 
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let all: [TestSubModel] = self.service.syncFetch()
+            let all: [TestSomeModel] = self.service.syncFetch()
 
             XCTAssertTrue(all == [testModel2])
 
@@ -133,18 +133,18 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testPartialUpdate() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 1, userName: "rt", userAvatar: "ab", title: nil, count: 3)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: nil, count: 3, nestedModel: nil)
 
         service.save(models: [testModel])
-        service.update(modelOf: TestSubModel.self,
+        service.update(modelOf: TestSomeModel.self,
                        with: testModel.userId,
                        updates: testModel2.difference(from: testModel).dictionaryRepresentation())
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let all: [TestSubModel] = self.service.syncFetch()
+            let all: [TestSomeModel] = self.service.syncFetch()
 
             XCTAssertTrue(all == [testModel2], "\(all)")
 
@@ -155,15 +155,15 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testDelete() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
         service.save(models: [testModel, testModel2])
         service.delete(models: [testModel])
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let all: [TestSubModel] = self.service.syncFetch()
+            let all: [TestSomeModel] = self.service.syncFetch()
 
             XCTAssertTrue(all == [testModel2])
 
@@ -174,15 +174,15 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testPrimaryKeyFetch() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
 
         service.save(model: testModel)
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.service.fetch(with: testModel.userId) {
-                (model: TestSubModel?) in
+            self.service.fetchUnique(with: testModel.userId) {
+                (model: TestSomeModel?) in
 
                 XCTAssertTrue(testModel == model)
 
@@ -194,8 +194,8 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testFetch() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
         service.save(model: testModel)
         service.save(model: testModel2)
@@ -204,7 +204,7 @@ class CustomRealmContainerTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.service.fetch() {
-                (all: [TestSubModel]) in
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all.sorted { $0.userId < $1.userId } == [testModel, testModel2])
                 expectation.fulfill()
@@ -215,8 +215,8 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testFetchWithPredicate() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
         service.save(model: testModel)
         service.save(model: testModel2)
@@ -224,8 +224,8 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.service.fetch(with: .query(query: "userName = \"rt\""), with: .unsorted) {
-                (all: [TestSubModel]) in
+            self.service.fetch(with: .predicate(predicate: NSPredicate(format: "userName = %@", argumentArray: ["rt"])), sorted: .unsorted) {
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [testModel])
                 expectation.fulfill()
@@ -236,8 +236,8 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testFetchWithSort() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
         service.save(model: testModel)
         service.save(model: testModel2)
@@ -245,8 +245,8 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.service.fetch(with: .unfiltered, with: .byKeyPath(keyPath: "userId", ascending: false)) {
-                (all: [TestSubModel]) in
+            self.service.fetch(with: .unfiltered, sorted: .byKeyPath(keyPath: "userId", ascending: false)) {
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [testModel2, testModel])
                 expectation.fulfill()
@@ -256,8 +256,209 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testFetchWithLimit() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.service.fetch(with: .unfiltered, sorted: .byKeyPath(keyPath: "count", ascending: false), limit: 2) {
+                (fetched: [TestSomeModel]) in
+                XCTAssertTrue(fetched == [testModel2, testModel3])
+                expectation.fulfill()
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testSyncFetchWithLimit() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let fetched: [TestSomeModel] = self.service.syncFetch(with: .unfiltered, sorted: .byKeyPath(keyPath: "count", ascending: false), limit: 2)
+            XCTAssertTrue(fetched == [testModel2, testModel3])
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testFetchWithLimitUpdate() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 4, nestedModel: nil)
+
+        service.save(models: [testModel4, testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetch(sorted: .byKeyPath(keyPath: "count", ascending: false), limit: 2, callback: {
+                (fetched: [TestSomeModel]) in
+                XCTAssertTrue(fetched == [testModel4, testModel2])
+            }, updates: {
+                (update: DatabaseObserveUpdate<TestSomeModel>) in
+                token?.invalidate()
+                XCTAssertTrue(token?.limit == 3)
+                XCTAssertTrue(update.values == [testModel4, testModel2, testModel3])
+                expectation.fulfill()
+            })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                token?.limit = 3
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testDynamicLimitInsertChange() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 4, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetch(sorted: .byKeyPath(keyPath: "count", ascending: false), limit: 2, callback: {
+                (fetched: [TestSomeModel]) in
+                XCTAssertTrue(fetched == [testModel2, testModel3])
+            }, updates: {
+                (update: DatabaseObserveUpdate<TestSomeModel>) in
+                token?.invalidate()
+                XCTAssertTrue(token?.limit == 3)
+                XCTAssertTrue(update.values == [testModel4, testModel2, testModel3])
+                expectation.fulfill()
+            })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.service.save(model: testModel4)
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testDynamicLimitDeleteChange() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 4, nestedModel: nil)
+
+        service.save(models: [testModel4, testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetch(sorted: .byKeyPath(keyPath: "count", ascending: false), limit: 3, callback: {
+                (fetched: [TestSomeModel]) in
+                XCTAssertTrue(fetched == [testModel4, testModel2, testModel3])
+            }, updates: {
+                (update: DatabaseObserveUpdate<TestSomeModel>) in
+                token?.invalidate()
+                XCTAssertTrue(token?.limit == 3)
+                XCTAssertTrue(update.values == [testModel2, testModel3, testModel])
+                expectation.fulfill()
+            })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.service.delete(model: testModel4)
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testLoadNext() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 4, nestedModel: nil)
+        let testModel5 = TestSomeModel(userId: 5, userName: "ki", userAvatar: "rw", title: "pl", count: 0, nestedModel: nil)
+
+        service.save(models: [testModel5, testModel4, testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetch(sorted: .byKeyPath(keyPath: "count", ascending: false), limit: 2, callback: {
+                (fetched: [TestSomeModel]) in
+                XCTAssertTrue(fetched == [testModel4, testModel2])
+            }, next: {
+                (fetched: [TestSomeModel], isLast: Bool) in
+                token?.invalidate()
+                XCTAssertTrue(token?.limit == 4)
+                XCTAssertTrue(!isLast)
+                XCTAssertTrue(fetched == [testModel3, testModel])
+                expectation.fulfill()
+            }, updates: {
+                (update: DatabaseObserveUpdate<TestSomeModel>) in
+                XCTFail()
+            })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                token?.loadNext(2)
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+    func testLoadNextIsLast() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 4, nestedModel: nil)
+
+        service.save(models: [testModel4, testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetch(sorted: .byKeyPath(keyPath: "count", ascending: false), limit: 2, callback: {
+                (fetched: [TestSomeModel]) in
+                XCTAssertTrue(fetched == [testModel4, testModel2])
+            }, next: {
+                (fetched: [TestSomeModel], isLast: Bool) in
+                token?.invalidate()
+                XCTAssertTrue(token?.limit == 4)
+                XCTAssertTrue(isLast)
+                XCTAssertTrue(fetched == [testModel3, testModel])
+                expectation.fulfill()
+            }, updates: {
+                (update: DatabaseObserveUpdate<TestSomeModel>) in
+                XCTFail()
+            })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                token?.loadNext(2)
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testFetchUpdate() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
 
         service.save(model: testModel)
 
@@ -265,8 +466,7 @@ class CustomRealmContainerTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let token = self.service.fetch(with: testModel.userId, callback: {
-                (model: TestSubModel?) in
-
+                (model: TestSomeModel?) in
             }, updates: {
                 update in
 
@@ -278,9 +478,9 @@ class CustomRealmContainerTests: XCTestCase {
                 }
             })
 
-            self.service.update(modelOf: TestSubModel.self,
+            self.service.update(modelOf: TestSomeModel.self,
                                 with: testModel.userId,
-                                updates: [TestSubModel.Updates.count(5)].dictionaryRepresentation())
+                                updates: [TestSomeModel.Updates.count(5)].dictionaryRepresentation())
 
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
                 token.invalidate()
@@ -290,18 +490,20 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testFetchDelete() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
 
         service.save(model: testModel)
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let token = self.service.fetch(with: testModel.userId, callback: {
-                (model: TestSubModel?) in
-
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetch(with: testModel.userId, callback: {
+                (model: TestSomeModel?) in
             }, updates: {
                 update in
+
+                token?.invalidate()
 
                 switch update {
                 case .update:
@@ -312,18 +514,16 @@ class CustomRealmContainerTests: XCTestCase {
                 }
             })
 
-            self.service.delete(model: testModel)
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                token.invalidate()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.service.delete(model: testModel)
             }
         }
         wait(for: [expectation], timeout: 1)
     }
 
     func testMultipleFetchInsert() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
         service.save(models: [testModel])
 
@@ -331,9 +531,8 @@ class CustomRealmContainerTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             var token: DatabaseUpdatesToken?
-            token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
-                (models: [TestSubModel]) in
-
+            token = self.service.fetch(with: .unfiltered, sorted: .unsorted, callback: {
+                (models: [TestSomeModel]) in
             }, updates: {
                 updates in
 
@@ -351,8 +550,8 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testMultipleFetchDelete() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
         service.save(models: [testModel, testModel2])
 
@@ -360,9 +559,8 @@ class CustomRealmContainerTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             var token: DatabaseUpdatesToken?
-            token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
-                (models: [TestSubModel]) in
-
+            token = self.service.fetch(with: .unfiltered, sorted: .unsorted, callback: {
+                (models: [TestSomeModel]) in
             }, updates: {
                 updates in
 
@@ -380,19 +578,18 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testMultipleFetchUpdate() {
-        let testModel = TestSubModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2)
-        let testModel2 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
         service.save(models: [testModel, testModel2])
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let testModel3 = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 5)
+            let testModel3 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 5, nestedModel: nil)
             var token: DatabaseUpdatesToken?
-            token = self.service.fetch(with: .unfiltered, with: .unsorted, callback: {
-                (models: [TestSubModel]) in
-
+            token = self.service.fetch(with: .unfiltered, sorted: .unsorted, callback: {
+                (models: [TestSomeModel]) in
             }, updates: {
                 updates in
 
@@ -403,7 +600,7 @@ class CustomRealmContainerTests: XCTestCase {
                 expectation.fulfill()
             })
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 self.service.update(model: testModel3)
             }
         }
@@ -411,8 +608,8 @@ class CustomRealmContainerTests: XCTestCase {
     }
 
     func testSimpleRelationship() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
-        let testModel = TestRRModel(id: 1, name: "ll", owner: subModel)
+        let someModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel = TestRRModel(id: 1, name: "ll", owner: someModel)
 
         service.save(models: [testModel])
 
@@ -427,6 +624,79 @@ class CustomRealmContainerTests: XCTestCase {
                 expectation.fulfill()
             }
         }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testNestedModel() {
+        let testModel = TestSomeModel.TestNestedModel(title: "title", count: 9)
+        let someModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: testModel)
+
+        service.save(models: [someModel])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+
+            self.service.fetch() {
+                (all: [TestSomeModel]) in
+
+                XCTAssertTrue(all.first?.nestedModel == testModel)
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testNestedModelUpdate() {
+        let testModel = TestSomeModel.TestNestedModel(title: "title", count: 9)
+        let someModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+
+        service.save(models: [someModel])
+        service.update(modelOf: TestSomeModel.self,
+                       with: someModel.userId,
+                       updates: ["nestedModel": testModel])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+
+            self.service.fetch() {
+                (all: [TestSomeModel]) in
+
+                XCTAssertTrue(all.first?.nestedModel == testModel)
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testCollectionsStoring() {
+        let codable = SomeCodable(key: "k", index: 4)
+        let url = URL(string: "https://google.com")
+        let testModel = TestCollectionsModel(id: 1,
+                                             strings: ["one", "two"],
+                                             intValues: [0, 3],
+                                             doubleValues: nil,
+                                             dates: [Date()],
+                                             codable: [codable],
+                                             urls: [url],
+                                             dict: [1: codable],
+                                             anotherDict: [codable: 2],
+                                             set: [url],
+                                             anotherSet: [codable])
+
+        service.save(model: testModel)
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let fetched: TestCollectionsModel? = self.service.syncFetchUnique(with: testModel.id)
+
+            XCTAssertTrue(testModel == fetched)
+
+            expectation.fulfill()
+        }
+
         wait(for: [expectation], timeout: 1)
     }
 }

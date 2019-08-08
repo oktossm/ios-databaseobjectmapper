@@ -156,39 +156,43 @@ extension RealmService {
     // MARK: Fetching
 
     public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
-                                           with sort: DatabaseSortType = .unsorted,
+                                           sorted sort: DatabaseSortType = .unsorted,
+                                           limit: Int? = nil,
                                            callback: @escaping ([T]) -> Void) where T.Container: RealmObject {
         let worker = self.nextWorker()
 
         worker.execute {
             realmOperator in
-            let values = realmOperator.values(ofType: T.self).filter(filter).sort(sort).compactMap({ try? T.mappable(for: $0) })
-            let result: [T] = Array(values)
+            let values = realmOperator.values(ofType: T.self).filter(filter).sort(sort).limited(limit).compactMap({ try? T.mappable(for: $0) })
             DispatchQueue.main.async {
-                callback(result)
+                callback(values)
             }
         }
     }
 
     public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
-                                               with sort: DatabaseSortType = .unsorted) -> [T] where T.Container: RealmObject {
+                                               sorted sort: DatabaseSortType = .unsorted,
+                                               limit: Int? = nil) -> [T] where T.Container: RealmObject {
         let realm = try! Realm()
         let syncOperator = RealmOperator(realm: realm)
-        let values = syncOperator.values(ofType: T.self).filter(filter).sort(sort).compactMap({ try? T.mappable(for: $0) })
-        return Array(values)
+        let values = syncOperator.values(ofType: T.self).filter(filter).sort(sort).limited(limit).compactMap({ try? T.mappable(for: $0) })
+        return values
     }
 
     public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
-                                           with sort: DatabaseSortType = .unsorted,
+                                           sorted sort: DatabaseSortType = .unsorted,
+                                           limit: Int? = nil,
                                            callback: @escaping ([T]) -> Void,
+                                           next: (([T], Bool) -> Void)? = nil,
                                            updates: @escaping (DatabaseObserveUpdate<T>) -> Void)
                     -> DatabaseUpdatesToken where T.Container: RealmObject {
-        let token = DatabaseUpdatesToken {}
+        let token = DatabaseUpdatesToken()
+        token.limit = limit
 
         let worker = self.nextWorker()
 
         worker.execute {
-            realmOperator in
+            [weak worker, weak self] realmOperator in
 
             if token.isInvalidated { return }
 
@@ -199,18 +203,25 @@ extension RealmService {
 
                 switch change {
                 case let .initial(newResults):
-                    let values = Array(newResults.compactMap({ try? T.mappable(for: $0) }))
+                    let values = newResults.limited(token.limit).compactMap({ try? T.mappable(for: $0) })
                     let result: [T] = Array(values)
                     DispatchQueue.main.async {
                         callback(result)
                     }
                 case let .update(newResults, deletions, insertions, modifications):
-                    let values = Array(newResults.compactMap({ try? T.mappable(for: $0) }))
+                    let deletionsInLimit = deletions.filter { token.limit == nil || $0 < (token.limit ?? 0) }
+                    let insertionsInLimit = insertions.filter { token.limit == nil || $0 < (token.limit ?? 0) }
+                    let modificationsInLimit = modifications.filter { token.limit == nil || $0 < (token.limit ?? 0) }
+                    let newLimit = token.limit.flatMap { $0 + (max(0, insertionsInLimit.count - deletionsInLimit.count)) }
+                    let values = newResults.limited(newLimit).compactMap({ try? T.mappable(for: $0) })
+                    if (token.limit ?? Int.max) < newResults.count {
+                        token.updateLimit(newLimit)
+                    }
                     DispatchQueue.main.async {
                         let update = DatabaseObserveUpdate(values: values,
-                                                           deletions: deletions,
-                                                           insertions: insertions,
-                                                           modifications: modifications)
+                                                           deletions: deletionsInLimit,
+                                                           insertions: insertionsInLimit,
+                                                           modifications: modificationsInLimit)
                         updates(update)
                     }
                 case .error(_):
@@ -219,12 +230,14 @@ extension RealmService {
             }
 
             token.invalidation = { rToken.invalidate() }
+            guard let worker = worker else { return }
+            self?.setupLimitation(for: token, worker: worker, results: results, next: next, updates: updates)
         }
 
         return token
     }
 
-    public func fetch<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void) where T.Container: RealmObject {
+    public func fetchUnique<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void) where T.Container: RealmObject {
 
         let worker = self.nextWorker()
 
@@ -247,7 +260,7 @@ extension RealmService {
     public func fetch<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void, updates: @escaping (DatabaseModelUpdate<T>) -> Void)
                     -> DatabaseUpdatesToken where T.Container: RealmObject {
 
-        let token = DatabaseUpdatesToken {}
+        let token = DatabaseUpdatesToken()
 
         let worker = self.nextWorker()
 
@@ -290,7 +303,8 @@ extension RealmService {
     public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                         in model: T,
                                                                         with filter: DatabaseFilterType = .unfiltered,
-                                                                        with sort: DatabaseSortType = .unsorted,
+                                                                        sorted sort: DatabaseSortType = .unsorted,
+                                                                        limit: Int? = nil,
                                                                         callback: @escaping ([R]) -> Void)
             where T.Container: Object, R.Container: Object {
         let worker = self.nextWorker()
@@ -300,6 +314,7 @@ extension RealmService {
             guard let values = realmOperator.relationValues(relation, in: model)?
                                             .filter(filter)
                                             .sort(sort)
+                                            .limited(limit)
                                             .compactMap({ try? R.mappable(for: $0) }) else {
                 DispatchQueue.main.async {
                     callback([])
@@ -317,13 +332,15 @@ extension RealmService {
     public func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                             in model: T,
                                                                             with filter: DatabaseFilterType = .unfiltered,
-                                                                            with sort: DatabaseSortType = .unsorted) -> [R]
+                                                                            sorted sort: DatabaseSortType = .unsorted,
+                                                                            limit: Int? = nil) -> [R]
             where T.Container: Object, R.Container: Object {
         let realm = try! Realm()
         let syncOperator = RealmOperator(realm: realm)
         guard let values = syncOperator.relationValues(relation, in: model)?
                                        .filter(filter)
                                        .sort(sort)
+                                       .limited(limit)
                                        .compactMap({ try? R.mappable(for: $0) }) else {
             return []
         }
@@ -335,16 +352,19 @@ extension RealmService {
     public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                         in model: T,
                                                                         with filter: DatabaseFilterType = .unfiltered,
-                                                                        with sort: DatabaseSortType = .unsorted,
+                                                                        sorted sort: DatabaseSortType = .unsorted,
+                                                                        limit: Int? = nil,
                                                                         callback: @escaping ([R]) -> Void,
+                                                                        next: (([R], Bool) -> Void)? = nil,
                                                                         updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
             where T.Container: Object, R.Container: Object {
-        let token = DatabaseUpdatesToken {}
+        let token = DatabaseUpdatesToken()
+        token.limit = limit
 
         let worker = self.nextWorker()
 
         worker.execute {
-            realmOperator in
+            [weak worker, weak self] realmOperator in
 
             if token.isInvalidated { return }
 
@@ -360,19 +380,27 @@ extension RealmService {
 
                 switch change {
                 case let .initial(newResults):
-                    let values = Array(newResults.compactMap({ try? R.mappable(for: $0) }))
+                    let values = Array(newResults.limited(token.limit).compactMap({ try? R.mappable(for: $0) }))
                     let result: [R] = Array(values)
                     DispatchQueue.main.async {
                         relation.cachedValue = result
                         callback(result)
                     }
                 case let .update(newResults, deletions, insertions, modifications):
-                    let values = Array(newResults.compactMap({ try? R.mappable(for: $0) }))
+                    let deletionsInLimit = deletions.filter { token.limit == nil || $0 < (token.limit ?? 0) }
+                    let insertionsInLimit = insertions.filter { token.limit == nil || $0 < (token.limit ?? 0) }
+                    let modificationsInLimit = modifications.filter { token.limit == nil || $0 < (token.limit ?? 0) }
+                    let newLimit = token.limit.flatMap { $0 + (max(0, insertionsInLimit.count - deletionsInLimit.count)) }
+                    let values = newResults.limited(newLimit).compactMap({ try? R.mappable(for: $0) })
+                    print(newResults.count)
+                    if (token.limit ?? Int.max) < newResults.count {
+                        token.updateLimit(newLimit)
+                    }
                     DispatchQueue.main.async {
                         let update = DatabaseObserveUpdate(values: values,
-                                                           deletions: deletions,
-                                                           insertions: insertions,
-                                                           modifications: modifications)
+                                                           deletions: deletionsInLimit,
+                                                           insertions: insertionsInLimit,
+                                                           modifications: modificationsInLimit)
                         relation.cachedValue = values
                         updates(update)
                     }
@@ -381,9 +409,59 @@ extension RealmService {
             }
 
             token.invalidation = { rToken.invalidate() }
+            guard let worker = worker else { return }
+            self?.setupLimitation(for: token, worker: worker, results: results, next: next, updates: updates)
         }
 
         return token
+    }
+}
+
+
+extension RealmService {
+    private func setupLimitation<T: DatabaseMappable>(for token: DatabaseUpdatesToken,
+                                                      worker: DatabaseRealmBackgroundWorker,
+                                                      results: AnyRealmCollection<T.Container>,
+                                                      next: (([T], Bool) -> Void)? = nil,
+                                                      updates: @escaping (DatabaseObserveUpdate<T>) -> Void) where T.Container: RealmObject {
+        token.limitation = {
+            [weak worker] oldLimit, newLimit in
+            worker?.execute {
+                _ in
+                guard oldLimit != newLimit, (oldLimit ?? Int.max) < results.count || (newLimit ?? Int.max) < results.count else { return }
+                let values = results.limited(newLimit).compactMap({ try? T.mappable(for: $0) })
+                let old = min(results.count, oldLimit ?? Int.max)
+                let new = min(results.count, newLimit ?? Int.max)
+                let deletions = old > new ? Array(new..<old) : []
+                let insertions = old < new ? Array(old..<new) : []
+                DispatchQueue.main.async {
+                    let update = DatabaseObserveUpdate(values: values,
+                                                       deletions: deletions,
+                                                       insertions: insertions,
+                                                       modifications: [])
+                    updates(update)
+                }
+            }
+        }
+        token.nextPage = {
+            [weak token, weak worker] count in
+            worker?.execute {
+                _ in
+                guard let oldLimit = token?.limit, results.count > oldLimit else {
+                    DispatchQueue.main.async {
+                        next?([], true)
+                    }
+                    return
+                }
+                let newLimit = oldLimit + count
+                let values = results.limited(in: oldLimit..<newLimit).compactMap({ try? T.mappable(for: $0) })
+                let isLast = newLimit >= results.count
+                token?.updateLimit(newLimit)
+                DispatchQueue.main.async {
+                    next?(values, isLast)
+                }
+            }
+        }
     }
 }
 

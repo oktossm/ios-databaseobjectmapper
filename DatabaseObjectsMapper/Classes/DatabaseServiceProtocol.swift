@@ -51,17 +51,50 @@ public enum DatabaseModelUpdate<T> {
 
 
 public class DatabaseUpdatesToken {
-    var invalidation: (() -> Void)
+    var nextPage: ((Int) -> Void)?
+    var invalidation: (() -> Void)?
+    var limitation: ((Int?, Int?) -> Void)?
 
-    public var isInvalidated: Bool = false
+    private var limitValue: Int?
+    private let limitQueue = DispatchQueue(label: "mm.databaseService.limitQueue", qos: .utility)
 
-    public init(invalidation: @escaping (() -> Void)) {
+    /// Check if token is invalidated
+    public private(set) var isInvalidated: Bool = false
+
+    /// Updates limit. Setting limit will call updates block with all values including new.
+    public var limit: Int? {
+        get {
+            return limitValue
+        }
+        set {
+            guard !isInvalidated else { return }
+            limitation?(limitValue, newValue)
+            limitQueue.sync { self.limitValue = newValue }
+        }
+    }
+
+    init(invalidation: (() -> Void)? = nil, limitation: ((Int?, Int?) -> Void)? = nil) {
         self.invalidation = invalidation
     }
 
+    deinit {
+        invalidate()
+    }
+
+    func updateLimit(_ limit: Int?) {
+        limitQueue.sync { self.limitValue = limit }
+    }
+
+    /// Invalidates token. Updates will no longer be listened.
     public func invalidate() {
         self.isInvalidated = true
-        self.invalidation()
+        self.invalidation?()
+    }
+
+    /// Loads next page. Updates limit according to load count. Will call next block with only new values fetched. Current limit must be non nil
+    public func loadNext(_ count: Int) {
+        guard limit != nil, !isInvalidated else { return }
+        nextPage?(count)
     }
 }
 
@@ -112,24 +145,30 @@ public protocol DatabaseServiceProtocol {
     // MARK: Fetching
 
     /// Fetches models of given type with optional filter and sorting. Objects returns async in `callback`.
-    func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType, with sort: DatabaseSortType, callback: @escaping (Array<T>) -> Void)
+    func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType,
+                                    sorted sort: DatabaseSortType,
+                                    limit: Int?,
+                                    callback: @escaping (Array<T>) -> Void)
 
     /// Fetches models of given type with optional filter and sorting. Returns models array.
-    func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType, with sort: DatabaseSortType) -> Array<T>
+    func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType, sorted sort: DatabaseSortType, limit: Int?) -> Array<T>
 
     /// Fetches models of given type with optional filter and sorting and subscribes on their updates. First fetch returns async in `callback`.
-    /// Next updates send in `updates` closure.
-    /// - returns: `DatabaseUpdatesToken` to stop observing `updates`.
+    /// Further updates send in `updates` closure.
+    /// Next block called when loadNext() called for DatabaseUpdatesToken, and returns array of only new values and boolean - isLast values.
+    /// - returns: `DatabaseUpdatesToken` to stop observing `updates` and handle limits and pagination.
     func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType,
-                                    with sort: DatabaseSortType,
+                                    sorted sort: DatabaseSortType,
+                                    limit: Int?,
                                     callback: @escaping (Array<T>) -> Void,
+                                    next: (([T], Bool) -> Void)?,
                                     updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
 
     /// Fetches model of given type and id. Object or nil returns async in callback.
-    func fetch<T: UniquelyMappable>(modelOf type: T.Type, with key: T.ID, callback: @escaping (T?) -> Void)
+    func fetchUnique<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void)
 
     /// Fetches model of given type and id. Returns model.
-    func syncFetch<T: UniquelyMappable>(modelOf type: T.Type, with key: T.ID) -> T?
+    func syncFetchUnique<T: UniquelyMappable>(with key: T.ID) -> T?
 
     /// Fetches model of given type and id. Object or nil returns async in callback.
     /// Next updates send in `updates` closure.
@@ -144,22 +183,25 @@ public protocol DatabaseServiceProtocol {
     func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                  in model: T,
                                                                  with filter: DatabaseFilterType,
-                                                                 with sort: DatabaseSortType,
+                                                                 sorted sort: DatabaseSortType,
+                                                                 limit: Int?,
                                                                  callback: @escaping (Array<R>) -> Void)
 
     /// Fetches relation models of given type with optional filter and sorting. Returns models array.
     func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                      in model: T,
                                                                      with filter: DatabaseFilterType,
-                                                                     with sort: DatabaseSortType) -> Array<R>
+                                                                     sorted sort: DatabaseSortType,
+                                                                     limit: Int?) -> Array<R>
 
     /// Fetches relation models of given type with optional filter and sorting and subscribes on their updates.
-    /// First fetch returns async in `callback`. Next updates send in `updates` closure.
+    /// First fetch returns async in `callback`. Next ufpdates send in `updates` closure.
     /// - returns: `DatabaseUpdatesToken` to stop observing `updates`.
     func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                  in model: T,
                                                                  with filter: DatabaseFilterType,
-                                                                 with sort: DatabaseSortType,
+                                                                 sorted sort: DatabaseSortType,
+                                                                 limit: Int?,
                                                                  callback: @escaping (Array<R>) -> Void,
                                                                  updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
 }

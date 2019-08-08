@@ -17,6 +17,8 @@
 		607FACEC1AFB9204008FA782 /* RealmContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* RealmContainerTests.swift */; };
 		DDEDB018389E6FB3783D7A22 /* TestContainers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBCF9194ED939A77D0384 /* TestContainers.swift */; };
 		DDEDB07EB0BCFB8F5D3155B3 /* AutoObjectDiff.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBF9C8737DD301E6A3912 /* AutoObjectDiff.generated.swift */; };
+		DDEDB34051A6619E26331AB5 /* CoreDataPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB102FD5605767F71D18F /* CoreDataPerformanceTests.swift */; };
+		DDEDB37CB9A7CCC4F940FF64 /* RealmPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB592581CB16A7179AAE2 /* RealmPerformanceTests.swift */; };
 		DDEDB4E3C9429B91A4EAE8E8 /* TestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB10073B1A1D08B373772 /* TestModel.swift */; };
 		DDEDB53F3311D0056334A35C /* RealmRelationshipsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB7767F5C024B83A2F7C7 /* RealmRelationshipsTests.swift */; };
 		DDEDB6F765EA25921C45110E /* AutoCodable.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB8B89C76135D86C072E3 /* AutoCodable.generated.swift */; };
@@ -60,7 +62,9 @@
 		A41B29EFD857217878D7EBDB /* Pods-DatabaseObjectsMapper_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Tests/Pods-DatabaseObjectsMapper_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		B6E67A8AC5BC5D2B96C56917 /* Pods-DatabaseObjectsMapper_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example.release.xcconfig"; sourceTree = "<group>"; };
 		DDEDB10073B1A1D08B373772 /* TestModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestModel.swift; sourceTree = "<group>"; };
+		DDEDB102FD5605767F71D18F /* CoreDataPerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataPerformanceTests.swift; sourceTree = "<group>"; };
 		DDEDB37F2F0BF1D6FBF2CFC3 /* AutoInitializable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoInitializable.generated.swift; sourceTree = "<group>"; };
+		DDEDB592581CB16A7179AAE2 /* RealmPerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmPerformanceTests.swift; sourceTree = "<group>"; };
 		DDEDB7767F5C024B83A2F7C7 /* RealmRelationshipsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmRelationshipsTests.swift; sourceTree = "<group>"; };
 		DDEDB8B89C76135D86C072E3 /* AutoCodable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoCodable.generated.swift; sourceTree = "<group>"; };
 		DDEDB9D0230BE414E652419E /* AutoCases.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoCases.generated.swift; sourceTree = "<group>"; };
@@ -160,6 +164,8 @@
 				DDEDBE207E8E87F178B2601B /* CustomRealmContainerTests.swift */,
 				DDEDBD4758318979199E1C1B /* CoreDataContainerTests.swift */,
 				DDEDB7767F5C024B83A2F7C7 /* RealmRelationshipsTests.swift */,
+				DDEDB592581CB16A7179AAE2 /* RealmPerformanceTests.swift */,
+				DDEDB102FD5605767F71D18F /* CoreDataPerformanceTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -278,6 +284,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 2FW53R75K6;
 						LastSwiftMigration = 1020;
 					};
 					607FACE41AFB9204008FA782 = {
@@ -421,6 +428,8 @@
 				DDEDBE28BA1B649F2B3EA195 /* CustomRealmContainerTests.swift in Sources */,
 				DDEDBF096EB7738D3C403A12 /* CoreDataContainerTests.swift in Sources */,
 				DDEDB53F3311D0056334A35C /* RealmRelationshipsTests.swift in Sources */,
+				DDEDB37CB9A7CCC4F940FF64 /* RealmPerformanceTests.swift in Sources */,
+				DDEDB34051A6619E26331AB5 /* CoreDataPerformanceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -558,6 +567,7 @@
 			baseConfigurationReference = 22EE19103B2C9D5DCE1BD59F /* Pods-DatabaseObjectsMapper_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 2FW53R75K6;
 				INFOPLIST_FILE = DatabaseObjectsMapper/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -573,6 +583,7 @@
 			baseConfigurationReference = B6E67A8AC5BC5D2B96C56917 /* Pods-DatabaseObjectsMapper_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 2FW53R75K6;
 				INFOPLIST_FILE = DatabaseObjectsMapper/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

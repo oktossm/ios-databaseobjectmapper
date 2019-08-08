@@ -7,7 +7,7 @@ import RealmSwift
 
 
 /// A RealmContainer allows any Codable type to be persisted to a Realm.
-public final class RealmContainer: Object, SharedDatabaseContainer {
+public final class RealmContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<RealmContainer, String> = \RealmContainer.id
 
     @objc dynamic var _value: Data? = nil
@@ -20,9 +20,6 @@ public final class RealmContainer: Object, SharedDatabaseContainer {
             _value = newValue.archived
         }
     }
-
-    /// The name of the type that the encoded data is. Used for retrieving all values.
-    @objc public dynamic var typeName = ""
 
     /// The unique identifier for the data. This property is used as the primary key.
     @objc public dynamic var id = ""

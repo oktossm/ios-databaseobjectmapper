@@ -49,7 +49,7 @@ class RealmRelationshipsTests: XCTestCase {
     }
 
     func testSimpleRelationship() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: subModel)
 
         service.save(models: [testModel])
@@ -67,7 +67,7 @@ class RealmRelationshipsTests: XCTestCase {
             }
 
             self.service.fetch() {
-                (all: [TestSubModel]) in
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [subModel])
                 expectation.fulfill()
@@ -77,7 +77,7 @@ class RealmRelationshipsTests: XCTestCase {
     }
 
     func testToManyRelationship() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
 
         service.save(model: subModel, update: true, relation: subModel.directModels, with: .setModels(models: [testModel]))
@@ -95,13 +95,13 @@ class RealmRelationshipsTests: XCTestCase {
             }
 
             self.service.fetch() {
-                (all: [TestSubModel]) in
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [subModel])
                 expectation.fulfill()
             }
 
-            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, with: .unsorted) {
+            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, sorted: .unsorted) {
                 (all: [TestRRModel]) in
 
                 XCTAssertTrue(all == [testModel])
@@ -112,7 +112,7 @@ class RealmRelationshipsTests: XCTestCase {
     }
 
     func testAddRelationship() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
 
         service.save(models: [testModel])
@@ -132,7 +132,7 @@ class RealmRelationshipsTests: XCTestCase {
             }
 
             self.service.fetch() {
-                (all: [TestSubModel]) in
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [subModel])
                 expectation.fulfill()
@@ -142,7 +142,7 @@ class RealmRelationshipsTests: XCTestCase {
     }
 
     func testAddToManyRelationship() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
 
         service.save(models: [subModel])
@@ -160,13 +160,13 @@ class RealmRelationshipsTests: XCTestCase {
             }
 
             self.service.fetch() {
-                (all: [TestSubModel]) in
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [subModel])
                 expectation.fulfill()
             }
 
-            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, with: .unsorted) {
+            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, sorted: .unsorted) {
                 (all: [TestRRModel]) in
 
                 XCTAssertTrue(all == [testModel])
@@ -177,7 +177,7 @@ class RealmRelationshipsTests: XCTestCase {
     }
 
     func testAddToManyRelationshipWithKeys() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
 
         service.save(models: [subModel])
@@ -196,13 +196,13 @@ class RealmRelationshipsTests: XCTestCase {
             }
 
             self.service.fetch() {
-                (all: [TestSubModel]) in
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [subModel])
                 expectation.fulfill()
             }
 
-            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, with: .unsorted) {
+            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, sorted: .unsorted) {
                 (all: [TestRRModel]) in
 
                 XCTAssertTrue(all == [testModel])
@@ -213,7 +213,7 @@ class RealmRelationshipsTests: XCTestCase {
     }
 
     func testRemoveSimpleRelationship() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: subModel)
 
         service.save(models: [testModel])
@@ -233,7 +233,7 @@ class RealmRelationshipsTests: XCTestCase {
             }
 
             self.service.fetch() {
-                (all: [TestSubModel]) in
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [subModel])
                 expectation.fulfill()
@@ -243,7 +243,7 @@ class RealmRelationshipsTests: XCTestCase {
     }
 
     func testRemoveToManyRelationship() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
 
         service.save(model: subModel, update: true, relation: subModel.directModels, with: .setModels(models: [testModel]))
@@ -262,13 +262,13 @@ class RealmRelationshipsTests: XCTestCase {
             }
 
             self.service.fetch() {
-                (all: [TestSubModel]) in
+                (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [subModel])
                 expectation.fulfill()
             }
 
-            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, with: .unsorted) {
+            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, sorted: .unsorted) {
                 (all: [TestRRModel]) in
 
                 XCTAssertTrue(all == [])
@@ -280,7 +280,7 @@ class RealmRelationshipsTests: XCTestCase {
 
 
     func testInverseRelationship() {
-        let subModel = TestSubModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2)
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: subModel)
 
         service.save(models: [testModel])
@@ -293,7 +293,7 @@ class RealmRelationshipsTests: XCTestCase {
             self.service.fetchRelation(subModel.inverseModel,
                                        in: subModel,
                                        with: .unfiltered,
-                                       with: .unsorted) {
+                                       sorted: .unsorted) {
                 (all: [TestRRModel]) in
                 XCTAssertTrue(all == [testModel])
                 expectation.fulfill()
@@ -305,8 +305,143 @@ class RealmRelationshipsTests: XCTestCase {
                 XCTAssertTrue(all == [testModel])
                 expectation.fulfill()
             }
-
         }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testFetchWithLimit() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel1 = TestRRModel(id: 1, name: "la", owner: nil)
+        let testModel2 = TestRRModel(id: 2, name: "lb", owner: nil)
+        let testModel3 = TestRRModel(id: 3, name: "lc", owner: nil)
+
+        service.save(models: [testModel])
+        service.updateRelation(testModel.directModels, in: testModel, with: .addModels(models: [testModel1, testModel2, testModel3]))
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.service.fetchRelation(testModel.directModels,
+                                       in: testModel,
+                                       with: .unfiltered,
+                                       sorted: .byKeyPath(keyPath: "name", ascending: true),
+                                       limit: 2) {
+                (fetched: [TestRRModel]) in
+                XCTAssertTrue(fetched == [testModel1, testModel2])
+                expectation.fulfill()
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testSyncFetchWithLimit() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel1 = TestRRModel(id: 1, name: "la", owner: nil)
+        let testModel2 = TestRRModel(id: 2, name: "lb", owner: nil)
+        let testModel3 = TestRRModel(id: 3, name: "lc", owner: nil)
+
+        service.save(models: [testModel])
+        service.updateRelation(testModel.directModels, in: testModel, with: .addModels(models: [testModel1, testModel2, testModel3]))
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let fetched: [TestRRModel] = self.service.syncFetchRelation(testModel.directModels,
+                                                                        in: testModel,
+                                                                        with: .unfiltered,
+                                                                        sorted: .byKeyPath(keyPath: "name", ascending: true),
+                                                                        limit: 2)
+            XCTAssertTrue(fetched == [testModel1, testModel2])
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testFetchWithLimitUpdate() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel1 = TestRRModel(id: 1, name: "la", owner: nil)
+        let testModel2 = TestRRModel(id: 2, name: "lb", owner: nil)
+        let testModel3 = TestRRModel(id: 3, name: "lc", owner: nil)
+        let testModel4 = TestRRModel(id: 4, name: "ld", owner: nil)
+
+        service.save(models: [testModel])
+        service.updateRelation(testModel.directModels, in: testModel, with: .addModels(models: [testModel1, testModel2, testModel3, testModel4]))
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetchRelation(
+                    testModel.directModels,
+                    in: testModel,
+                    sorted: .byKeyPath(keyPath: "name", ascending: true),
+                    limit: 2,
+                    callback: {
+                        (fetched: [TestRRModel]) in
+                        XCTAssertTrue(fetched == [testModel1, testModel2])
+                    },
+                    updates: {
+                        (update: DatabaseObserveUpdate<TestRRModel>) in
+                        token?.invalidate()
+                        XCTAssertTrue(token?.limit == 3)
+                        XCTAssertTrue(update.values == [testModel1, testModel2, testModel3])
+                        expectation.fulfill()
+                    })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                token?.limit = 3
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testLoadNext() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
+        let testModel1 = TestRRModel(id: 1, name: "la", owner: nil)
+        let testModel2 = TestRRModel(id: 2, name: "lb", owner: nil)
+        let testModel3 = TestRRModel(id: 3, name: "lc", owner: nil)
+        let testModel4 = TestRRModel(id: 4, name: "ld", owner: nil)
+
+        service.save(models: [testModel])
+        service.updateRelation(testModel.directModels, in: testModel, with: .addModels(models: [testModel1, testModel2, testModel3, testModel4]))
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetchRelation(
+                    testModel.directModels,
+                    in: testModel,
+                    sorted: .byKeyPath(keyPath: "name", ascending: true),
+                    limit: 2,
+                    callback: {
+                        (fetched: [TestRRModel]) in
+                        XCTAssertTrue(fetched == [testModel1, testModel2])
+                    },
+                    next: {
+                        (fetched: [TestRRModel], isLast: Bool) in
+                        token?.invalidate()
+                        XCTAssertTrue(token?.limit == 4)
+                        XCTAssertTrue(isLast)
+                        XCTAssertTrue(fetched == [testModel3, testModel4])
+                        expectation.fulfill()
+                    },
+                    updates: {
+                        (update: DatabaseObserveUpdate<TestRRModel>) in
+                        token?.invalidate()
+                        XCTAssertTrue(token?.limit == 3)
+                        XCTAssertTrue(update.values == [testModel1, testModel2, testModel3])
+                        expectation.fulfill()
+                    })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                token?.loadNext(2)
+            }
+        }
+
         wait(for: [expectation], timeout: 1)
     }
 }

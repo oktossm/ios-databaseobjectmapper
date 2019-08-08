@@ -25,7 +25,6 @@ open class CoreDataService {
     }
 
     deinit {
-
     }
 }
 
@@ -109,7 +108,7 @@ extension CoreDataService {
                   let managed: T.Container = s.writeContext.findFirst(with: T.idMapping(key)) else { return }
             guard let model = try? T.mappable(for: managed) else { return }
             let updates: [String: Any?] = updates.mapValues {
-                if let mappable = $0 as? AnyDatabaseMappable & DictionaryCodable {
+                if let mappable = $0 as? DictionaryCodable {
                     return mappable.encodedValue
                 } else {
                     return $0
@@ -152,7 +151,7 @@ extension CoreDataService {
     }
 
     public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
-                                           with sort: DatabaseSortType = .unsorted,
+                                           sorted sort: DatabaseSortType = .unsorted,
                                            callback: @escaping (Array<T>) -> Void) where T.Container: CoreDataObject {
         self.readContext.perform {
             [weak self] in
@@ -170,7 +169,7 @@ extension CoreDataService {
     }
 
     public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
-                                               with sort: DatabaseSortType = .unsorted) -> Array<T> where T.Container: CoreDataObject {
+                                               sorted sort: DatabaseSortType = .unsorted) -> Array<T> where T.Container: CoreDataObject {
         var result = [T]()
 
         self.readContext.performAndWait {
@@ -191,10 +190,10 @@ extension CoreDataService {
     }
 
     public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
-                                           with sort: DatabaseSortType = .unsorted,
+                                           sorted sort: DatabaseSortType = .unsorted,
                                            callback: @escaping (Array<T>) -> Void,
                                            updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.Container: CoreDataObject {
-        let token = DatabaseUpdatesToken {}
+        let token = DatabaseUpdatesToken()
 
         self.readContext.perform {
             [weak self] in
@@ -228,7 +227,6 @@ extension CoreDataService {
                                                   insertions: update.insertions,
                                                   modifications: update.modifications))
                 } catch {
-
                 }
             }
 
@@ -240,8 +238,7 @@ extension CoreDataService {
         return token
     }
 
-    public func fetch<T: UniquelyMappable>(with key: T.ID,
-                                           callback: @escaping (T?) -> Void) where T.Container: CoreDataObject {
+    public func fetchUnique<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void) where T.Container: CoreDataObject {
         self.readContext.perform {
             [weak self] in
             guard let s = self else { return }
@@ -251,7 +248,7 @@ extension CoreDataService {
         }
     }
 
-    public func syncFetch<T: UniquelyMappable>(with key: T.ID) -> T? where T.Container: CoreDataObject {
+    public func syncFetchUnique<T: UniquelyMappable>(with key: T.ID) -> T? where T.Container: CoreDataObject {
 
         var result: T? = nil
 
@@ -269,7 +266,7 @@ extension CoreDataService {
     public func fetch<T: UniquelyMappable>(with key: T.ID,
                                            callback: @escaping (T?) -> Void,
                                            updates: @escaping (DatabaseModelUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.Container: CoreDataObject {
-        let token = DatabaseUpdatesToken {}
+        let token = DatabaseUpdatesToken()
 
         self.readContext.perform {
             [weak self] in
