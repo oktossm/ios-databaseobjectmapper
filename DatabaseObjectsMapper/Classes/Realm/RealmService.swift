@@ -118,6 +118,13 @@ extension RealmService {
         }
     }
 
+    public func update<T: UniquelyMappable & KeyPathConvertible>(modelOf type: T.Type,
+                                                                 with key: T.ID,
+                                                                 updates: [RootKeyPathUpdate<T>]) where T.Container: RealmObject {
+        let updates = Dictionary(updates.map { $0.update }) { _, last in last }
+        self.update(modelOf: type, with: key, updates: updates)
+    }
+
     public func updateRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T, with update: Relation<R>.Update)
             where T.Container: RealmObject, R.Container: RealmObject {
         self.writeWorker.execute {
@@ -414,6 +421,164 @@ extension RealmService {
         }
 
         return token
+    }
+
+    // MARK: Type safe Fetching
+
+    public func fetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                         sorted sort: [SortDescriptor<T>] = [],
+                                                         limit: Int? = nil,
+                                                         callback: @escaping ([T]) -> Void)
+            where T.Container: RealmObject, P.ModelType == T {
+        fetch(with: .predicate(predicate: predicate.predicate),
+              sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+              limit: limit,
+              callback: callback)
+    }
+
+    public func fetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = [],
+                                                                limit: Int? = nil,
+                                                                callback: @escaping ([T]) -> Void)
+            where T.Container: RealmObject {
+        fetch(with: .unfiltered,
+              sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+              limit: limit,
+              callback: callback)
+    }
+
+    public func syncFetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                             sorted sort: [SortDescriptor<T>] = [],
+                                                             limit: Int? = nil) -> [T] where T.Container: RealmObject, P.ModelType == T {
+        return syncFetch(with: .predicate(predicate: predicate.predicate),
+                         sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                         limit: limit)
+    }
+
+    public func syncFetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = [],
+                                                                    limit: Int? = nil) -> [T] where T.Container: RealmObject {
+        return syncFetch(with: .unfiltered,
+                         sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                         limit: limit)
+    }
+
+    public func fetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                         sorted sort: [SortDescriptor<T>] = [],
+                                                         limit: Int? = nil,
+                                                         callback: @escaping ([T]) -> Void,
+                                                         next: (([T], Bool) -> Void)? = nil,
+                                                         updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
+            where T.Container: RealmObject, P.ModelType == T {
+        return fetch(with: .predicate(predicate: predicate.predicate),
+                     sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                     limit: limit,
+                     callback: callback,
+                     next: next,
+                     updates: updates)
+    }
+
+    public func fetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = [],
+                                                                limit: Int? = nil,
+                                                                callback: @escaping ([T]) -> Void,
+                                                                next: (([T], Bool) -> Void)? = nil,
+                                                                updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
+            where T.Container: RealmObject {
+        return fetch(with: .unfiltered,
+                     sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                     limit: limit,
+                     callback: callback,
+                     next: next,
+                     updates: updates)
+    }
+
+    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable, P: Predicate>(_ relation: Relation<R>,
+                                                                                      in model: T,
+                                                                                      predicate: P,
+                                                                                      sorted sort: [SortDescriptor<R>] = [],
+                                                                                      limit: Int? = nil,
+                                                                                      callback: @escaping ([R]) -> Void)
+            where T.Container: Object, R.Container: Object, P.ModelType == R {
+        fetchRelation(relation,
+                      in: model,
+                      with: .predicate(predicate: predicate.predicate),
+                      sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                      limit: limit,
+                      callback: callback)
+    }
+
+    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible>(_ relation: Relation<R>,
+                                                                                             in model: T,
+                                                                                             sorted sort: [SortDescriptor<R>] = [],
+                                                                                             limit: Int? = nil,
+                                                                                             callback: @escaping ([R]) -> Void)
+            where T.Container: Object, R.Container: Object {
+        fetchRelation(relation,
+                      in: model,
+                      with: .unfiltered,
+                      sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                      limit: limit,
+                      callback: callback)
+    }
+
+    public func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable, P: Predicate>(_ relation: Relation<R>,
+                                                                                          in model: T,
+                                                                                          predicate: P,
+                                                                                          sorted sort: [SortDescriptor<R>] = [],
+                                                                                          limit: Int? = nil) -> [R]
+            where T.Container: Object, R.Container: Object, P.ModelType == R {
+        return syncFetchRelation(relation,
+                                 in: model,
+                                 with: .predicate(predicate: predicate.predicate),
+                                 sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                                 limit: limit)
+    }
+
+    public func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible>(_ relation: Relation<R>,
+                                                                                                 in model: T,
+                                                                                                 sorted sort: [SortDescriptor<R>] = [],
+                                                                                                 limit: Int? = nil) -> [R]
+            where T.Container: Object, R.Container: Object {
+        return syncFetchRelation(relation,
+                                 in: model,
+                                 with: .unfiltered,
+                                 sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                                 limit: limit)
+    }
+
+    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable, P: Predicate>(_ relation: Relation<R>,
+                                                                                      in model: T,
+                                                                                      predicate: P,
+                                                                                      sorted sort: [SortDescriptor<R>] = [],
+                                                                                      limit: Int? = nil,
+                                                                                      callback: @escaping ([R]) -> Void,
+                                                                                      next: (([R], Bool) -> Void)? = nil,
+                                                                                      updates: @escaping (DatabaseObserveUpdate<R>) -> Void)
+                    -> DatabaseUpdatesToken where T.Container: Object, R.Container: Object, P.ModelType == R {
+        return fetchRelation(relation,
+                             in: model,
+                             with: .predicate(predicate: predicate.predicate),
+                             sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                             limit: limit,
+                             callback: callback,
+                             next: next,
+                             updates: updates)
+    }
+
+    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible>(_ relation: Relation<R>,
+                                                                                             in model: T,
+                                                                                             sorted sort: [SortDescriptor<R>] = [],
+                                                                                             limit: Int? = nil,
+                                                                                             callback: @escaping ([R]) -> Void,
+                                                                                             next: (([R], Bool) -> Void)? = nil,
+                                                                                             updates: @escaping (DatabaseObserveUpdate<R>) -> Void)
+                    -> DatabaseUpdatesToken where T.Container: Object, R.Container: Object {
+        return fetchRelation(relation,
+                             in: model,
+                             with: .unfiltered,
+                             sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                             limit: limit,
+                             callback: callback,
+                             next: next,
+                             updates: updates)
     }
 }
 

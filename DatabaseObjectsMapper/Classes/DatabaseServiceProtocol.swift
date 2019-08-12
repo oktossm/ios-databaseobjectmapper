@@ -18,6 +18,10 @@ public enum DatabaseSortType {
         case .sortDescriptors(let sortDescriptors): return sortDescriptors
         }
     }
+
+    init(sortDescriptors: [AnySortDescriptor]) {
+        self = .sortDescriptors(sortDescriptors: sortDescriptors.map { $0.sortDescriptor })
+    }
 }
 
 
@@ -130,6 +134,9 @@ public protocol DatabaseServiceProtocol {
     /// Updates model of given type by id if its already exists. Updates only properties listed in updates.
     func update<T: UniquelyMappable>(modelOf type: T.Type, with key: T.ID, updates: [String: Any?])
 
+    /// Type safe updates model of given type by id if its already exists. Updates only properties listed in updates.
+    func update<T: UniquelyMappable & KeyPathConvertible>(modelOf type: T.Type, with key: T.ID, updates: [RootKeyPathUpdate<T>])
+
     ///  Updates model by id if it is already exists with relation updates. If model not found nothing happens.
     func updateRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T, with update: Relation<R>.Update)
 
@@ -203,5 +210,94 @@ public protocol DatabaseServiceProtocol {
                                                                  sorted sort: DatabaseSortType,
                                                                  limit: Int?,
                                                                  callback: @escaping (Array<R>) -> Void,
+                                                                 updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
+
+    // MARK: Type safe Fetching
+
+    /// Fetch with type safe predicate and sort descriptors using KeyPath
+    /// Examples:
+    ///      fetch(\TestSomeModel.userName == "rt")
+    ///      fetch(\TestSomeModel.userName == "rt" && \TestSomeModel.count == 2)
+    func fetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                  sorted sort: [SortDescriptor<T>],
+                                                  limit: Int?,
+                                                  callback: @escaping ([T]) -> Void)
+
+    /// Fetch with type safe sort descriptors using KeyPath
+    /// Examples:
+    ///      fetch(sorted: [SortDescriptor(\TestSomeModel.count, ascending: false)])
+    func fetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>], limit: Int?, callback: @escaping ([T]) -> Void)
+
+    /// Sync fetch with safe predicate and sort descriptors using KeyPath
+    func syncFetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                      sorted sort: [SortDescriptor<T>],
+                                                      limit: Int?) -> [T]
+
+    /// Sync fetch with type safe sort descriptors using KeyPath
+    func syncFetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>], limit: Int?) -> [T]
+
+    /// Fetch with type safe predicate and sort descriptors using KeyPath
+    func fetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                  sorted sort: [SortDescriptor<T>],
+                                                  limit: Int?,
+                                                  callback: @escaping ([T]) -> Void,
+                                                  next: (([T], Bool) -> Void)?,
+                                                  updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
+
+    /// Fetch with type safe predicate and sort descriptors using KeyPath
+    func fetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>],
+                                                         limit: Int?,
+                                                         callback: @escaping ([T]) -> Void,
+                                                         next: (([T], Bool) -> Void)?,
+                                                         updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
+
+
+    /// Type safe fetch for relations
+    func fetchRelation<T: UniquelyMappable, R: UniquelyMappable, P: Predicate>(_ relation: Relation<R>,
+                                                                               in model: T,
+                                                                               predicate: P,
+                                                                               sorted sort: [SortDescriptor<R>],
+                                                                               limit: Int?,
+                                                                               callback: @escaping ([R]) -> Void)
+
+
+    func fetchRelation<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible>(_ relation: Relation<R>,
+                                                                                      in model: T,
+                                                                                      sorted sort: [SortDescriptor<R>],
+                                                                                      limit: Int?,
+                                                                                      callback: @escaping ([R]) -> Void)
+
+
+    func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable, P: Predicate>(_ relation: Relation<R>,
+                                                                                   in model: T,
+                                                                                   predicate: P,
+                                                                                   sorted sort: [SortDescriptor<R>],
+                                                                                   limit: Int?) -> [R]
+
+
+    func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible>(_ relation: Relation<R>,
+                                                                                          in model: T,
+                                                                                          sorted sort: [SortDescriptor<R>],
+                                                                                          limit: Int?) -> [R]
+
+
+    func fetchRelation<T: UniquelyMappable,
+                      R: UniquelyMappable,
+                      P: Predicate>
+            (_ relation: Relation<R>,
+             in model: T,
+             predicate: P,
+             sorted sort: [SortDescriptor<R>],
+             limit: Int?,
+             callback: @escaping ([R]) -> Void,
+             next: (([R], Bool) -> Void)?,
+             updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
+
+    func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                 in model: T,
+                                                                 sorted sort: [SortDescriptor<R>],
+                                                                 limit: Int?,
+                                                                 callback: @escaping ([R]) -> Void,
+                                                                 next: (([R], Bool) -> Void)?,
                                                                  updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
 }

@@ -14,11 +14,11 @@ extension AnyRealmCollection {
         case .unsorted: return self
         case .byKeyPath(let path, let ascending): return AnyRealmCollection(self.sorted(byKeyPath: path, ascending: ascending))
         case .sortDescriptors(let descriptors): return AnyRealmCollection(self.sorted(by: descriptors.compactMap {
-            descriptor -> SortDescriptor? in
+            descriptor -> RealmSwift.SortDescriptor? in
             guard let keyPath = descriptor.key else {
                 return nil
             }
-            return SortDescriptor(keyPath: keyPath, ascending: descriptor.ascending)
+            return RealmSwift.SortDescriptor(keyPath: keyPath, ascending: descriptor.ascending)
         }))
         }
     }

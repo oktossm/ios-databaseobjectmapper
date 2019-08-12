@@ -111,6 +111,40 @@ class RealmRelationshipsTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testFetchToManyRelationship() {
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel1 = TestRRModel(id: 1, name: "ll", owner: nil)
+        let testModel2 = TestRRModel(id: 2, name: "dd", owner: nil)
+        let testModel3 = TestRRModel(id: 3, name: "kk", owner: nil)
+        let testModel4 = TestRRModel(id: 4, name: "kk", owner: nil)
+
+        service.save(model: subModel,
+                     update: true,
+                     relation: subModel.directModels,
+                     with: .setModels(models: [testModel1, testModel2, testModel3, testModel4]))
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+
+            let models = self.service.syncFetchRelation(subModel.directModels, in: subModel, predicate: \TestRRModel.id == 2)
+            XCTAssertTrue(models == [testModel2])
+
+            let models2 = self.service.syncFetchRelation(subModel.directModels,
+                                                         in: subModel,
+                                                         predicate: \TestRRModel.name == "kk",
+                                                         sorted: [SortDescriptor(\TestRRModel.id, ascending: true)])
+            XCTAssertTrue(models2 == [testModel3, testModel4])
+
+            self.service.fetchRelation(subModel.directModels, in: subModel, predicate: \TestRRModel.id < 3) {
+                (all: [TestRRModel]) in
+                XCTAssertTrue(models2 == [testModel1, testModel2])
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testAddRelationship() {
         let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: nil)

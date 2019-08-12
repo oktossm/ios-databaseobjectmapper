@@ -143,7 +143,34 @@ class CustomRealmContainerTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestSomeModel] = self.service.syncFetch()
+
+            XCTAssertTrue(all == [testModel2], "\(all)")
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testTypeSafeUpdate() {
+        let nestedModel = TestSomeModel.TestNestedModel(title: "title", count: 9)
+
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: nil, count: 3, nestedModel: nestedModel)
+
+        service.save(models: [testModel])
+        service.update(modelOf: TestSomeModel.self,
+                       with: testModel.userId,
+                       updates: [\TestSomeModel.count <- 3,
+                                 \TestSomeModel.userAvatar <- "ab",
+                                 \TestSomeModel.title <- nil,
+                                 \TestSomeModel.nestedModel <- nestedModel])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let all: [TestSomeModel] = self.service.syncFetch()
 
             XCTAssertTrue(all == [testModel2], "\(all)")
@@ -224,10 +251,40 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.service.fetch(with: .predicate(predicate: NSPredicate(format: "userName = %@", argumentArray: ["rt"])), sorted: .unsorted) {
+            let models = self.service.syncFetch(\TestSomeModel.userName == "rt")
+            XCTAssertTrue(models == [testModel])
+            let models2 = self.service.syncFetch(\TestSomeModel.userId > 1)
+            XCTAssertTrue(models2 == [testModel2])
+            let models3 = self.service.syncFetch(\TestSomeModel.title != "pl")
+            XCTAssertTrue(models3 == [testModel])
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testFetchWithComplexPredicate() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "g", userAvatar: "op", title: "kl", count: 1, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 2
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.service.fetch(\TestSomeModel.userName == "rt" && \TestSomeModel.count == 2) {
                 (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [testModel])
+                expectation.fulfill()
+            }
+            self.service.fetch(\TestSomeModel.userName == "rt" || \TestSomeModel.userAvatar == "rw") {
+                (all: [TestSomeModel]) in
+
+                XCTAssertTrue(all.count == 2)
+                XCTAssertTrue(all.contains(testModel))
+                XCTAssertTrue(all.contains(testModel2))
                 expectation.fulfill()
             }
         }
@@ -237,18 +294,21 @@ class CustomRealmContainerTests: XCTestCase {
 
     func testFetchWithSort() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
-        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 1, nestedModel: nil)
 
-        service.save(model: testModel)
-        service.save(model: testModel2)
+        service.save(models: [testModel, testModel2, testModel3])
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let models: [TestSomeModel] = self.service.syncFetch(sorted: [SortDescriptor(\TestSomeModel.count, ascending: false)])
+            XCTAssertTrue(models == [testModel2, testModel, testModel3])
+
             self.service.fetch(with: .unfiltered, sorted: .byKeyPath(keyPath: "userId", ascending: false)) {
                 (all: [TestSomeModel]) in
 
-                XCTAssertTrue(all == [testModel2, testModel])
+                XCTAssertTrue(all == [testModel3, testModel2, testModel])
                 expectation.fulfill()
             }
         }
@@ -422,6 +482,7 @@ class CustomRealmContainerTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
     }
+
     func testLoadNextIsLast() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 1, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
@@ -570,7 +631,7 @@ class CustomRealmContainerTests: XCTestCase {
                 expectation.fulfill()
             })
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 self.service.delete(model: testModel2)
             }
         }

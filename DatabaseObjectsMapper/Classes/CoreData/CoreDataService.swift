@@ -122,6 +122,14 @@ extension CoreDataService {
         }
     }
 
+
+    public func update<T: UniquelyMappable & KeyPathConvertible>(modelOf type: T.Type,
+                                                                 with key: T.ID,
+                                                                 updates: [RootKeyPathUpdate<T>]) where T.Container: CoreDataObject {
+        let updates = Dictionary(updates.map { $0.update }) { _, last in last }
+        self.update(modelOf: type, with: key, updates: updates)
+    }
+
     public func delete<T: UniquelyMappable>(model: T) where T.Container: CoreDataObject {
         self.delete(models: [model])
     }
@@ -302,5 +310,58 @@ extension CoreDataService {
         }
 
         return token
+    }
+
+    // MARK: Type safe Fetching
+
+    public func fetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                         sorted sort: [SortDescriptor<T>] = [],
+                                                         callback: @escaping ([T]) -> Void)
+            where T.Container: CoreDataObject, P.ModelType == T {
+        fetch(with: .predicate(predicate: predicate.predicate),
+              sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+              callback: callback)
+    }
+
+    public func fetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = [], callback: @escaping ([T]) -> Void)
+            where T.Container: CoreDataObject {
+        fetch(with: .unfiltered,
+              sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+              callback: callback)
+    }
+
+    public func syncFetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                             sorted sort: [SortDescriptor<T>] = []) -> [T]
+            where T.Container: CoreDataObject, P.ModelType == T {
+        return syncFetch(with: .predicate(predicate: predicate.predicate),
+                         sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort))
+    }
+
+    public func syncFetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = []) -> [T] where T.Container: CoreDataObject {
+        return syncFetch(with: .unfiltered,
+                         sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort))
+    }
+
+    public func fetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
+                                                         sorted sort: [SortDescriptor<T>] = [],
+                                                         callback: @escaping ([T]) -> Void,
+                                                         next: (([T], Bool) -> Void)? = nil,
+                                                         updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
+            where T.Container: CoreDataObject, P.ModelType == T {
+        return fetch(with: .predicate(predicate: predicate.predicate),
+                     sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                     callback: callback,
+                     updates: updates)
+    }
+
+    public func fetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = [],
+                                                                callback: @escaping ([T]) -> Void,
+                                                                next: (([T], Bool) -> Void)? = nil,
+                                                                updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
+            where T.Container: CoreDataObject {
+        return fetch(with: .unfiltered,
+                     sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+                     callback: callback,
+                     updates: updates)
     }
 }

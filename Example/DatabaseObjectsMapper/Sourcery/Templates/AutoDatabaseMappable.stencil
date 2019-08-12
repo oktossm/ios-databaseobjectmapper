@@ -32,7 +32,7 @@ import {{ value }}
 // MARK: - AutoDatabaseMappable for classes, structs
 {% for type in types.implementing.AutoDatabaseMappable|!enum|!protocol %}
 // MARK: - {{ type.name }} generated container
-class {{ type.name }}Container: Object, DatabaseContainer {
+{{ type.accessLevel }} class {{ type.name }}Container: Object, DatabaseContainer {
 {% for variable in type.staticVariables where variable.name == "idKey" %}
 {% set idName variable.defaultValue|replace:"\",""|replace:type.name,""|replace:".","" %}
 {% for var in type.storedVariables where var.name == idName %}
@@ -47,5 +47,17 @@ class {{ type.name }}Container: Object, DatabaseContainer {
 {% endfor %}
 {% call iterateVariables type.storedVariables idName %}
 {% endfor %}
+}
+
+extension {{ type.name }}: KeyPathConvertible {
+    static func key(for keyPath: PartialKeyPath<{{ type.name }}>) -> String {
+        switch keyPath {
+        {% for var in type.storedVariables %}
+        case \{{ type.name }}.{{ var.name }}: return "{{ var.name }}"
+        {% endfor %}
+        default:
+            fatalError("Unhandled key path")
+        }
+    }
 }
 {% endfor %}
