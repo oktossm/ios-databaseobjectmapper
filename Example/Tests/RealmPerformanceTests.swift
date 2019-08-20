@@ -102,7 +102,8 @@ class RealmPerformanceTests: XCTestCase {
                                              dict: [1: codable],
                                              anotherDict: [codable: 2],
                                              set: [url],
-                                             anotherSet: [codable])
+                                             anotherSet: [codable],
+                                             someEnum: [.thirdCase])
 
         service.save(models: Array(0..<1000).map { testModel.idLens.set($0) })
 

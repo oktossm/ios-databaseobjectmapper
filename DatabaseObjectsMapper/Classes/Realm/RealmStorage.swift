@@ -96,10 +96,13 @@ public struct RealmWriteTransaction {
                                             with key: T.ID,
                                             updates: [String: Any?]) where T.Container: Object {
         let updates: [String: Any?] = updates.mapValues {
-            if let mappable = $0 as? DictionaryCodable {
+            value in
+            if let mappable = value as? DictionaryCodableCollection {
+                return mappable.encodedCollectionValue
+            } else if let mappable = value as? DictionaryCodable {
                 return mappable.encodedValue
             } else {
-                return $0
+                return value
             }
         }
         guard let object = realm.object(ofType: T.Container.self, forPrimaryKey: T.idMapping(key)),

@@ -96,6 +96,30 @@ struct SomeCodable: Codable, Equatable, Hashable {
 }
 
 
+enum SomeEnum: Int, Codable {
+   case firstCase
+   case secondCase
+   case thirdCase
+}
+
+enum SomeStringEnum: String, Codable {
+    case firstCase
+    case secondCase
+    case thirdCase
+}
+
+struct TestPrimitivesModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
+    let id: Int
+    let value: Int32?
+    let doubleValue: Double
+    let floatValue: Float?
+    let boolValue: Bool?
+    let someEnum: SomeEnum
+    let someEnumOpt: SomeEnum?
+    let stringEnum: SomeStringEnum
+    let stringEnumOpt: SomeStringEnum?
+}
+
 struct TestCollectionsModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
     let id: Int
     let strings: [String]
@@ -108,6 +132,12 @@ struct TestCollectionsModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, Au
     let anotherDict: [SomeCodable: Int]
     let set: Set<URL?>
     let anotherSet: Set<SomeCodable>?
+    let someEnum: [SomeEnum]
+}
+
+extension TestPrimitivesModel: UniquelyMappable {
+    typealias Container = TestPrimitivesModelContainer
+    static var idKey = \TestPrimitivesModel.id
 }
 
 extension TestCollectionsModel: UniquelyMappable {
