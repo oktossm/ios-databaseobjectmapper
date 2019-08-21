@@ -41,7 +41,7 @@ class RealmContainerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        service.deleteAll()
+        service.deleteAll(sync: true)
     }
 
     override func tearDown() {
