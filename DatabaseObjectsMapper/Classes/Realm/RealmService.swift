@@ -180,7 +180,7 @@ extension RealmService {
     public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
                                                sorted sort: DatabaseSortType = .unsorted,
                                                limit: Int? = nil) -> [T] where T.Container: RealmObject {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: self.configuration)
         let syncOperator = RealmOperator(realm: realm)
         let values = syncOperator.values(ofType: T.self).filter(filter).sort(sort).limited(limit).compactMap({ try? T.mappable(for: $0) })
         return values
@@ -258,7 +258,7 @@ extension RealmService {
     }
 
     public func syncFetchUnique<T: UniquelyMappable>(with key: T.ID) -> T? where T.Container: RealmObject {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: self.configuration)
         let syncOperator = RealmOperator(realm: realm)
         let value = syncOperator.value(ofType: T.self, with: key).flatMap({ try? T.mappable(for: $0) })
         return value
@@ -342,7 +342,7 @@ extension RealmService {
                                                                             sorted sort: DatabaseSortType = .unsorted,
                                                                             limit: Int? = nil) -> [R]
             where T.Container: Object, R.Container: Object {
-        let realm = try! Realm()
+        let realm = try! Realm(configuration: self.configuration)
         let syncOperator = RealmOperator(realm: realm)
         guard let values = syncOperator.relationValues(relation, in: model)?
                                        .filter(filter)

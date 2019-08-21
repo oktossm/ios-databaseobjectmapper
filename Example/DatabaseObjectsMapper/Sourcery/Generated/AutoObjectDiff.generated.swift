@@ -231,6 +231,7 @@ extension TestCollectionsModel {
         case anotherDict([SomeCodable: Int])
         case set(Set<URL?>)
         case anotherSet(Set<SomeCodable>?)
+        case someEnum([SomeEnum])
         var key: String {
             switch self {
                 case .id: return "id"
@@ -244,6 +245,7 @@ extension TestCollectionsModel {
                 case .anotherDict: return "anotherDict"
                 case .set: return "set"
                 case .anotherSet: return "anotherSet"
+                case .someEnum: return "someEnum"
             }
         }
         var value: Any? {
@@ -259,6 +261,7 @@ extension TestCollectionsModel {
             case .anotherDict(let newValue): return newValue
             case .set(let newValue): return newValue
             case .anotherSet(let newValue): return newValue
+            case .someEnum(let newValue): return newValue
             }
         }
         init?(key: String, value: Any?) {
@@ -307,6 +310,10 @@ extension TestCollectionsModel {
                 if let value = value as? Set<SomeCodable>? {
                     self = .anotherSet(value)
                 } else { return nil }
+            case "someEnum":
+                if let value = value as? [SomeEnum] {
+                    self = .someEnum(value)
+                } else { return nil }
             default: return nil
             }
         }
@@ -331,6 +338,7 @@ extension TestCollectionsModel {
         updates.append(.anotherDict(anotherDict))
         updates.append(.set(set))
         updates.append(.anotherSet(anotherSet))
+        updates.append(.someEnum(someEnum))
         return updates
     }
 
@@ -362,6 +370,8 @@ extension TestCollectionsModel {
                 return TestCollectionsModel.setLens.set(newValue, self)
             case .anotherSet(let newValue):
                 return TestCollectionsModel.anotherSetLens.set(newValue, self)
+            case .someEnum(let newValue):
+                return TestCollectionsModel.someEnumLens.set(newValue, self)
         }
     }
     func updated(_ _updates: [Updates]) -> TestCollectionsModel {
@@ -380,6 +390,7 @@ extension TestCollectionsModel {
         if anotherDict != _model.anotherDict { updates.append(.anotherDict(anotherDict)) }
         if set != _model.set { updates.append(.set(set)) }
         if anotherSet != _model.anotherSet { updates.append(.anotherSet(anotherSet)) }
+        if someEnum != _model.someEnum { updates.append(.someEnum(someEnum)) }
         return updates
     }
 }
@@ -503,6 +514,151 @@ extension TestModel {
         if someCount != _model.someCount { updates.append(.someCount(someCount)) }
         if urls != _model.urls { updates.append(.urls(urls)) }
         if someModel != _model.someModel { updates.append(.someModel(someModel)) }
+        return updates
+    }
+}
+// MARK: TestPrimitivesModel ObjectDiff
+extension TestPrimitivesModel {
+
+    enum Updates: DictionaryElementRepresentable {
+        case id(Int)
+        case value(Int32?)
+        case doubleValue(Double)
+        case floatValue(Float?)
+        case boolValue(Bool?)
+        case someEnum(SomeEnum)
+        case someEnumOpt(SomeEnum?)
+        case stringEnum(SomeStringEnum)
+        case stringEnumOpt(SomeStringEnum?)
+        var key: String {
+            switch self {
+                case .id: return "id"
+                case .value: return "value"
+                case .doubleValue: return "doubleValue"
+                case .floatValue: return "floatValue"
+                case .boolValue: return "boolValue"
+                case .someEnum: return "someEnum"
+                case .someEnumOpt: return "someEnumOpt"
+                case .stringEnum: return "stringEnum"
+                case .stringEnumOpt: return "stringEnumOpt"
+            }
+        }
+        var value: Any? {
+            switch self {
+            case .id(let newValue): return newValue
+            case .value(let newValue): return newValue
+            case .doubleValue(let newValue): return newValue
+            case .floatValue(let newValue): return newValue
+            case .boolValue(let newValue): return newValue
+            case .someEnum(let newValue): return newValue
+            case .someEnumOpt(let newValue): return newValue
+            case .stringEnum(let newValue): return newValue
+            case .stringEnumOpt(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "id":
+                if let value = value as? Int {
+                    self = .id(value)
+                } else { return nil }
+            case "value":
+                if let value = value as? Int32? {
+                    self = .value(value)
+                } else { return nil }
+            case "doubleValue":
+                if let value = value as? Double {
+                    self = .doubleValue(value)
+                } else { return nil }
+            case "floatValue":
+                if let value = value as? Float? {
+                    self = .floatValue(value)
+                } else { return nil }
+            case "boolValue":
+                if let value = value as? Bool? {
+                    self = .boolValue(value)
+                } else { return nil }
+            case "someEnum":
+                if let value = value as? SomeEnum {
+                    self = .someEnum(value)
+                } else { return nil }
+            case "someEnumOpt":
+                if let value = value as? SomeEnum? {
+                    self = .someEnumOpt(value)
+                } else { return nil }
+            case "stringEnum":
+                if let value = value as? SomeStringEnum {
+                    self = .stringEnum(value)
+                } else { return nil }
+            case "stringEnumOpt":
+                if let value = value as? SomeStringEnum? {
+                    self = .stringEnumOpt(value)
+                } else { return nil }
+            default: return nil
+            }
+        }
+    }
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
+        _updates.forEach { dict[$0.key] = $0.value }
+        return dict
+    }
+
+    func allUpdates() -> [Updates] {
+        var updates = [Updates]()
+        updates.append(.id(id))
+        updates.append(.value(value))
+        updates.append(.doubleValue(doubleValue))
+        updates.append(.floatValue(floatValue))
+        updates.append(.boolValue(boolValue))
+        updates.append(.someEnum(someEnum))
+        updates.append(.someEnumOpt(someEnumOpt))
+        updates.append(.stringEnum(stringEnum))
+        updates.append(.stringEnumOpt(stringEnumOpt))
+        return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestPrimitivesModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
+    }
+    func updated(_ _update: Updates) -> TestPrimitivesModel {
+        switch _update {
+            case .id(let newValue):
+                return TestPrimitivesModel.idLens.set(newValue, self)
+            case .value(let newValue):
+                return TestPrimitivesModel.valueLens.set(newValue, self)
+            case .doubleValue(let newValue):
+                return TestPrimitivesModel.doubleValueLens.set(newValue, self)
+            case .floatValue(let newValue):
+                return TestPrimitivesModel.floatValueLens.set(newValue, self)
+            case .boolValue(let newValue):
+                return TestPrimitivesModel.boolValueLens.set(newValue, self)
+            case .someEnum(let newValue):
+                return TestPrimitivesModel.someEnumLens.set(newValue, self)
+            case .someEnumOpt(let newValue):
+                return TestPrimitivesModel.someEnumOptLens.set(newValue, self)
+            case .stringEnum(let newValue):
+                return TestPrimitivesModel.stringEnumLens.set(newValue, self)
+            case .stringEnumOpt(let newValue):
+                return TestPrimitivesModel.stringEnumOptLens.set(newValue, self)
+        }
+    }
+    func updated(_ _updates: [Updates]) -> TestPrimitivesModel {
+        return _updates.reduce(self) { (value, update) in value.updated(update) }
+    }
+    func difference(from _model: TestPrimitivesModel) -> [Updates] {
+        var updates = [Updates]()
+        if id != _model.id { updates.append(.id(id)) }
+        if value != _model.value { updates.append(.value(value)) }
+        if doubleValue != _model.doubleValue { updates.append(.doubleValue(doubleValue)) }
+        if floatValue != _model.floatValue { updates.append(.floatValue(floatValue)) }
+        if boolValue != _model.boolValue { updates.append(.boolValue(boolValue)) }
+        if someEnum != _model.someEnum { updates.append(.someEnum(someEnum)) }
+        if someEnumOpt != _model.someEnumOpt { updates.append(.someEnumOpt(someEnumOpt)) }
+        if stringEnum != _model.stringEnum { updates.append(.stringEnum(stringEnum)) }
+        if stringEnumOpt != _model.stringEnumOpt { updates.append(.stringEnumOpt(stringEnumOpt)) }
         return updates
     }
 }

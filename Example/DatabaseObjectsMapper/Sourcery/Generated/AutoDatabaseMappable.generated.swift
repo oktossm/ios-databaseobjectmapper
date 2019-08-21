@@ -31,6 +31,7 @@ internal class TestCollectionsModelContainer: Object, DatabaseContainer {
     @objc public dynamic var anotherDict = Data()
     @objc public dynamic var set = Data()
     @objc public dynamic var anotherSet: Data?
+    @objc public dynamic var someEnum = Data()
 }
 
 extension TestCollectionsModel: KeyPathConvertible {
@@ -47,6 +48,44 @@ extension TestCollectionsModel: KeyPathConvertible {
         case \TestCollectionsModel.anotherDict: return "anotherDict"
         case \TestCollectionsModel.set: return "set"
         case \TestCollectionsModel.anotherSet: return "anotherSet"
+        case \TestCollectionsModel.someEnum: return "someEnum"
+        default:
+            fatalError("Unhandled key path")
+        }
+    }
+}
+// MARK: - TestPrimitivesModel generated container
+internal class TestPrimitivesModelContainer: Object, DatabaseContainer {
+    public static var idKey: WritableKeyPath<TestPrimitivesModelContainer, Int> = \TestPrimitivesModelContainer.id
+            public override static func primaryKey() -> String? {
+        return "id"
+    }
+    public override class func indexedProperties() -> [String] {
+        return []
+    }
+    @objc public dynamic var id: Int = 0
+    let value = RealmOptional<Int32>()
+    @objc public dynamic var doubleValue: Double = 0
+    let floatValue = RealmOptional<Float>()
+    let boolValue = RealmOptional<Bool>()
+    @objc public dynamic var someEnum: Int = Int()
+    let someEnumOpt = RealmOptional<Int>()
+    @objc public dynamic var stringEnum: String = String()
+    @objc public dynamic var stringEnumOpt: String?
+}
+
+extension TestPrimitivesModel: KeyPathConvertible {
+    static func key(for keyPath: PartialKeyPath<TestPrimitivesModel>) -> String {
+        switch keyPath {
+        case \TestPrimitivesModel.id: return "id"
+        case \TestPrimitivesModel.value: return "value"
+        case \TestPrimitivesModel.doubleValue: return "doubleValue"
+        case \TestPrimitivesModel.floatValue: return "floatValue"
+        case \TestPrimitivesModel.boolValue: return "boolValue"
+        case \TestPrimitivesModel.someEnum: return "someEnum"
+        case \TestPrimitivesModel.someEnumOpt: return "someEnumOpt"
+        case \TestPrimitivesModel.stringEnum: return "stringEnum"
+        case \TestPrimitivesModel.stringEnumOpt: return "stringEnumOpt"
         default:
             fatalError("Unhandled key path")
         }

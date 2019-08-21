@@ -8,22 +8,22 @@ class CustomRealmContainerTests: XCTestCase {
 
     lazy var service: RealmService = {
         let config = Realm.Configuration(
-                // Set the new schema version. This must be greater than the previously used
-                // version (if you've never set a schema version before, the version is 0).
-                schemaVersion: 1,
+            // Set the new schema version. This must be greater than the previously used
+            // version (if you've never set a schema version before, the version is 0).
+            schemaVersion: 1,
 
-                // Set the block which will be called automatically when opening a Realm with
-                // a schema version lower than the one set above
-                migrationBlock: {
-                    _, oldSchemaVersion in
-                    // We haven’t migrated anything yet, so oldSchemaVersion == 0
-                    if oldSchemaVersion < 3 {
-                        // Nothing to do!
-                        // Realm will automatically detect new properties and removed properties
-                        // And will update the schema on disk automatically
-                    }
-                },
-                deleteRealmIfMigrationNeeded: true)
+            // Set the block which will be called automatically when opening a Realm with
+            // a schema version lower than the one set above
+            migrationBlock: {
+                _, oldSchemaVersion in
+                // We haven’t migrated anything yet, so oldSchemaVersion == 0
+                if oldSchemaVersion < 3 {
+                    // Nothing to do!
+                    // Realm will automatically detect new properties and removed properties
+                    // And will update the schema on disk automatically
+                }
+            },
+            deleteRealmIfMigrationNeeded: true)
 
         // Tell Realm to use this new configuration object for the default Realm
         Realm.Configuration.defaultConfiguration = config
@@ -744,7 +744,8 @@ class CustomRealmContainerTests: XCTestCase {
                                              dict: [1: codable],
                                              anotherDict: [codable: 2],
                                              set: [url],
-                                             anotherSet: [codable])
+                                             anotherSet: [codable],
+                                             someEnum: [.secondCase, .thirdCase])
 
         service.save(model: testModel)
 
@@ -754,6 +755,85 @@ class CustomRealmContainerTests: XCTestCase {
             let fetched: TestCollectionsModel? = self.service.syncFetchUnique(with: testModel.id)
 
             XCTAssertTrue(testModel == fetched)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testPrimitivesStoring() {
+        let testModel = TestPrimitivesModel(id: 1,
+                                            value: 20,
+                                            doubleValue: 3.02,
+                                            floatValue: nil,
+                                            boolValue: true,
+                                            someEnum: .secondCase,
+                                            someEnumOpt: .thirdCase,
+                                            stringEnum: .firstCase,
+                                            stringEnumOpt: .secondCase)
+        let testModel2 = TestPrimitivesModel(id: 2,
+                                             value: 5,
+                                             doubleValue: 4.5909,
+                                             floatValue: 9.123,
+                                             boolValue: false,
+                                             someEnum: .firstCase,
+                                             someEnumOpt: nil,
+                                             stringEnum: .secondCase,
+                                             stringEnumOpt: nil)
+
+        service.save(models: [testModel, testModel2])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let fetched: TestPrimitivesModel? = self.service.syncFetchUnique(with: testModel.id)
+            let fetched2: TestPrimitivesModel? = self.service.syncFetchUnique(with: testModel2.id)
+
+            XCTAssertTrue(testModel == fetched)
+            XCTAssertTrue(testModel2 == fetched2)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testCollectionsUpdate() {
+        let codable = SomeCodable(key: "k", index: 4)
+        let newCodable = SomeCodable(key: "b", index: 5)
+        let url = URL(string: "https://google.com")
+        let url2 = URL(string: "https://yahoo.com")
+        let testModel = TestCollectionsModel(id: 1,
+                                             strings: ["one", "two"],
+                                             intValues: [0, 3],
+                                             doubleValues: nil,
+                                             dates: [Date()],
+                                             codable: [codable],
+                                             urls: [url],
+                                             dict: [1: codable],
+                                             anotherDict: [codable: 2],
+                                             set: [url],
+                                             anotherSet: [codable],
+                                             someEnum: [.secondCase, .thirdCase])
+
+        service.save(models: [testModel])
+        let updates: [RootKeyPathUpdate<TestCollectionsModel>] = [\TestCollectionsModel.intValues <- [0, 5],
+                                                                  \TestCollectionsModel.codable <- [newCodable, codable],
+                                                                  \TestCollectionsModel.urls <- [url, url2],
+                                                                  \TestCollectionsModel.dict <- [2: newCodable]]
+
+        service.update(modelOf: TestCollectionsModel.self, with: testModel.id, updates: updates)
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestCollectionsModel] = self.service.syncFetch()
+
+            XCTAssertTrue(all.first?.intValues == [0, 5], "\(all)")
+            XCTAssertTrue(all.first?.codable == [newCodable, codable], "\(all)")
+            XCTAssertTrue(all.first?.urls == [url, url2], "\(all)")
+            XCTAssertTrue(all.first?.dict == [2: newCodable], "\(all)")
 
             expectation.fulfill()
         }
