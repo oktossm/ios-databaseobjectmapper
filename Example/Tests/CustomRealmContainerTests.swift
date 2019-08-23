@@ -41,7 +41,7 @@ class CustomRealmContainerTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        service.deleteAll()
+        service.deleteAll(sync: true)
     }
 
     override func tearDown() {
@@ -69,6 +69,20 @@ class CustomRealmContainerTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
     }
+
+    func testSyncStoreWithKey() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+
+        service.save(model: testModel, sync: true)
+        service.save(model: testModel, sync: true)
+
+        let fetched: TestSomeModel? = self.service.syncFetchUnique(with: testModel.userId)
+        let all: [TestSomeModel] = self.service.syncFetch()
+
+        XCTAssertTrue(all.count == 1)
+        XCTAssertTrue(testModel == fetched)
+    }
+
 
     func testMultipleStoreWithKey() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
@@ -111,6 +125,20 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testMultipleUpdateSync() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "ad", title: "pl", count: 3, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2], sync: true)
+        service.update(models: [testModel3, testModel4], sync: true)
+
+        let all: [TestSomeModel] = self.service.syncFetch()
+
+        XCTAssertTrue(all.sorted { $0.userId < $1.userId } == [testModel3, testModel4])
+    }
+
     func testUpdateByKey() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3, nestedModel: nil)
@@ -130,6 +158,18 @@ class CustomRealmContainerTests: XCTestCase {
         }
 
         wait(for: [expectation], timeout: 1)
+    }
+
+    func testUpdateByKeySync() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3, nestedModel: nil)
+
+        service.save(models: [testModel], sync: true)
+        service.update(modelOf: TestSomeModel.self, with: testModel.userId, updates: testModel2.encodedValue, sync: true)
+
+        let all: [TestSomeModel] = self.service.syncFetch()
+
+        XCTAssertTrue(all == [testModel2])
     }
 
     func testPartialUpdate() {
@@ -152,6 +192,21 @@ class CustomRealmContainerTests: XCTestCase {
         }
 
         wait(for: [expectation], timeout: 1)
+    }
+
+    func testPartialUpdateSync() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: nil, count: 3, nestedModel: nil)
+
+        service.save(models: [testModel], sync: true)
+        service.update(modelOf: TestSomeModel.self,
+                       with: testModel.userId,
+                       updates: testModel2.difference(from: testModel).dictionaryRepresentation(),
+                       sync: true)
+
+        let all: [TestSomeModel] = self.service.syncFetch()
+
+        XCTAssertTrue(all == [testModel2], "\(all)")
     }
 
     func testTypeSafeUpdate() {
@@ -200,6 +255,18 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testDeleteSync() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2], sync: true)
+        service.delete(models: [testModel], sync: true)
+
+        let all: [TestSomeModel] = self.service.syncFetch()
+
+        XCTAssertTrue(all == [testModel2])
+    }
+
     func testPrimaryKeyFetch() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
 
@@ -218,6 +285,16 @@ class CustomRealmContainerTests: XCTestCase {
         }
 
         wait(for: [expectation], timeout: 1)
+    }
+
+    func testPrimaryKeyFetchSync() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+
+        service.save(model: testModel, sync: true)
+
+        let model: TestSomeModel? = self.service.syncFetchUnique(with: testModel.userId)
+
+        XCTAssertTrue(testModel == model)
     }
 
     func testFetch() {

@@ -40,7 +40,7 @@ class RealmRelationshipsTests: XCTestCase {
         // swiftlint:enable force_try
 
         service = RealmService()
-        service.deleteAll()
+        service.deleteAll(sync: true)
     }
 
     override func tearDown() {
@@ -138,7 +138,7 @@ class RealmRelationshipsTests: XCTestCase {
 
             self.service.fetchRelation(subModel.directModels, in: subModel, predicate: \TestRRModel.id < 3) {
                 (all: [TestRRModel]) in
-                XCTAssertTrue(models2 == [testModel1, testModel2])
+                XCTAssertTrue(all == [testModel1, testModel2])
                 expectation.fulfill()
             }
         }
