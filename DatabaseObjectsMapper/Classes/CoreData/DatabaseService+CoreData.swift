@@ -41,6 +41,12 @@ public extension DatabaseMappable where Container: NSManagedObject & SharedDatab
 
 
 public extension UniquelyMappable where Container: NSManagedObject {
+    func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
+        guard let context = userInfo as? NSManagedObjectContext else { return nil }
+        let container: Container? = context.findFirst(with: self.objectKeyValue)
+        return container
+    }
+    
     func update(_ container: Container, updates: [String: Any]) {
         defaultUpdate(container, updates: updates)
         updateId(for: container)
@@ -103,6 +109,9 @@ public extension DatabaseMappable where Container: NSManagedObject {
             guard let value = reflection[$0] as? AnyDatabaseMappable else { return }
             if let oldObject = container.value(forKey: $0) as? AnyDatabaseContainer {
                 value.update(oldObject)
+            } else if let oldObject = try? value.existingContainer(with: writeContext) {
+                value.update(oldObject)
+                container.setValue(oldObject, forKey: $0)
             } else {
                 container.setValue(try? value.container(with: nil), forKey: $0)
             }
