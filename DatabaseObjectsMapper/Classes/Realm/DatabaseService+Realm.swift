@@ -39,6 +39,10 @@ public extension DatabaseMappable where Container: Object & SharedDatabaseContai
 
 
 public extension UniquelyMappable where Container: Object {
+    func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
+        let realm = try! Realm()
+            return realm.object(ofType: Container.self, forPrimaryKey: self.objectKeyValue)
+    }
     func update(_ container: Container, updates: [String: Any]) {
         updateProperties(for: container, updates: updates)
         updateRelationships(for: container)
@@ -102,6 +106,9 @@ public extension DatabaseMappable where Container: Object {
             guard let value = reflection[$0] as? AnyDatabaseMappable else { return }
             if let oldObject = container[$0] as? AnyDatabaseContainer {
                 value.update(oldObject)
+            } else if let oldObject = try? value.existingContainer(with: nil) {
+                value.update(oldObject)
+                container[$0] = oldObject
             } else {
                 container[$0] = try? value.container(with: nil)
             }

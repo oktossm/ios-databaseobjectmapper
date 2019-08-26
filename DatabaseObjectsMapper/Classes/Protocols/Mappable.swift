@@ -9,7 +9,7 @@ public protocol DatabaseMappable: DictionaryCodable, AnyDatabaseMappable {
 
     associatedtype Container: DatabaseContainer
 
-    /// Creates an instance obf a `Container` type from a `DatabaseMappable`.
+    /// Creates an instance of a `Container` type from a `DatabaseMappable`.
     /// - parameter userInfo: User info can be passed here.
     func container(with userInfo: Any?) throws -> Container
 
@@ -95,12 +95,17 @@ public extension UniquelyMappable where Container.ID == String, Container: Share
 
 /// Helper protocol to support relationships
 public protocol AnyDatabaseMappable {
+    func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer?
     func container(with userInfo: Any?) throws -> AnyDatabaseContainer
     func update(_ container: AnyDatabaseContainer)
 }
 
 
 public extension DatabaseMappable {
+    func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
+        return nil
+    }
+
     func container(with userInfo: Any?) throws -> AnyDatabaseContainer {
         let object: Container = try self.container(with: userInfo)
         return object
@@ -110,5 +115,4 @@ public extension DatabaseMappable {
         guard let container = container as? Container else { fatalError("Wrong container type") }
         self.update(container)
     }
-
 }

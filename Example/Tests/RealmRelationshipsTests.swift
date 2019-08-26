@@ -175,6 +175,41 @@ class RealmRelationshipsTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testAddExistingRelationship() {
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
+
+        service.save(models: [testModel])
+        service.save(models: [subModel])
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.service.update(modelOf: TestRRModel.self,
+                                with: testModel.id,
+                                updates: [TestRRModel.Updates.owner(subModel)].dictionaryRepresentation())
+        }
+
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 2
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+
+            self.service.fetch() {
+                (all: [TestRRModel]) in
+
+                XCTAssertTrue(all == [testModel.updated([TestRRModel.Updates.owner(subModel)])])
+                expectation.fulfill()
+            }
+
+            self.service.fetch() {
+                (all: [TestSomeModel]) in
+
+                XCTAssertTrue(all == [subModel])
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testAddToManyRelationship() {
         let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
