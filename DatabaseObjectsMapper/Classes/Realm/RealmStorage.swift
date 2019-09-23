@@ -99,7 +99,7 @@ public struct RealmWriteTransaction {
             value in
             if let mappable = value as? DictionaryCodableCollection {
                 return mappable.encodedCollectionValue
-            } else if let mappable = value as? DictionaryCodable {
+            } else if let mappable = value as? Encodable {
                 return mappable.encodedValue
             } else {
                 return value
@@ -118,7 +118,7 @@ public struct RealmWriteTransaction {
     /// - parameter model: Model to update.
     /// - parameter update: Relation.Update value
     public func updateRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T, with update: Relation<R>.Update)
-            where T.Container: Object, R.Container: Object {
+        where T.Container: Object, R.Container: Object {
         guard let key = Mirror(reflecting: model).children.first(where: { relation === (unwrapUsingProtocol($0.value) as AnyObject) })?.label,
               let object = realm.object(ofType: T.Container.self, forPrimaryKey: model.objectKeyValue) else { return }
         guard relation.type == .direct, let list = object[key] as? List<R.Container> else { return }
@@ -240,7 +240,7 @@ class RealmOperator: NSObject {
     /// - parameter keyPath: KeyPath for relation.
     /// - returns: A `QPResults` containing all the values.
     func relationValues<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T)
-                    -> AnyRealmCollection<R.Container>? where T.Container: Object, R.Container: Object {
+            -> AnyRealmCollection<R.Container>? where T.Container: Object, R.Container: Object {
         guard let key = Mirror(reflecting: model).children.first(where: { relation === (unwrapUsingProtocol($0.value) as AnyObject) })?.label,
               let object = realm.object(ofType: T.Container.self, forPrimaryKey: model.objectKeyValue) else { return nil }
         switch relation.type {

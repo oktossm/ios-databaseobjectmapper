@@ -59,3 +59,13 @@ extension Dictionary: DictionaryCodable where Key: Codable, Value: Codable {}
 
 extension Array: DictionaryCodableCollection where Element: Codable {}
 extension Set: DictionaryCodableCollection where Element: Codable {}
+
+
+extension Encodable {
+    public var encodedValue: Any? {
+        let encoder = DictionaryEncoder()
+        let dictionary: [String: Self] = ["value": self]
+        let result: [String: Any]? = try? encoder.encode(dictionary)
+        return result?["value"]
+    }
+}

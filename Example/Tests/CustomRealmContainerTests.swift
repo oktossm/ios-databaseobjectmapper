@@ -876,6 +876,75 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testPrimitivesUpdates() {
+        let testModel = TestPrimitivesModel(id: 1,
+                                            value: 20,
+                                            doubleValue: 3.02,
+                                            floatValue: nil,
+                                            boolValue: true,
+                                            someEnum: .secondCase,
+                                            someEnumOpt: .thirdCase,
+                                            stringEnum: .firstCase,
+                                            stringEnumOpt: .secondCase)
+
+        service.save(models: [testModel])
+
+        let expectation = XCTestExpectation()
+
+        service.update(modelOf: TestPrimitivesModel.self,
+                       with: testModel.id,
+                       updates: ["doubleValue": 5, "someEnum": SomeEnum.firstCase, "someEnumOpt": nil, "stringEnumOpt": SomeStringEnum.thirdCase])
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let fetched: TestPrimitivesModel? = self.service.syncFetchUnique(with: testModel.id)
+
+            XCTAssertTrue(fetched?.doubleValue == 5)
+            XCTAssertTrue(fetched?.someEnum == .firstCase)
+            XCTAssertTrue(fetched?.someEnumOpt == nil)
+            XCTAssertTrue(fetched?.stringEnumOpt == .thirdCase)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testTypeSafePrimitivesUpdates() {
+        let testModel = TestPrimitivesModel(id: 1,
+                                            value: 20,
+                                            doubleValue: 3.02,
+                                            floatValue: nil,
+                                            boolValue: true,
+                                            someEnum: .secondCase,
+                                            someEnumOpt: .thirdCase,
+                                            stringEnum: .firstCase,
+                                            stringEnumOpt: .secondCase)
+
+        service.save(models: [testModel])
+
+        let expectation = XCTestExpectation()
+
+        service.update(modelOf: TestPrimitivesModel.self,
+                       with: testModel.id,
+                       updates: [\TestPrimitivesModel.doubleValue <- 5,
+                                 \TestPrimitivesModel.someEnum <- .firstCase,
+                                 \TestPrimitivesModel.someEnumOpt <- nil,
+                                 \TestPrimitivesModel.stringEnumOpt <- .thirdCase])
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let fetched: TestPrimitivesModel? = self.service.syncFetchUnique(with: testModel.id)
+
+            XCTAssertTrue(fetched?.doubleValue == 5)
+            XCTAssertTrue(fetched?.someEnum == .firstCase)
+            XCTAssertTrue(fetched?.someEnumOpt == nil)
+            XCTAssertTrue(fetched?.stringEnumOpt == .thirdCase)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testCollectionsUpdate() {
         let codable = SomeCodable(key: "k", index: 4)
         let newCodable = SomeCodable(key: "b", index: 5)
