@@ -311,7 +311,7 @@ extension TestPrimitivesModel {
   static let idLens = Lens<TestPrimitivesModel, Int>(
     get: { $0.id },
     set: { id, testPrimitivesModel in
-       TestPrimitivesModel(id: id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+       TestPrimitivesModel(id: id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
     }
   )
   var idLens: BoundLens<TestPrimitivesModel, Int> {
@@ -320,7 +320,7 @@ extension TestPrimitivesModel {
   static let valueLens = Lens<TestPrimitivesModel, Int32?>(
     get: { $0.value },
     set: { value, testPrimitivesModel in
-       TestPrimitivesModel(id: testPrimitivesModel.id, value: value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
     }
   )
   var valueLens: BoundLens<TestPrimitivesModel, Int32?> {
@@ -329,7 +329,7 @@ extension TestPrimitivesModel {
   static let doubleValueLens = Lens<TestPrimitivesModel, Double>(
     get: { $0.doubleValue },
     set: { doubleValue, testPrimitivesModel in
-       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
     }
   )
   var doubleValueLens: BoundLens<TestPrimitivesModel, Double> {
@@ -338,7 +338,7 @@ extension TestPrimitivesModel {
   static let floatValueLens = Lens<TestPrimitivesModel, Float?>(
     get: { $0.floatValue },
     set: { floatValue, testPrimitivesModel in
-       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: floatValue, boolValue: testPrimitivesModel.boolValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
     }
   )
   var floatValueLens: BoundLens<TestPrimitivesModel, Float?> {
@@ -347,16 +347,25 @@ extension TestPrimitivesModel {
   static let boolValueLens = Lens<TestPrimitivesModel, Bool?>(
     get: { $0.boolValue },
     set: { boolValue, testPrimitivesModel in
-       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: boolValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
     }
   )
   var boolValueLens: BoundLens<TestPrimitivesModel, Bool?> {
      return BoundLens<TestPrimitivesModel, Bool?>(instance: self, lens: TestPrimitivesModel.boolValueLens)
   }
+  static let urlValueLens = Lens<TestPrimitivesModel, URL?>(
+    get: { $0.urlValue },
+    set: { urlValue, testPrimitivesModel in
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+    }
+  )
+  var urlValueLens: BoundLens<TestPrimitivesModel, URL?> {
+     return BoundLens<TestPrimitivesModel, URL?>(instance: self, lens: TestPrimitivesModel.urlValueLens)
+  }
   static let someEnumLens = Lens<TestPrimitivesModel, SomeEnum>(
     get: { $0.someEnum },
     set: { someEnum, testPrimitivesModel in
-       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, someEnum: someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
     }
   )
   var someEnumLens: BoundLens<TestPrimitivesModel, SomeEnum> {
@@ -365,7 +374,7 @@ extension TestPrimitivesModel {
   static let someEnumOptLens = Lens<TestPrimitivesModel, SomeEnum?>(
     get: { $0.someEnumOpt },
     set: { someEnumOpt, testPrimitivesModel in
-       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
     }
   )
   var someEnumOptLens: BoundLens<TestPrimitivesModel, SomeEnum?> {
@@ -374,7 +383,7 @@ extension TestPrimitivesModel {
   static let stringEnumLens = Lens<TestPrimitivesModel, SomeStringEnum>(
     get: { $0.stringEnum },
     set: { stringEnum, testPrimitivesModel in
-       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: stringEnum, stringEnumOpt: testPrimitivesModel.stringEnumOpt)
     }
   )
   var stringEnumLens: BoundLens<TestPrimitivesModel, SomeStringEnum> {
@@ -383,7 +392,7 @@ extension TestPrimitivesModel {
   static let stringEnumOptLens = Lens<TestPrimitivesModel, SomeStringEnum?>(
     get: { $0.stringEnumOpt },
     set: { stringEnumOpt, testPrimitivesModel in
-       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: stringEnumOpt)
+       TestPrimitivesModel(id: testPrimitivesModel.id, value: testPrimitivesModel.value, doubleValue: testPrimitivesModel.doubleValue, floatValue: testPrimitivesModel.floatValue, boolValue: testPrimitivesModel.boolValue, urlValue: testPrimitivesModel.urlValue, someEnum: testPrimitivesModel.someEnum, someEnumOpt: testPrimitivesModel.someEnumOpt, stringEnum: testPrimitivesModel.stringEnum, stringEnumOpt: stringEnumOpt)
     }
   )
   var stringEnumOptLens: BoundLens<TestPrimitivesModel, SomeStringEnum?> {

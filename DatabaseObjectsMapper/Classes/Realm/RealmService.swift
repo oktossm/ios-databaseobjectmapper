@@ -86,6 +86,21 @@ extension RealmService {
         sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
     }
 
+    public func saveSkippingRelations<T: UniquelyMappable>(model: T, sync: Bool = false) where T.Container: RealmObject {
+        self.saveSkippingRelations(models: [model], sync: sync)
+    }
+
+    public func saveSkippingRelations<T: UniquelyMappable>(models: [T], sync: Bool = false) where T.Container: RealmObject {
+        let block: RealmBlock = {
+            realmOperator in
+            try? realmOperator.write {
+                transaction in
+                try? transaction.addSkippingRelations(models)
+            }
+        }
+        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+    }
+
     public func save<T: UniquelyMappable, R: UniquelyMappable>(model: T,
                                                                update: Bool = true,
                                                                relation: Relation<R>,
@@ -107,12 +122,16 @@ extension RealmService {
         self.update(models: [model], sync: sync)
     }
 
-    public func update<T: UniquelyMappable>(models: [T], sync: Bool = false) where T.Container: RealmObject {
+    public func update<T: UniquelyMappable>(model: T, sync: Bool = false, skipRelations: Bool = false) where T.Container: RealmObject {
+        self.update(models: [model], sync: sync, skipRelations: skipRelations)
+    }
+
+    public func update<T: UniquelyMappable>(models: [T], sync: Bool = false, skipRelations: Bool = false) where T.Container: RealmObject {
         let block: RealmBlock = {
             realmOperator in
             try? realmOperator.write {
                 transaction in
-                try? transaction.update(models)
+                try? transaction.update(models, skipRelations: skipRelations)
             }
         }
         sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)

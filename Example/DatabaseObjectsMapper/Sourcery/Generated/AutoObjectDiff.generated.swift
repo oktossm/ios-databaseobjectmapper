@@ -526,6 +526,7 @@ extension TestPrimitivesModel {
         case doubleValue(Double)
         case floatValue(Float?)
         case boolValue(Bool?)
+        case urlValue(URL?)
         case someEnum(SomeEnum)
         case someEnumOpt(SomeEnum?)
         case stringEnum(SomeStringEnum)
@@ -537,6 +538,7 @@ extension TestPrimitivesModel {
                 case .doubleValue: return "doubleValue"
                 case .floatValue: return "floatValue"
                 case .boolValue: return "boolValue"
+                case .urlValue: return "urlValue"
                 case .someEnum: return "someEnum"
                 case .someEnumOpt: return "someEnumOpt"
                 case .stringEnum: return "stringEnum"
@@ -550,6 +552,7 @@ extension TestPrimitivesModel {
             case .doubleValue(let newValue): return newValue
             case .floatValue(let newValue): return newValue
             case .boolValue(let newValue): return newValue
+            case .urlValue(let newValue): return newValue
             case .someEnum(let newValue): return newValue
             case .someEnumOpt(let newValue): return newValue
             case .stringEnum(let newValue): return newValue
@@ -577,6 +580,10 @@ extension TestPrimitivesModel {
             case "boolValue":
                 if let value = value as? Bool? {
                     self = .boolValue(value)
+                } else { return nil }
+            case "urlValue":
+                if let value = value as? URL? {
+                    self = .urlValue(value)
                 } else { return nil }
             case "someEnum":
                 if let value = value as? SomeEnum {
@@ -612,6 +619,7 @@ extension TestPrimitivesModel {
         updates.append(.doubleValue(doubleValue))
         updates.append(.floatValue(floatValue))
         updates.append(.boolValue(boolValue))
+        updates.append(.urlValue(urlValue))
         updates.append(.someEnum(someEnum))
         updates.append(.someEnumOpt(someEnumOpt))
         updates.append(.stringEnum(stringEnum))
@@ -635,6 +643,8 @@ extension TestPrimitivesModel {
                 return TestPrimitivesModel.floatValueLens.set(newValue, self)
             case .boolValue(let newValue):
                 return TestPrimitivesModel.boolValueLens.set(newValue, self)
+            case .urlValue(let newValue):
+                return TestPrimitivesModel.urlValueLens.set(newValue, self)
             case .someEnum(let newValue):
                 return TestPrimitivesModel.someEnumLens.set(newValue, self)
             case .someEnumOpt(let newValue):
@@ -655,6 +665,7 @@ extension TestPrimitivesModel {
         if doubleValue != _model.doubleValue { updates.append(.doubleValue(doubleValue)) }
         if floatValue != _model.floatValue { updates.append(.floatValue(floatValue)) }
         if boolValue != _model.boolValue { updates.append(.boolValue(boolValue)) }
+        if urlValue != _model.urlValue { updates.append(.urlValue(urlValue)) }
         if someEnum != _model.someEnum { updates.append(.someEnum(someEnum)) }
         if someEnumOpt != _model.someEnumOpt { updates.append(.someEnumOpt(someEnumOpt)) }
         if stringEnum != _model.stringEnum { updates.append(.stringEnum(stringEnum)) }

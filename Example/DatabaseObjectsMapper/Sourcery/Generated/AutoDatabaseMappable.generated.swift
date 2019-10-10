@@ -68,6 +68,7 @@ internal class TestPrimitivesModelContainer: Object, DatabaseContainer {
     @objc public dynamic var doubleValue: Double = 0
     let floatValue = RealmOptional<Float>()
     let boolValue = RealmOptional<Bool>()
+    @objc public dynamic var urlValue: String?
     @objc public dynamic var someEnum: Int = Int()
     let someEnumOpt = RealmOptional<Int>()
     @objc public dynamic var stringEnum: String = String()
@@ -82,6 +83,7 @@ extension TestPrimitivesModel: KeyPathConvertible {
         case \TestPrimitivesModel.doubleValue: return "doubleValue"
         case \TestPrimitivesModel.floatValue: return "floatValue"
         case \TestPrimitivesModel.boolValue: return "boolValue"
+        case \TestPrimitivesModel.urlValue: return "urlValue"
         case \TestPrimitivesModel.someEnum: return "someEnum"
         case \TestPrimitivesModel.someEnumOpt: return "someEnumOpt"
         case \TestPrimitivesModel.stringEnum: return "stringEnum"

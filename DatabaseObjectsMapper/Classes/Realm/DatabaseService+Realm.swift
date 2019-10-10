@@ -25,6 +25,12 @@ public extension DatabaseMappable where Container: Object & SharedDatabaseContai
         return try self.realmObject(with: userInfo)
     }
 
+    func updateSkippingRelations(_ container: Container, updates: [String: Any]) {
+        container.typeName = Self.typeName
+        updateProperties(for: container, updates: updates)
+        updateId(for: container)
+    }
+
     func update(_ container: Container, updates: [String: Any]) {
         container.typeName = Self.typeName
         updateProperties(for: container, updates: updates)
@@ -41,8 +47,14 @@ public extension DatabaseMappable where Container: Object & SharedDatabaseContai
 public extension UniquelyMappable where Container: Object {
     func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
         let realm = try! Realm()
-            return realm.object(ofType: Container.self, forPrimaryKey: self.objectKeyValue)
+        return realm.object(ofType: Container.self, forPrimaryKey: self.objectKeyValue)
     }
+
+    func updateSkippingRelations(_ container: Container, updates: [String: Any]) {
+        updateProperties(for: container, updates: updates)
+        updateId(for: container)
+    }
+
     func update(_ container: Container, updates: [String: Any]) {
         updateProperties(for: container, updates: updates)
         updateRelationships(for: container)
@@ -103,10 +115,11 @@ public extension DatabaseMappable where Container: Object {
             return (string, unwrapUsingProtocol(value))
         })
         relations.forEach {
-            guard let value = reflection[$0] as? AnyDatabaseMappable else { return }
-            if let oldObject = container[$0] as? AnyDatabaseContainer {
-                value.update(oldObject)
-            } else if let oldObject = try? value.existingContainer(with: nil) {
+            guard let value = reflection[$0] as? AnyDatabaseMappable else {
+                container[$0] = nil
+                return
+            }
+            if let oldObject = try? value.existingContainer(with: nil) {
                 value.update(oldObject)
                 container[$0] = oldObject
             } else {
@@ -118,6 +131,25 @@ public extension DatabaseMappable where Container: Object {
 
 
 public extension DatabaseContainer where Self: Object {
+    var encodedPropertiesValue: [String: Any] {
+        let properties = objectSchema.properties
+        var encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
+            .filter { $0.objectClassName == nil }
+            .compactMap {
+                guard let value = self[$0.name] else {
+                    return nil
+                }
+                if $0.type == .data, let data = value as? Data {
+                    if let archived: [String: Any] = Dictionary(archive: data) {
+                        return ($0.name, archived)
+                    } else if let archived: [Any] = Array(archive: data) {
+                        return ($0.name, archived)
+                    }
+                }
+                return ($0.name, value)
+            })
+        return encoded
+    }
     var encodedValue: [String: Any] {
         get {
             let properties = objectSchema.properties

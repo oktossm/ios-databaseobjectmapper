@@ -114,6 +114,7 @@ struct TestPrimitivesModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, Aut
     let doubleValue: Double
     let floatValue: Float?
     let boolValue: Bool?
+    let urlValue: URL?
     let someEnum: SomeEnum
     let someEnumOpt: SomeEnum?
     let stringEnum: SomeStringEnum

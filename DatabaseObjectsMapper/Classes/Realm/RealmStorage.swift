@@ -71,21 +71,38 @@ public struct RealmWriteTransaction {
     /// - parameter update: If true, the Realm will try to find a value with the same primary key and update it. Otherwise, the value will be added.
     public func add<T: DatabaseMappable>(_ value: T, update: Bool) throws where T.Container: Object {
         let object = try value.container(with: nil)
-        realm.add(object, update: update ? .all : .error)
+        realm.add(object, update: update ? .modified : .error)
     }
 
+    /// Adds or updates an existing UniquelyMappable type into the Realm ignoring relations update.
+    /// - parameter value: The value to be added to the realm.
+    /// - parameter update: If true, the Realm will try to find a value with the same primary key and update it. Otherwise, the value will be added.
+    public func addSkippingRelations<T: UniquelyMappable>(_ value: T) throws where T.Container: Object {
+        let object = try value.container(with: nil)
+        realm.create(T.Container.self, value: object.encodedPropertiesValue, update: .modified)
+    }
+
+    public func addSkippingRelations<S: Sequence>(_ values: S) throws where S.Element: UniquelyMappable, S.Element.Container: Object {
+        try values.forEach { try self.addSkippingRelations($0) }
+    }
     /// Updates an existing DatabaseMappable type in the Realm.
     /// - parameter value: The value to be added to the realm.
-    public func update<T: UniquelyMappable>(_ value: T) throws where T.Container: Object {
+    /// - parameter skipRelations: If true relations will not be updated for this object.
+    public func update<T: UniquelyMappable>(_ value: T, skipRelations: Bool = false) throws where T.Container: Object {
         guard let object = realm.object(ofType: T.Container.self, forPrimaryKey: value.objectKeyValue) else { return }
-        value.update(object)
-        realm.add(object, update: .all)
+        if skipRelations {
+            value.updateSkippingRelations(object, updates: value.encodedValue)
+        } else {
+            value.update(object)
+        }
+        realm.add(object, update: .modified)
     }
 
     /// Updates an existing sequence of DatabaseMappable types in the Realm.
     /// - parameter values: The sequence of values to be added to the realm.
-    public func update<S: Sequence>(_ values: S) throws where S.Element: UniquelyMappable, S.Element.Container: Object {
-        try values.forEach { try self.update($0) }
+    /// - parameter skipRelations: If true relations will not be updated for this object.
+    public func update<S: Sequence>(_ values: S, skipRelations: Bool = false) throws where S.Element: UniquelyMappable, S.Element.Container: Object {
+        try values.forEach { try self.update($0, skipRelations: skipRelations) }
     }
 
     /// Updates an existing DatabaseMappable type in the Realm.
@@ -149,7 +166,7 @@ public struct RealmWriteTransaction {
     /// - parameter update: If true, the Realm will try to find values with the same primary keys and update them. Otherwise, the values will be added.
     public func add<S: Sequence>(_ values: S, update: Bool) throws where S.Element: DatabaseMappable, S.Element.Container: Object {
         let mapped = try values.map { try $0.container(with: nil) }
-        realm.add(mapped, update: update ? .all : .error)
+        realm.add(mapped, update: update ? .modified : .error)
     }
 
     /// Deletes a DatabaseMappable type from the Realm.

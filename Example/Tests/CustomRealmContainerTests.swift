@@ -287,6 +287,37 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testPrimaryKeyFetchDelete() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+
+        service.save(model: testModel)
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let token = self.service.fetch(with: testModel.userId, callback: {
+                (model: TestSomeModel?) in
+                XCTAssertTrue(testModel == model)
+            }, updates: {
+                update in
+
+                switch update {
+                case .update:
+                    XCTFail()
+                case .delete:
+                    expectation.fulfill()
+                }
+            })
+
+            self.service.delete(model: testModel)
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+                token.invalidate()
+            }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testPrimaryKeyFetchSync() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
 
@@ -612,7 +643,8 @@ class CustomRealmContainerTests: XCTestCase {
                 case .update(let newModel):
                     XCTAssertTrue(newModel.count == 5)
                     expectation.fulfill()
-                case .delete:break
+                case .delete:
+                    XCTFail()
                 }
             })
 
@@ -845,6 +877,7 @@ class CustomRealmContainerTests: XCTestCase {
                                             doubleValue: 3.02,
                                             floatValue: nil,
                                             boolValue: true,
+                                            urlValue: URL(string: "https://google.com"),
                                             someEnum: .secondCase,
                                             someEnumOpt: .thirdCase,
                                             stringEnum: .firstCase,
@@ -854,6 +887,7 @@ class CustomRealmContainerTests: XCTestCase {
                                              doubleValue: 4.5909,
                                              floatValue: 9.123,
                                              boolValue: false,
+                                             urlValue: nil,
                                              someEnum: .firstCase,
                                              someEnumOpt: nil,
                                              stringEnum: .secondCase,
@@ -882,6 +916,7 @@ class CustomRealmContainerTests: XCTestCase {
                                             doubleValue: 3.02,
                                             floatValue: nil,
                                             boolValue: true,
+                                            urlValue: URL(string: "https://yahoo.com"),
                                             someEnum: .secondCase,
                                             someEnumOpt: .thirdCase,
                                             stringEnum: .firstCase,
@@ -893,7 +928,11 @@ class CustomRealmContainerTests: XCTestCase {
 
         service.update(modelOf: TestPrimitivesModel.self,
                        with: testModel.id,
-                       updates: ["doubleValue": 5, "someEnum": SomeEnum.firstCase, "someEnumOpt": nil, "stringEnumOpt": SomeStringEnum.thirdCase])
+                       updates: ["doubleValue": 5, 
+                                 "someEnum": SomeEnum.firstCase, 
+                                 "someEnumOpt": nil, 
+                                 "stringEnumOpt": SomeStringEnum.thirdCase, 
+                                 "urlValue" : URL(string: "https://google.com")])
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let fetched: TestPrimitivesModel? = self.service.syncFetchUnique(with: testModel.id)
@@ -902,6 +941,7 @@ class CustomRealmContainerTests: XCTestCase {
             XCTAssertTrue(fetched?.someEnum == .firstCase)
             XCTAssertTrue(fetched?.someEnumOpt == nil)
             XCTAssertTrue(fetched?.stringEnumOpt == .thirdCase)
+            XCTAssertTrue(fetched?.urlValue == URL(string: "https://google.com"))
 
             expectation.fulfill()
         }
@@ -915,6 +955,7 @@ class CustomRealmContainerTests: XCTestCase {
                                             doubleValue: 3.02,
                                             floatValue: nil,
                                             boolValue: true,
+                                            urlValue: URL(string: "https://google.com"),
                                             someEnum: .secondCase,
                                             someEnumOpt: .thirdCase,
                                             stringEnum: .firstCase,
@@ -929,7 +970,8 @@ class CustomRealmContainerTests: XCTestCase {
                        updates: [\TestPrimitivesModel.doubleValue <- 5,
                                  \TestPrimitivesModel.someEnum <- .firstCase,
                                  \TestPrimitivesModel.someEnumOpt <- nil,
-                                 \TestPrimitivesModel.stringEnumOpt <- .thirdCase])
+                                 \TestPrimitivesModel.stringEnumOpt <- .thirdCase,
+                                 \TestPrimitivesModel.urlValue <- URL(string: "https://yahoo.com")])
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let fetched: TestPrimitivesModel? = self.service.syncFetchUnique(with: testModel.id)
@@ -938,6 +980,7 @@ class CustomRealmContainerTests: XCTestCase {
             XCTAssertTrue(fetched?.someEnum == .firstCase)
             XCTAssertTrue(fetched?.someEnumOpt == nil)
             XCTAssertTrue(fetched?.stringEnumOpt == .thirdCase)
+            XCTAssertTrue(fetched?.urlValue == URL(string: "https://yahoo.com"))
 
             expectation.fulfill()
         }
