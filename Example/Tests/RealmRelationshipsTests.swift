@@ -399,24 +399,63 @@ class RealmRelationshipsTests: XCTestCase {
         let testModel = TestRRModel(id: 1, name: "ll", owner: subModel)
 
         service.save(model: testModel)
-        service.saveSkippingRelations(model: testModel.ownerLens.set(nil))
         let expectation = XCTestExpectation()
         expectation.expectedFulfillmentCount = 2
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 
-            self.service.fetch() {
-                (all: [TestRRModel]) in
+            self.service.saveSkippingRelations(model: testModel.ownerLens.set(nil))
 
-                XCTAssertTrue(all == [testModel])
-                expectation.fulfill()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.service.fetch() {
+                    (all: [TestRRModel]) in
+
+                    XCTAssertTrue(all == [testModel])
+                    expectation.fulfill()
+                }
+
+                self.service.fetch() {
+                    (all: [TestSomeModel]) in
+
+                    XCTAssertTrue(all == [subModel])
+                    expectation.fulfill()
+                }
             }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
 
-            self.service.fetch() {
-                (all: [TestSomeModel]) in
+    func testSkipRelationshipsSavingNonNilExisting() {
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel = TestRNModel(id: 1, name: "ll", owner: subModel)
 
-                XCTAssertTrue(all == [subModel])
-                expectation.fulfill()
+        service.save(model: testModel)
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 2
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+
+            self.service.saveSkippingRelations(model: testModel.ownerLens.set(TestSomeModel(userId: 2,
+                                                                                            userName: "",
+                                                                                            userAvatar: "",
+                                                                                            title: "",
+                                                                                            count: 0,
+                                                                                            nestedModel: nil)))
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.service.fetch() {
+                    (all: [TestRNModel]) in
+
+                    XCTAssertTrue(all == [testModel])
+                    expectation.fulfill()
+                }
+
+                self.service.fetch() {
+                    (all: [TestSomeModel]) in
+
+                    XCTAssertTrue(all == [subModel])
+                    expectation.fulfill()
+                }
             }
         }
         wait(for: [expectation], timeout: 1)

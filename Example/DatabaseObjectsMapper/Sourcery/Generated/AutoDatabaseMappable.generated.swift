@@ -14,7 +14,7 @@ import DatabaseObjectsMapper
 // MARK: - TestCollectionsModel generated container
 internal class TestCollectionsModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestCollectionsModelContainer, Int> = \TestCollectionsModelContainer.id
-            public override static func primaryKey() -> String? {
+    public override static func primaryKey() -> String? {
         return "id"
     }
     public override class func indexedProperties() -> [String] {
@@ -35,7 +35,7 @@ internal class TestCollectionsModelContainer: Object, DatabaseContainer {
 }
 
 extension TestCollectionsModel: KeyPathConvertible {
-    static func key(for keyPath: PartialKeyPath<TestCollectionsModel>) -> String {
+    public static func key(for keyPath: PartialKeyPath<TestCollectionsModel>) -> String {
         switch keyPath {
         case \TestCollectionsModel.id: return "id"
         case \TestCollectionsModel.strings: return "strings"
@@ -57,7 +57,7 @@ extension TestCollectionsModel: KeyPathConvertible {
 // MARK: - TestPrimitivesModel generated container
 internal class TestPrimitivesModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestPrimitivesModelContainer, Int> = \TestPrimitivesModelContainer.id
-            public override static func primaryKey() -> String? {
+    public override static func primaryKey() -> String? {
         return "id"
     }
     public override class func indexedProperties() -> [String] {
@@ -76,7 +76,7 @@ internal class TestPrimitivesModelContainer: Object, DatabaseContainer {
 }
 
 extension TestPrimitivesModel: KeyPathConvertible {
-    static func key(for keyPath: PartialKeyPath<TestPrimitivesModel>) -> String {
+    public static func key(for keyPath: PartialKeyPath<TestPrimitivesModel>) -> String {
         switch keyPath {
         case \TestPrimitivesModel.id: return "id"
         case \TestPrimitivesModel.value: return "value"
@@ -93,10 +93,35 @@ extension TestPrimitivesModel: KeyPathConvertible {
         }
     }
 }
+// MARK: - TestRNModel generated container
+internal class TestRNModelContainer: Object, DatabaseContainer {
+    public static var idKey: WritableKeyPath<TestRNModelContainer, Int> = \TestRNModelContainer.id
+    public override static func primaryKey() -> String? {
+        return "id"
+    }
+    public override class func indexedProperties() -> [String] {
+        return []
+    }
+    @objc public dynamic var id: Int = 0
+    @objc public dynamic var name: String = String()
+    @objc public dynamic var owner: TestSomeModelContainer?
+}
+
+extension TestRNModel: KeyPathConvertible {
+    public static func key(for keyPath: PartialKeyPath<TestRNModel>) -> String {
+        switch keyPath {
+        case \TestRNModel.id: return "id"
+        case \TestRNModel.name: return "name"
+        case \TestRNModel.owner: return "owner"
+        default:
+            fatalError("Unhandled key path")
+        }
+    }
+}
 // MARK: - TestRRModel generated container
 internal class TestRRModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestRRModelContainer, Int> = \TestRRModelContainer.id
-            public override static func primaryKey() -> String? {
+    public override static func primaryKey() -> String? {
         return "id"
     }
     public override class func indexedProperties() -> [String] {
@@ -109,7 +134,7 @@ internal class TestRRModelContainer: Object, DatabaseContainer {
 }
 
 extension TestRRModel: KeyPathConvertible {
-    static func key(for keyPath: PartialKeyPath<TestRRModel>) -> String {
+    public static func key(for keyPath: PartialKeyPath<TestRRModel>) -> String {
         switch keyPath {
         case \TestRRModel.id: return "id"
         case \TestRRModel.name: return "name"
@@ -123,7 +148,7 @@ extension TestRRModel: KeyPathConvertible {
 // MARK: - TestSomeModel generated container
 internal class TestSomeModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestSomeModelContainer, Int> = \TestSomeModelContainer.userId
-            public override static func primaryKey() -> String? {
+    public override static func primaryKey() -> String? {
         return "userId"
     }
     public override class func indexedProperties() -> [String] {
@@ -140,7 +165,7 @@ internal class TestSomeModelContainer: Object, DatabaseContainer {
 }
 
 extension TestSomeModel: KeyPathConvertible {
-    static func key(for keyPath: PartialKeyPath<TestSomeModel>) -> String {
+    public static func key(for keyPath: PartialKeyPath<TestSomeModel>) -> String {
         switch keyPath {
         case \TestSomeModel.userId: return "userId"
         case \TestSomeModel.userName: return "userName"

@@ -673,6 +673,85 @@ extension TestPrimitivesModel {
         return updates
     }
 }
+// MARK: TestRNModel ObjectDiff
+extension TestRNModel {
+
+    enum Updates: DictionaryElementRepresentable {
+        case id(Int)
+        case name(String)
+        case owner(TestSomeModel)
+        var key: String {
+            switch self {
+                case .id: return "id"
+                case .name: return "name"
+                case .owner: return "owner"
+            }
+        }
+        var value: Any? {
+            switch self {
+            case .id(let newValue): return newValue
+            case .name(let newValue): return newValue
+            case .owner(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "id":
+                if let value = value as? Int {
+                    self = .id(value)
+                } else { return nil }
+            case "name":
+                if let value = value as? String {
+                    self = .name(value)
+                } else { return nil }
+            case "owner":
+                if let value = value as? TestSomeModel {
+                    self = .owner(value)
+                } else { return nil }
+            default: return nil
+            }
+        }
+    }
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
+        _updates.forEach { dict[$0.key] = $0.value }
+        return dict
+    }
+
+    func allUpdates() -> [Updates] {
+        var updates = [Updates]()
+        updates.append(.id(id))
+        updates.append(.name(name))
+        updates.append(.owner(owner))
+        return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestRNModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
+    }
+    func updated(_ _update: Updates) -> TestRNModel {
+        switch _update {
+            case .id(let newValue):
+                return TestRNModel.idLens.set(newValue, self)
+            case .name(let newValue):
+                return TestRNModel.nameLens.set(newValue, self)
+            case .owner(let newValue):
+                return TestRNModel.ownerLens.set(newValue, self)
+        }
+    }
+    func updated(_ _updates: [Updates]) -> TestRNModel {
+        return _updates.reduce(self) { (value, update) in value.updated(update) }
+    }
+    func difference(from _model: TestRNModel) -> [Updates] {
+        var updates = [Updates]()
+        if id != _model.id { updates.append(.id(id)) }
+        if name != _model.name { updates.append(.name(name)) }
+        if owner != _model.owner { updates.append(.owner(owner)) }
+        return updates
+    }
+}
 // MARK: TestRRModel ObjectDiff
 extension TestRRModel {
 

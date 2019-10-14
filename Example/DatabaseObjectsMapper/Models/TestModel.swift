@@ -90,6 +90,13 @@ struct TestRRModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses 
     let users = Relation<TestRRModel>(type: .direct)
 }
 
+struct TestRNModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
+    let id: Int
+    let name: String
+
+    let owner: TestSomeModel
+}
+
 struct SomeCodable: Codable, Equatable, Hashable {
     let key: String
     let index: Int
@@ -177,4 +184,9 @@ extension TestCDSimpleModel: DatabaseMappable {
 extension TestRRModel: UniquelyMappable {
     typealias Container = TestRRModelContainer
     static var idKey = \TestRRModel.id
+}
+
+extension TestRNModel: UniquelyMappable {
+    typealias Container = TestRNModelContainer
+    static var idKey = \TestRNModel.id
 }

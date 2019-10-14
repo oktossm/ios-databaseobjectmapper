@@ -399,6 +399,35 @@ extension TestPrimitivesModel {
      return BoundLens<TestPrimitivesModel, SomeStringEnum?>(instance: self, lens: TestPrimitivesModel.stringEnumOptLens)
   }
 }
+extension TestRNModel {
+  static let idLens = Lens<TestRNModel, Int>(
+    get: { $0.id },
+    set: { id, testRNModel in
+       TestRNModel(id: id, name: testRNModel.name, owner: testRNModel.owner)
+    }
+  )
+  var idLens: BoundLens<TestRNModel, Int> {
+     return BoundLens<TestRNModel, Int>(instance: self, lens: TestRNModel.idLens)
+  }
+  static let nameLens = Lens<TestRNModel, String>(
+    get: { $0.name },
+    set: { name, testRNModel in
+       TestRNModel(id: testRNModel.id, name: name, owner: testRNModel.owner)
+    }
+  )
+  var nameLens: BoundLens<TestRNModel, String> {
+     return BoundLens<TestRNModel, String>(instance: self, lens: TestRNModel.nameLens)
+  }
+  static let ownerLens = Lens<TestRNModel, TestSomeModel>(
+    get: { $0.owner },
+    set: { owner, testRNModel in
+       TestRNModel(id: testRNModel.id, name: testRNModel.name, owner: owner)
+    }
+  )
+  var ownerLens: BoundLens<TestRNModel, TestSomeModel> {
+     return BoundLens<TestRNModel, TestSomeModel>(instance: self, lens: TestRNModel.ownerLens)
+  }
+}
 extension TestRRModel {
   static let idLens = Lens<TestRRModel, Int>(
     get: { $0.id },

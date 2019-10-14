@@ -78,8 +78,8 @@ public struct RealmWriteTransaction {
     /// - parameter value: The value to be added to the realm.
     /// - parameter update: If true, the Realm will try to find a value with the same primary key and update it. Otherwise, the value will be added.
     public func addSkippingRelations<T: UniquelyMappable>(_ value: T) throws where T.Container: Object {
-        let object = try value.container(with: nil)
-        realm.create(T.Container.self, value: object.encodedPropertiesValue, update: .modified)
+        let object = try value.containerSkippingRelation(with: nil)
+        realm.create(T.Container.self, value: object.propertiesValue, update: .modified)
     }
 
     public func addSkippingRelations<S: Sequence>(_ values: S) throws where S.Element: UniquelyMappable, S.Element.Container: Object {

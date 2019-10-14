@@ -25,6 +25,12 @@ public extension DatabaseMappable where Container: Object & SharedDatabaseContai
         return try self.realmObject(with: userInfo)
     }
 
+    func containerSkippingRelation(with userInfo: Any?) throws -> Container {
+        let object = Container()
+        self.updateSkippingRelations(object, updates: encodedValue)
+        return object
+    }
+
     func updateSkippingRelations(_ container: Container, updates: [String: Any]) {
         container.typeName = Self.typeName
         updateProperties(for: container, updates: updates)
@@ -48,6 +54,12 @@ public extension UniquelyMappable where Container: Object {
     func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
         let realm = try! Realm()
         return realm.object(ofType: Container.self, forPrimaryKey: self.objectKeyValue)
+    }
+
+    func containerSkippingRelation(with userInfo: Any?) throws -> Container {
+        let object = Container()
+        self.updateSkippingRelations(object, updates: encodedValue)
+        return object
     }
 
     func updateSkippingRelations(_ container: Container, updates: [String: Any]) {
@@ -131,20 +143,13 @@ public extension DatabaseMappable where Container: Object {
 
 
 public extension DatabaseContainer where Self: Object {
-    var encodedPropertiesValue: [String: Any] {
+    var propertiesValue: [String: Any] {
         let properties = objectSchema.properties
-        var encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
+        let encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
             .filter { $0.objectClassName == nil }
             .compactMap {
                 guard let value = self[$0.name] else {
                     return nil
-                }
-                if $0.type == .data, let data = value as? Data {
-                    if let archived: [String: Any] = Dictionary(archive: data) {
-                        return ($0.name, archived)
-                    } else if let archived: [Any] = Array(archive: data) {
-                        return ($0.name, archived)
-                    }
                 }
                 return ($0.name, value)
             })
@@ -154,20 +159,20 @@ public extension DatabaseContainer where Self: Object {
         get {
             let properties = objectSchema.properties
             var encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
-                    .filter { $0.objectClassName == nil }
-                    .compactMap {
-                        guard let value = self[$0.name] else {
-                            return nil
+                .filter { $0.objectClassName == nil }
+                .compactMap {
+                    guard let value = self[$0.name] else {
+                        return nil
+                    }
+                    if $0.type == .data, let data = value as? Data {
+                        if let archived: [String: Any] = Dictionary(archive: data) {
+                            return ($0.name, archived)
+                        } else if let archived: [Any] = Array(archive: data) {
+                            return ($0.name, archived)
                         }
-                        if $0.type == .data, let data = value as? Data {
-                            if let archived: [String: Any] = Dictionary(archive: data) {
-                                return ($0.name, archived)
-                            } else if let archived: [Any] = Array(archive: data) {
-                                return ($0.name, archived)
-                            }
-                        }
-                        return ($0.name, value)
-                    })
+                    }
+                    return ($0.name, value)
+                })
             properties.filter { $0.objectClassName != nil && !$0.isArray && $0.type != .linkingObjects }.forEach {
                 if let object = self[$0.name] as? AnyDatabaseContainer {
                     encoded[$0.name] = object.encodedValue
