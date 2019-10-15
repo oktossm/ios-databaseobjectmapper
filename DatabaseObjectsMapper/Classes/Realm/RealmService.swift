@@ -159,6 +159,35 @@ extension RealmService {
         self.update(modelOf: type, with: key, updates: updates, sync: sync)
     }
 
+    public func updateSingleRelation<T: UniquelyMappable & KeyPathConvertible, R: UniquelyMappable>(in model: T,
+                                                                                                    for keyPath: KeyPath<T, R>,
+                                                                                                    relationId: R.ID?,
+                                                                                                    sync: Bool = false)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let block: RealmBlock = {
+            realmOperator in
+            try? realmOperator.write {
+                transaction in
+                transaction.updateSingleRelation(in: model, for: keyPath, relationOf: R.self, relationId: relationId)
+            }
+        }
+        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+    }
+    public func updateSingleRelation<T: UniquelyMappable & KeyPathConvertible, R: UniquelyMappable>(in model: T,
+                                                                                                    for keyPath: KeyPath<T, R?>,
+                                                                                                    relationId: R.ID?,
+                                                                                                    sync: Bool = false)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let block: RealmBlock = {
+            realmOperator in
+            try? realmOperator.write {
+                transaction in
+                transaction.updateSingleRelation(in: model, for: keyPath, relationOf: R.self, relationId: relationId)
+            }
+        }
+        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+    }
+
     public func updateRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                          in model: T,
                                                                          with update: Relation<R>.Update,

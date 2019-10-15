@@ -210,6 +210,71 @@ class RealmRelationshipsTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testUpdateExistingRelationship() {
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
+
+        service.save(models: [testModel])
+        service.save(models: [subModel])
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.service.updateSingleRelation(in: testModel, for: \TestRRModel.owner, relationId: subModel.idValue)
+        }
+
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 2
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+
+            self.service.fetch() {
+                (all: [TestRRModel]) in
+
+                XCTAssertTrue(all == [testModel.updated([TestRRModel.Updates.owner(subModel)])])
+                expectation.fulfill()
+            }
+
+            self.service.fetch() {
+                (all: [TestSomeModel]) in
+
+                XCTAssertTrue(all == [subModel])
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testRemoveSingleRelationshipWithUpdate() {
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel = TestRRModel(id: 1, name: "ll", owner: subModel)
+
+        service.save(models: [testModel])
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.service.updateSingleRelation(in: testModel, for: \TestRRModel.owner, relationId: nil)
+        }
+
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 2
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+
+            self.service.fetch() {
+                (all: [TestRRModel]) in
+
+                XCTAssertTrue(all == [testModel.updated([TestRRModel.Updates.owner(nil)])])
+                expectation.fulfill()
+            }
+
+            self.service.fetch() {
+                (all: [TestSomeModel]) in
+
+                XCTAssertTrue(all == [subModel])
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testAddToManyRelationship() {
         let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
         let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
@@ -565,7 +630,7 @@ class RealmRelationshipsTests: XCTestCase {
 
         let expectation = XCTestExpectation()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let fetched: [TestRRModel] = self.service.syncFetchRelation(testModel.directModels,
                                                                         in: testModel,
                                                                         with: .unfiltered,

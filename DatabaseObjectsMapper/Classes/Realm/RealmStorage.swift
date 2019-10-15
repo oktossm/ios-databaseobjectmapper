@@ -85,6 +85,7 @@ public struct RealmWriteTransaction {
     public func addSkippingRelations<S: Sequence>(_ values: S) throws where S.Element: UniquelyMappable, S.Element.Container: Object {
         try values.forEach { try self.addSkippingRelations($0) }
     }
+
     /// Updates an existing DatabaseMappable type in the Realm.
     /// - parameter value: The value to be added to the realm.
     /// - parameter skipRelations: If true relations will not be updated for this object.
@@ -128,6 +129,19 @@ public struct RealmWriteTransaction {
         updates.filter { $0.value == nil }.forEach { encoded[$0.key] = nil }
         guard let new = T(encoded) else { return }
         new.update(object)
+    }
+
+    public func updateSingleRelation<T: UniquelyMappable & KeyPathConvertible, R: UniquelyMappable>(in model: T,
+                                                                                                    for keyPath: PartialKeyPath<T>,
+                                                                                                    relationOf type: R.Type,
+                                                                                                    relationId: R.ID?)
+        where T.Container: Object, R.Container: Object {
+        guard let object = realm.object(ofType: T.Container.self, forPrimaryKey: model.objectKeyValue) else { return }
+        if let id = relationId, let relationObject = realm.object(ofType: R.Container.self, forPrimaryKey: R.idMapping(id)) {
+            object[T.key(for: keyPath)] = relationObject
+        } else {
+            object[T.key(for: keyPath)] = nil
+        }
     }
 
     /// Updates relation in existing DatabaseMappable type in the Realm.
