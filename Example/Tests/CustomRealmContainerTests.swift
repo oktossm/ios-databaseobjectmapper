@@ -634,10 +634,13 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let token = self.service.fetch(with: testModel.userId, callback: {
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetch(with: testModel.userId, callback: {
                 (model: TestSomeModel?) in
             }, updates: {
                 update in
+
+                token?.invalidate()
 
                 switch update {
                 case .update(let newModel):
@@ -651,10 +654,6 @@ class CustomRealmContainerTests: XCTestCase {
             self.service.update(modelOf: TestSomeModel.self,
                                 with: testModel.userId,
                                 updates: [TestSomeModel.Updates.count(5)].dictionaryRepresentation())
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                token.invalidate()
-            }
         }
         wait(for: [expectation], timeout: 1)
     }
