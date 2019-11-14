@@ -32,9 +32,11 @@ internal class DatabaseBackgroundWorker: DatabaseWorker {
 
         let thread = Thread {
             [weak self] in
+
             while let `self` = self, !self.thread.isCancelled {
-                RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantPast)
+                _ = CFRunLoopRunInMode(CFRunLoopMode.defaultMode, 1, true)
             }
+
             Thread.exit()
         }
         thread.qualityOfService = .utility
