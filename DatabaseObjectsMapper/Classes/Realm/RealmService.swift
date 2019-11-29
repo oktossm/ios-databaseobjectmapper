@@ -436,14 +436,14 @@ extension RealmService {
 
         // Listen for item deletes
         let innerToken = self.fetchUnique(with: model.idValue, callback: {
-            (item: T?) in
+            [weak token] (item: T?) in
             guard item == nil else { return }
-            token.invalidate()
+            token?.invalidate()
         }, updates: {
-            updates in
+            [weak token] updates in
             switch updates {
             case .delete:
-                token.invalidate()
+                token?.invalidate()
             default:
                 break
             }
@@ -467,6 +467,11 @@ extension RealmService {
                 change in
 
                 if token.isInvalidated { return }
+
+                // Check if item still exists
+                guard let _: T.Container = realmOperator.value(ofType: T.self, with: model.idValue) else {
+                    return
+                }
 
                 switch change {
                 case let .initial(newResults):
