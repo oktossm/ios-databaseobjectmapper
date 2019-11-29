@@ -330,7 +330,9 @@ extension RealmService {
         return value
     }
 
-    public func fetch<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void, updates: @escaping (DatabaseModelUpdate<T>) -> Void)
+    public func fetchUnique<T: UniquelyMappable>(with key: T.ID,
+                                                 callback: @escaping (T?) -> Void,
+                                                 updates: @escaping (DatabaseModelUpdate<T>) -> Void)
             -> DatabaseUpdatesToken where T.Container: RealmObject {
 
         let token = DatabaseUpdatesToken()
@@ -432,6 +434,21 @@ extension RealmService {
         let token = DatabaseUpdatesToken()
         token.limit = limit
 
+        // Listen for item deletes
+        let innerToken = self.fetchUnique(with: model.idValue, callback: {
+            (item: T?) in
+            guard item == nil else { return }
+            token.invalidate()
+        }, updates: {
+            updates in
+            switch updates {
+            case .delete:
+                token.invalidate()
+            default:
+                break
+            }
+        })
+
         let worker = self.nextWorker()
 
         worker.execute {
@@ -449,6 +466,8 @@ extension RealmService {
             let rToken = results.observe {
                 change in
 
+                if token.isInvalidated { return }
+
                 switch change {
                 case let .initial(newResults):
                     let values = Array(newResults.limited(token.limit).compactMap({ try? R.mappable(for: $0) }))
@@ -463,7 +482,6 @@ extension RealmService {
                     let modificationsInLimit = modifications.filter { token.limit == nil || $0 < (token.limit ?? 0) }
                     let newLimit = token.limit.flatMap { $0 + (max(0, insertionsInLimit.count - deletionsInLimit.count)) }
                     let values = newResults.limited(newLimit).compactMap({ try? R.mappable(for: $0) })
-                    print(newResults.count)
                     if (token.limit ?? Int.max) < newResults.count {
                         token.updateLimit(newLimit)
                     }
@@ -479,7 +497,10 @@ extension RealmService {
                 }
             }
 
-            token.invalidation = { rToken.invalidate() }
+            token.invalidation = {
+                rToken.invalidate()
+                innerToken.invalidate()
+            }
             guard let worker = worker else { return }
             self?.setupLimitation(for: token, worker: worker, results: results, next: next, updates: updates)
         }

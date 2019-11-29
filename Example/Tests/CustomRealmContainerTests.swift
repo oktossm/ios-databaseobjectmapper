@@ -295,7 +295,7 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let token = self.service.fetch(with: testModel.userId, callback: {
+            let token = self.service.fetchUnique(with: testModel.userId, callback: {
                 (model: TestSomeModel?) in
                 XCTAssertTrue(testModel == model)
             }, updates: {
@@ -635,7 +635,7 @@ class CustomRealmContainerTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             var token: DatabaseUpdatesToken?
-            token = self.service.fetch(with: testModel.userId, callback: {
+            token = self.service.fetchUnique(with: testModel.userId, callback: {
                 (model: TestSomeModel?) in
             }, updates: {
                 update in
@@ -667,7 +667,7 @@ class CustomRealmContainerTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             var token: DatabaseUpdatesToken?
-            token = self.service.fetch(with: testModel.userId, callback: {
+            token = self.service.fetchUnique(with: testModel.userId, callback: {
                 (model: TestSomeModel?) in
             }, updates: {
                 update in

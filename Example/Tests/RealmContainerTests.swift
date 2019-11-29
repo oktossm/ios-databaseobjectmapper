@@ -260,7 +260,7 @@ class RealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.token = self.service.fetch(with: testModel.id, callback: {
+            self.token = self.service.fetchUnique(with: testModel.id, callback: {
                 (_: TestModel?) in
                 self.service.update(modelOf: TestModel.self, with: testModel.id, updates: [TestModel.Updates.count(5)].dictionaryRepresentation())
             }, updates: {
@@ -287,7 +287,7 @@ class RealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.token = self.service.fetch(with: testModel.id, callback: {
+            self.token = self.service.fetchUnique(with: testModel.id, callback: {
                 (_: TestModel?) in
                 self.service.delete(model: testModel)
             }, updates: {

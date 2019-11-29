@@ -562,6 +562,42 @@ class RealmRelationshipsTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testUpdateObjectWithToManyRelationship() {
+        let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel = TestRRModel(id: 1, name: "ll", owner: nil)
+
+        service.save(model: subModel, update: true, relation: subModel.directModels, with: .setModels(models: [testModel]))
+        service.saveSkippingRelations(model: subModel)
+
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 3
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+
+            self.service.fetch() {
+                (all: [TestRRModel]) in
+
+                XCTAssertTrue(all == [testModel])
+                expectation.fulfill()
+            }
+
+            self.service.fetch() {
+                (all: [TestSomeModel]) in
+
+                XCTAssertTrue(all == [subModel])
+                expectation.fulfill()
+            }
+
+            self.service.fetchRelation(subModel.directModels, in: subModel, with: .unfiltered, sorted: .unsorted) {
+                (all: [TestRRModel]) in
+
+                XCTAssertTrue(all == [testModel])
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
 
     func testInverseRelationship() {
         let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
