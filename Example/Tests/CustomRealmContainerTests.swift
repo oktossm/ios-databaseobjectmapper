@@ -927,11 +927,11 @@ class CustomRealmContainerTests: XCTestCase {
 
         service.update(modelOf: TestPrimitivesModel.self,
                        with: testModel.id,
-                       updates: ["doubleValue": 5, 
-                                 "someEnum": SomeEnum.firstCase, 
-                                 "someEnumOpt": nil, 
-                                 "stringEnumOpt": SomeStringEnum.thirdCase, 
-                                 "urlValue" : URL(string: "https://google.com")])
+                       updates: ["doubleValue": 5,
+                                 "someEnum": SomeEnum.firstCase,
+                                 "someEnumOpt": nil,
+                                 "stringEnumOpt": SomeStringEnum.thirdCase,
+                                 "urlValue": URL(string: "https://google.com")])
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             let fetched: TestPrimitivesModel? = self.service.syncFetchUnique(with: testModel.id)
@@ -1022,6 +1022,105 @@ class CustomRealmContainerTests: XCTestCase {
             XCTAssertTrue(all.first?.codable == [newCodable, codable], "\(all)")
             XCTAssertTrue(all.first?.urls == [url, url2], "\(all)")
             XCTAssertTrue(all.first?.dict == [2: newCodable], "\(all)")
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testMaxMin() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 10, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 7, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2, testModel3, testModel4])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let max: Int? = self.service.maxSync(with: .unfiltered, for: \TestSomeModel.count)
+            let min: Int? = self.service.minSync(with: .unfiltered, for: \TestSomeModel.count)
+            let minFiltered: Int? = self.service.minSync(with: .query(query: "userAvatar == 'rw'"), for: \TestSomeModel.count)
+
+            XCTAssertTrue(max == 10)
+            XCTAssertTrue(min == 2)
+            XCTAssertTrue(minFiltered == 3)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testMaxMinOptional() {
+        let testModel = TestPrimitivesModel(id: 1,
+                                            value: 20,
+                                            doubleValue: 3.02,
+                                            floatValue: nil,
+                                            boolValue: true,
+                                            urlValue: URL(string: "https://google.com"),
+                                            someEnum: .secondCase,
+                                            someEnumOpt: .thirdCase,
+                                            stringEnum: .firstCase,
+                                            stringEnumOpt: .secondCase)
+        let testModel2 = TestPrimitivesModel(id: 2,
+                                             value: 5,
+                                             doubleValue: 4.5909,
+                                             floatValue: 9.123,
+                                             boolValue: false,
+                                             urlValue: nil,
+                                             someEnum: .firstCase,
+                                             someEnumOpt: nil,
+                                             stringEnum: .secondCase,
+                                             stringEnumOpt: nil)
+        let testModel3 = TestPrimitivesModel(id: 3,
+                                             value: nil,
+                                             doubleValue: 4.5909,
+                                             floatValue: 9.123,
+                                             boolValue: false,
+                                             urlValue: nil,
+                                             someEnum: .firstCase,
+                                             someEnumOpt: nil,
+                                             stringEnum: .secondCase,
+                                             stringEnumOpt: nil)
+
+        service.save(models: [testModel, testModel2, testModel3])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let max = self.service.maxSync(with: .unfiltered, for: \TestPrimitivesModel.value)
+            let min = self.service.minSync(with: .unfiltered, for: \TestPrimitivesModel.value)
+
+            XCTAssertTrue(max == 20)
+            XCTAssertTrue(min == 5)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testSumAverage() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 3, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 4, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 10, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 7, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2, testModel3, testModel4])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let sum: Int = self.service.sumSync(with: .unfiltered, for: \TestSomeModel.count)
+            let average: Double? = self.service.averageSync(with: .unfiltered, for: \TestSomeModel.count)
+            let averageFiltered: Double? = self.service.averageSync(with: .query(query: "userAvatar == 'rw'"), for: \TestSomeModel.count)
+
+            XCTAssertTrue(sum == 24)
+            XCTAssertTrue(average == 6)
+            XCTAssertTrue(averageFiltered == 7)
 
             expectation.fulfill()
         }
