@@ -7,6 +7,8 @@ import RealmSwift
 
 
 public typealias RealmObject = Object
+public typealias MinMaxType = RealmSwift.MinMaxType
+public typealias AddableType = RealmSwift.AddableType
 
 
 open class RealmService {
@@ -173,20 +175,6 @@ extension RealmService {
         }
         sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
     }
-    public func updateSingleRelation<T: UniquelyMappable & KeyPathConvertible, R: UniquelyMappable>(in model: T,
-                                                                                                    for keyPath: KeyPath<T, R?>,
-                                                                                                    relationId: R.ID?,
-                                                                                                    sync: Bool = false)
-        where T.Container: RealmObject, R.Container: RealmObject {
-        let block: RealmBlock = {
-            realmOperator in
-            try? realmOperator.write {
-                transaction in
-                transaction.updateSingleRelation(in: model, for: keyPath, relationOf: R.self, relationId: relationId)
-            }
-        }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
-    }
 
     public func updateRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                          in model: T,
@@ -231,6 +219,86 @@ extension RealmService {
 
 
     // MARK: Fetching
+
+    public func min<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                             for keyPath: KeyPath<T, R>,
+                                                                             callback: @escaping (R?) -> Void) where T.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: R? = realmOperator.values(ofType: T.self).filter(filter).min(ofProperty: T.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func max<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                             for keyPath: KeyPath<T, R>,
+                                                                             callback: @escaping (R?) -> Void) where T.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: R? = realmOperator.values(ofType: T.self).filter(filter).max(ofProperty: T.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func sum<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                              for keyPath: KeyPath<T, R>,
+                                                                              callback: @escaping (R) -> Void) where T.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: R = realmOperator.values(ofType: T.self).filter(filter).sum(ofProperty: T.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func average<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                  for keyPath: KeyPath<T, R>,
+                                                                                  callback: @escaping (Double?) -> Void)
+        where T.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: Double? = realmOperator.values(ofType: T.self).filter(filter).average(ofProperty: T.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func minSync<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                 for keyPath: KeyPath<T, R>) -> R?
+        where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).min(ofProperty: T.key(for: keyPath))
+    }
+
+    public func maxSync<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                 for keyPath: KeyPath<T, R>) -> R?
+        where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).max(ofProperty: T.key(for: keyPath))
+    }
+
+    public func sumSync<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                  for keyPath: KeyPath<T, R>) -> R where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).sum(ofProperty: T.key(for: keyPath))
+    }
+
+    public func averageSync<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                      for keyPath: KeyPath<T, R>) -> Double?
+        where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).average(ofProperty: T.key(for: keyPath))
+    }
 
     public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
                                            sorted sort: DatabaseSortType = .unsorted,
@@ -374,6 +442,108 @@ extension RealmService {
     }
 
     // MARK: Relations
+
+    public func min<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
+                                                                                                  in model: T,
+                                                                                                  with filter: DatabaseFilterType = .unfiltered,
+                                                                                                  for keyPath: KeyPath<R, V>,
+                                                                                                  callback: @escaping (V?) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: V? = realmOperator.relationValues(relation, in: model)?.filter(filter).min(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func max<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
+                                                                                                  in model: T,
+                                                                                                  with filter: DatabaseFilterType = .unfiltered,
+                                                                                                  for keyPath: KeyPath<R, V>,
+                                                                                                  callback: @escaping (V?) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: V? = realmOperator.relationValues(relation, in: model)?.filter(filter).max(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func sum<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: AddableType>(_ relation: Relation<R>,
+                                                                                                   in model: T,
+                                                                                                   with filter: DatabaseFilterType = .unfiltered,
+                                                                                                   for keyPath: KeyPath<R, V>,
+                                                                                                   callback: @escaping (V?) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: V? = realmOperator.relationValues(relation, in: model)?.filter(filter).sum(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func average<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: AddableType>(_ relation: Relation<R>,
+                                                                                                       in model: T,
+                                                                                                       with filter: DatabaseFilterType = .unfiltered,
+                                                                                                       for keyPath: KeyPath<R, V>,
+                                                                                                       callback: @escaping (Double?) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: Double? = realmOperator.relationValues(relation, in: model)?.filter(filter).average(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func minSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
+                                                                                                      in model: T,
+                                                                                                      with filter: DatabaseFilterType = .unfiltered,
+                                                                                                      for keyPath: KeyPath<R, V>) -> V?
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).min(ofProperty: R.key(for: keyPath))
+    }
+
+    public func maxSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
+                                                                                                      in model: T,
+                                                                                                      with filter: DatabaseFilterType = .unfiltered,
+                                                                                                      for keyPath: KeyPath<R, V>) -> V?
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).max(ofProperty: R.key(for: keyPath))
+    }
+
+    public func sumSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: AddableType>(_ relation: Relation<R>,
+                                                                                                       in model: T,
+                                                                                                       with filter: DatabaseFilterType = .unfiltered,
+                                                                                                       for keyPath: KeyPath<R, V>) -> V?
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).sum(ofProperty: R.key(for: keyPath))
+    }
+
+    public func averageSync<T: UniquelyMappable,
+                           R: UniquelyMappable & KeyPathConvertible,
+                           V: AddableType>(_ relation: Relation<R>,
+                                           in model: T,
+                                           with filter: DatabaseFilterType = .unfiltered,
+                                           for keyPath: KeyPath<R, V>) -> Double?
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).average(ofProperty: R.key(for: keyPath))
+    }
 
     public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                         in model: T,
@@ -669,6 +839,207 @@ extension RealmService {
                              callback: callback,
                              next: next,
                              updates: updates)
+    }
+}
+
+
+// MARK: - Optional key paths support
+extension RealmService {
+    public func updateSingleRelation<T: UniquelyMappable & KeyPathConvertible, R: UniquelyMappable>(in model: T,
+                                                                                                    for keyPath: KeyPath<T, R?>,
+                                                                                                    relationId: R.ID?,
+                                                                                                    sync: Bool = false)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let block: RealmBlock = {
+            realmOperator in
+            try? realmOperator.write {
+                transaction in
+                transaction.updateSingleRelation(in: model, for: keyPath, relationOf: R.self, relationId: relationId)
+            }
+        }
+        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+    }
+
+    public func min<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                             for keyPath: KeyPath<T, R?>,
+                                                                             callback: @escaping (R?) -> Void) where T.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: R? = realmOperator.values(ofType: T.self).filter(filter).min(ofProperty: T.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func max<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                             for keyPath: KeyPath<T, R?>,
+                                                                             callback: @escaping (R?) -> Void) where T.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: R? = realmOperator.values(ofType: T.self).filter(filter).max(ofProperty: T.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func sum<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                              for keyPath: KeyPath<T, R?>,
+                                                                              callback: @escaping (R) -> Void) where T.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: R = realmOperator.values(ofType: T.self).filter(filter).sum(ofProperty: T.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func average<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                  for keyPath: KeyPath<T, R?>,
+                                                                                  callback: @escaping (Double?) -> Void)
+        where T.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: Double? = realmOperator.values(ofType: T.self).filter(filter).average(ofProperty: T.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func minSync<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                 for keyPath: KeyPath<T, R?>) -> R?
+        where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).min(ofProperty: T.key(for: keyPath))
+    }
+
+    public func maxSync<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                 for keyPath: KeyPath<T, R?>) -> R?
+        where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).max(ofProperty: T.key(for: keyPath))
+    }
+
+    public func sumSync<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                  for keyPath: KeyPath<T, R?>) -> R where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).sum(ofProperty: T.key(for: keyPath))
+    }
+
+    public func averageSync<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
+                                                                                      for keyPath: KeyPath<T, R?>) -> Double?
+        where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).average(ofProperty: T.key(for: keyPath))
+    }
+
+    public func min<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
+                                                                                                  in model: T,
+                                                                                                  with filter: DatabaseFilterType = .unfiltered,
+                                                                                                  for keyPath: KeyPath<R, V?>,
+                                                                                                  callback: @escaping (V?) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: V? = realmOperator.relationValues(relation, in: model)?.filter(filter).min(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func max<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
+                                                                                                  in model: T,
+                                                                                                  with filter: DatabaseFilterType = .unfiltered,
+                                                                                                  for keyPath: KeyPath<R, V?>,
+                                                                                                  callback: @escaping (V?) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: V? = realmOperator.relationValues(relation, in: model)?.filter(filter).max(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func sum<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: AddableType>(_ relation: Relation<R>,
+                                                                                                   in model: T,
+                                                                                                   with filter: DatabaseFilterType = .unfiltered,
+                                                                                                   for keyPath: KeyPath<R, V?>,
+                                                                                                   callback: @escaping (V?) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: V? = realmOperator.relationValues(relation, in: model)?.filter(filter).sum(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func average<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: AddableType>(_ relation: Relation<R>,
+                                                                                                       in model: T,
+                                                                                                       with filter: DatabaseFilterType = .unfiltered,
+                                                                                                       for keyPath: KeyPath<R, V?>,
+                                                                                                       callback: @escaping (Double?) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.nextWorker()
+
+        worker.execute {
+            realmOperator in
+            let value: Double? = realmOperator.relationValues(relation, in: model)?.filter(filter).average(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
+    public func minSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
+                                                                                                      in model: T,
+                                                                                                      with filter: DatabaseFilterType = .unfiltered,
+                                                                                                      for keyPath: KeyPath<R, V?>) -> V?
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).min(ofProperty: R.key(for: keyPath))
+    }
+
+    public func maxSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
+                                                                                                      in model: T,
+                                                                                                      with filter: DatabaseFilterType = .unfiltered,
+                                                                                                      for keyPath: KeyPath<R, V?>) -> V?
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).max(ofProperty: R.key(for: keyPath))
+    }
+
+    public func sumSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: AddableType>(_ relation: Relation<R>,
+                                                                                                       in model: T,
+                                                                                                       with filter: DatabaseFilterType = .unfiltered,
+                                                                                                       for keyPath: KeyPath<R, V?>) -> V?
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).sum(ofProperty: R.key(for: keyPath))
+    }
+
+    public func averageSync<T: UniquelyMappable,
+                           R: UniquelyMappable & KeyPathConvertible,
+                           V: AddableType>(_ relation: Relation<R>,
+                                           in model: T,
+                                           with filter: DatabaseFilterType = .unfiltered,
+                                           for keyPath: KeyPath<R, V?>) -> Double?
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).average(ofProperty: R.key(for: keyPath))
     }
 }
 
