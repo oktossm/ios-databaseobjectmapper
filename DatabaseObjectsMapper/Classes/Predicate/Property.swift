@@ -71,3 +71,42 @@ extension Data: AnyEquatableProperty {
 
 extension NSData: AnyEquatableProperty {
 }
+
+// String
+public protocol StringEquatableProperty: AnyEquatableProperty {
+}
+
+
+extension String: StringEquatableProperty {
+}
+
+// String
+public protocol NumericComparableProperty: AnyEquatableProperty, Comparable, CustomStringConvertible {
+}
+
+extension Int: NumericComparableProperty {
+}
+
+
+extension Int8: NumericComparableProperty {
+}
+
+
+extension Int16: NumericComparableProperty {
+}
+
+
+extension Int32: NumericComparableProperty {
+}
+
+
+extension Int64: NumericComparableProperty {
+}
+
+
+extension Float: NumericComparableProperty {
+}
+
+
+extension Double: NumericComparableProperty {
+}

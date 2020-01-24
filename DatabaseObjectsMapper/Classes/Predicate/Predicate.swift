@@ -5,12 +5,12 @@
 import Foundation
 
 
-public protocol AnyPredicate {
+public protocol NSPredicateConvertible {
     var predicate: NSPredicate { get }
 }
 
 
-public protocol Predicate: AnyPredicate {
+public protocol Predicate: NSPredicateConvertible {
     associatedtype ModelType: KeyPathConvertible
 }
 
@@ -30,8 +30,8 @@ public struct BasicPredicate<Model: KeyPathConvertible>: Predicate {
 public struct AndPredicate<Model: KeyPathConvertible>: Predicate {
     public typealias ModelType = Model
 
-    let left: BasicPredicate<Model>
-    let right: BasicPredicate<Model>
+    let left: AnyPredicate<Model>
+    let right: AnyPredicate<Model>
 
     public var predicate: NSPredicate {
         return NSCompoundPredicate(type: .and, subpredicates: [left.predicate, right.predicate])
@@ -42,8 +42,8 @@ public struct AndPredicate<Model: KeyPathConvertible>: Predicate {
 public struct OrPredicate<Model: KeyPathConvertible>: Predicate {
     public typealias ModelType = Model
 
-    let left: BasicPredicate<Model>
-    let right: BasicPredicate<Model>
+    let left: AnyPredicate<Model>
+    let right: AnyPredicate<Model>
 
     public var predicate: NSPredicate {
         return NSCompoundPredicate(type: .or, subpredicates: [left.predicate, right.predicate])
@@ -54,7 +54,7 @@ public struct OrPredicate<Model: KeyPathConvertible>: Predicate {
 public struct NotPredicate<Model: KeyPathConvertible>: Predicate {
     public typealias ModelType = Model
 
-    let original: BasicPredicate<Model>
+    let original: AnyPredicate<Model>
 
     public var predicate: NSPredicate {
         return NSCompoundPredicate(notPredicateWithSubpredicate: original.predicate)
