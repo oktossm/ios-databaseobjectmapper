@@ -1,5 +1,5 @@
 PODS:
-  - DatabaseObjectsMapper (0.1.0):
+  - DatabaseObjectsMapper (0.2.0):
     - DictionaryCoding (~> 1.0)
     - RealmSwift (~> 4.1)
   - DictionaryCoding (1.0.6)
@@ -30,7 +30,7 @@ EXTERNAL SOURCES:
     :path: "../../SourceryAdditions"
 
 SPEC CHECKSUMS:
-  DatabaseObjectsMapper: 7b91949e817ce211236924c0747213af8257eac5
+  DatabaseObjectsMapper: f5586e8d273d47f2fdc0559e2f13a79568530d2e
   DictionaryCoding: 0ebf6aa87afe8be803c544b85b8d894907c0e019
   Realm: 25f0a8244cbb1c2271c922963ea8666fc2d8104d
   RealmSwift: 9e2657b33764f80e4a4dffd6d440e24715782052

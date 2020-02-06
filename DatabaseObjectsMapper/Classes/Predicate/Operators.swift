@@ -6,70 +6,100 @@ import Foundation
 
 
 // MARK: Logical Operators
-public func &&<Model: KeyPathConvertible>(lhs: BasicPredicate<Model>, rhs: BasicPredicate<Model>) -> AndPredicate<Model> {
+public func &&<Model: KeyPathConvertible>(lhs: AnyPredicate<Model>, rhs: AnyPredicate<Model>) -> AnyPredicate<Model> {
     return AndPredicate(left: lhs, right: rhs)
+        .anyPredicate
 }
 
-public func ||<Model: KeyPathConvertible>(lhs: BasicPredicate<Model>, rhs: BasicPredicate<Model>) -> OrPredicate<Model> {
+public func ||<Model: KeyPathConvertible>(lhs: AnyPredicate<Model>, rhs: AnyPredicate<Model>) -> AnyPredicate<Model> {
     return OrPredicate(left: lhs, right: rhs)
+        .anyPredicate
 }
 
-public prefix func !<Model: KeyPathConvertible>(predicate: BasicPredicate<Model>) -> NotPredicate<Model> {
+public prefix func !<Model: KeyPathConvertible>(predicate: AnyPredicate<Model>) -> AnyPredicate<Model> {
     return NotPredicate(original: predicate)
+        .anyPredicate
 }
 
 // MARK: AnyEquatableProperty
-public func ==<Model: KeyPathConvertible, Property: AnyEquatableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K == %@", arguments: [Model.key(for: lhs), rhs])
+public func ==<Model: KeyPathConvertible, Property: AnyEquatableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K == %@",
+                                 arguments: [Model.key(for: lhs), rhs])
+        .anyPredicate
 }
 
-public func !=<Model: KeyPathConvertible, Property: AnyEquatableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K != %@", arguments: [Model.key(for: lhs), rhs])
+public func !=<Model: KeyPathConvertible, Property: AnyEquatableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K != %@",
+                                 arguments: [Model.key(for: lhs), rhs])
+        .anyPredicate
 }
 
 // MARK: Optional<AnyEquatableProperty>
-public func ==<Model: KeyPathConvertible, Property: AnyEquatableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K == %@", arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+public func ==<Model: KeyPathConvertible, Property: AnyEquatableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K == %@",
+                                 arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+        .anyPredicate
 }
 
-public func !=<Model: KeyPathConvertible, Property: AnyEquatableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K != %@", arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+public func !=<Model: KeyPathConvertible, Property: AnyEquatableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K != %@",
+                                 arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+        .anyPredicate
 }
 
 
 // MARK: AnyComparableProperty
-public func <<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K < %@", arguments: [Model.key(for: lhs), rhs])
+public func <<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K < %@",
+                                 arguments: [Model.key(for: lhs), rhs])
+        .anyPredicate
 }
 
-public func ><Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K > %@", arguments: [Model.key(for: lhs), rhs])
+public func ><Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K > %@",
+                                 arguments: [Model.key(for: lhs), rhs])
+        .anyPredicate
 }
 
-public func <=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K <= %@", arguments: [Model.key(for: lhs), rhs])
+public func <=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K <= %@",
+                                 arguments: [Model.key(for: lhs), rhs])
+        .anyPredicate
 }
 
-public func >=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K >= %@", arguments: [Model.key(for: lhs), rhs])
+public func >=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property>, rhs: Property) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K >= %@",
+                                 arguments: [Model.key(for: lhs), rhs])
+        .anyPredicate
 }
 
 // MARK: Optional<AnyComparableProperty>
-public func <<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K < %@", arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+public func <<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K < %@",
+                                 arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+        .anyPredicate
 }
 
-public func ><Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K > %@", arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+public func ><Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K > %@",
+                                 arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+        .anyPredicate
 }
 
-public func <=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K <= %@", arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+public func <=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K <= %@",
+                                 arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+        .anyPredicate
 }
 
-public func >=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> BasicPredicate<Model> {
-    return BasicPredicate<Model>(format: "%K >= %@", arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+public func >=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: KeyPath<Model, Property?>, rhs: Property?) -> AnyPredicate<Model> {
+    return BasicPredicate<Model>(format: "%K >= %@",
+                                 arguments: [Model.key(for: lhs), rhs ?? NSNull()])
+        .anyPredicate
 }
+
+// MARK: Operator for Numeric && String operators
+infix operator ~: MultiplicationPrecedence
 
 // MARK: Assign operator
 
