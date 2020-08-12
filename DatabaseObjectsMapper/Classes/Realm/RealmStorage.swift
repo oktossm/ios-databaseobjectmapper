@@ -230,9 +230,9 @@ class RealmOperator: NSObject {
     /// - parameter block: The actions to perform.
     func write(_ block: (RealmWriteTransaction) throws -> Void) throws {
         let transaction = RealmWriteTransaction(realm: realm)
-        try realm.write {
-            try block(transaction)
-        }
+        realm.beginWrite()
+        try block(transaction)
+        try realm.commitWrite()
     }
 
     /// Performs actions on the Realm within a write transaction.
