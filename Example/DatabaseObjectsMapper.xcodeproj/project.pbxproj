@@ -15,6 +15,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* RealmContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* RealmContainerTests.swift */; };
+		8040BD7423DB38D2005E80C2 /* AnyPredicateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8040BD7323DB38D2005E80C2 /* AnyPredicateTests.swift */; };
 		DDEDB018389E6FB3783D7A22 /* TestContainers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBCF9194ED939A77D0384 /* TestContainers.swift */; };
 		DDEDB07EB0BCFB8F5D3155B3 /* AutoObjectDiff.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDBF9C8737DD301E6A3912 /* AutoObjectDiff.generated.swift */; };
 		DDEDB34051A6619E26331AB5 /* CoreDataPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDEDB102FD5605767F71D18F /* CoreDataPerformanceTests.swift */; };
@@ -58,6 +59,7 @@
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* RealmContainerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmContainerTests.swift; sourceTree = "<group>"; };
 		712F917019EBC8049798AE6A /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		8040BD7323DB38D2005E80C2 /* AnyPredicateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyPredicateTests.swift; sourceTree = "<group>"; };
 		85ADCD8E0FEA47ECEF76AD96 /* Pods-DatabaseObjectsMapper_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Tests/Pods-DatabaseObjectsMapper_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		A41B29EFD857217878D7EBDB /* Pods-DatabaseObjectsMapper_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Tests/Pods-DatabaseObjectsMapper_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		B6E67A8AC5BC5D2B96C56917 /* Pods-DatabaseObjectsMapper_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DatabaseObjectsMapper_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-DatabaseObjectsMapper_Example/Pods-DatabaseObjectsMapper_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 				DDEDB7767F5C024B83A2F7C7 /* RealmRelationshipsTests.swift */,
 				DDEDB592581CB16A7179AAE2 /* RealmPerformanceTests.swift */,
 				DDEDB102FD5605767F71D18F /* CoreDataPerformanceTests.swift */,
+				8040BD7323DB38D2005E80C2 /* AnyPredicateTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -427,6 +430,7 @@
 				607FACEC1AFB9204008FA782 /* RealmContainerTests.swift in Sources */,
 				DDEDBE28BA1B649F2B3EA195 /* CustomRealmContainerTests.swift in Sources */,
 				DDEDBF096EB7738D3C403A12 /* CoreDataContainerTests.swift in Sources */,
+				8040BD7423DB38D2005E80C2 /* AnyPredicateTests.swift in Sources */,
 				DDEDB53F3311D0056334A35C /* RealmRelationshipsTests.swift in Sources */,
 				DDEDB37CB9A7CCC4F940FF64 /* RealmPerformanceTests.swift in Sources */,
 				DDEDB34051A6619E26331AB5 /* CoreDataPerformanceTests.swift in Sources */,
