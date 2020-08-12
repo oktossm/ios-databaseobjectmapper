@@ -14,27 +14,21 @@ public typealias AddableType = RealmSwift.AddableType
 open class RealmService {
 
     private let writeWorker: DatabaseRealmBackgroundWorker
-    private var readWorkers: [DatabaseRealmBackgroundWorker]
+    private let readWorkers: [DatabaseRealmBackgroundWorker]
     private let configuration: Realm.Configuration
+
+    private var readWorker: DatabaseRealmBackgroundWorker {
+        return self.readWorkers.randomElement()!
+    }
+
 
     public init(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
         self.configuration = configuration
-        self.writeWorker = DatabaseRealmBackgroundWorker(configuration: configuration)
-        self.readWorkers = []
-    }
-
-    deinit {
-        self.writeWorker.stop()
-        self.readWorkers.forEach { $0.stop() }
-    }
-
-    func nextWorker() -> DatabaseRealmBackgroundWorker {
-        if let worker = self.readWorkers.first(where: { !$0.isWorking }) {
-            return worker
+        self.writeWorker = DatabaseRealmBackgroundWorker(configuration: configuration, queue: DispatchQueue(label: "mm.databaseService.writeQueue"))
+        self.readWorkers = (1...3).map {
+            _ in
+            DatabaseRealmBackgroundWorker(configuration: configuration, queue: DispatchQueue(label: "mm.databaseService.readQueue"))
         }
-        let newWorker = DatabaseRealmBackgroundWorker(configuration: configuration)
-        self.readWorkers.append(newWorker)
-        return newWorker
     }
 
     func syncOperator() -> RealmOperator {
@@ -223,7 +217,7 @@ extension RealmService {
     public func min<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
                                                                              for keyPath: KeyPath<T, R>,
                                                                              callback: @escaping (R?) -> Void) where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -237,7 +231,7 @@ extension RealmService {
     public func max<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
                                                                              for keyPath: KeyPath<T, R>,
                                                                              callback: @escaping (R?) -> Void) where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -251,7 +245,7 @@ extension RealmService {
     public func sum<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
                                                                               for keyPath: KeyPath<T, R>,
                                                                               callback: @escaping (R) -> Void) where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -266,7 +260,7 @@ extension RealmService {
                                                                                   for keyPath: KeyPath<T, R>,
                                                                                   callback: @escaping (Double?) -> Void)
         where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -304,11 +298,13 @@ extension RealmService {
                                            sorted sort: DatabaseSortType = .unsorted,
                                            limit: Int? = nil,
                                            callback: @escaping ([T]) -> Void) where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
-            let values = realmOperator.values(ofType: T.self).filter(filter).sort(sort).limited(limit).compactMap({ try? T.mappable(for: $0) })
+            let values = realmOperator.values(ofType: T.self).filter(filter).sort(sort).limited(limit).compactMap({
+                try? T.mappable(for: $0)
+            })
             DispatchQueue.main.async {
                 callback(values)
             }
@@ -318,7 +314,9 @@ extension RealmService {
     public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
                                                sorted sort: DatabaseSortType = .unsorted,
                                                limit: Int? = nil) -> [T] where T.Container: RealmObject {
-        let values = syncOperator().values(ofType: T.self).filter(filter).sort(sort).limited(limit).compactMap({ try? T.mappable(for: $0) })
+        let values = syncOperator().values(ofType: T.self).filter(filter).sort(sort).limited(limit).compactMap({
+            try? T.mappable(for: $0)
+        })
         return values
     }
 
@@ -332,7 +330,7 @@ extension RealmService {
         let token = DatabaseUpdatesToken()
         token.limit = limit
 
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             [weak worker, weak self] realmOperator in
@@ -346,7 +344,9 @@ extension RealmService {
 
                 switch change {
                 case let .initial(newResults):
-                    let values = newResults.limited(token.limit).compactMap({ try? T.mappable(for: $0) })
+                    let values = newResults.limited(token.limit).compactMap({
+                        try? T.mappable(for: $0)
+                    })
                     let result: [T] = Array(values)
                     DispatchQueue.main.async {
                         callback(result)
@@ -355,8 +355,10 @@ extension RealmService {
                     let deletionsInLimit = deletions.filter { token.limit == nil || $0 < (token.limit ?? 0) }
                     let insertionsInLimit = insertions.filter { token.limit == nil || $0 < (token.limit ?? 0) }
                     let modificationsInLimit = modifications.filter { token.limit == nil || $0 < (token.limit ?? 0) }
-                    let newLimit = token.limit.flatMap { $0 + (max(0, insertionsInLimit.count - deletionsInLimit.count)) }
-                    let values = newResults.limited(newLimit).compactMap({ try? T.mappable(for: $0) })
+                    let newLimit = token.limit.flatMap { $0 + (Swift.max(0, insertionsInLimit.count - deletionsInLimit.count)) }
+                    let values = newResults.limited(newLimit).compactMap({
+                        try? T.mappable(for: $0)
+                    })
                     if (token.limit ?? Int.max) < newResults.count {
                         token.updateLimit(newLimit)
                     }
@@ -382,11 +384,13 @@ extension RealmService {
 
     public func fetchUnique<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void) where T.Container: RealmObject {
 
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
-            let value = realmOperator.value(ofType: T.self, with: key).flatMap({ try? T.mappable(for: $0) })
+            let value = realmOperator.value(ofType: T.self, with: key).flatMap({
+                try? T.mappable(for: $0)
+            })
             DispatchQueue.main.async {
                 callback(value)
             }
@@ -394,7 +398,9 @@ extension RealmService {
     }
 
     public func syncFetchUnique<T: UniquelyMappable>(with key: T.ID) -> T? where T.Container: RealmObject {
-        let value = syncOperator().value(ofType: T.self, with: key).flatMap({ try? T.mappable(for: $0) })
+        let value = syncOperator().value(ofType: T.self, with: key).flatMap({
+            try? T.mappable(for: $0)
+        })
         return value
     }
 
@@ -405,7 +411,7 @@ extension RealmService {
 
         let token = DatabaseUpdatesToken()
 
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -449,7 +455,7 @@ extension RealmService {
                                                                                                   for keyPath: KeyPath<R, V>,
                                                                                                   callback: @escaping (V?) -> Void)
         where T.Container: RealmObject, R.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -466,7 +472,7 @@ extension RealmService {
                                                                                                   for keyPath: KeyPath<R, V>,
                                                                                                   callback: @escaping (V?) -> Void)
         where T.Container: RealmObject, R.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -483,7 +489,7 @@ extension RealmService {
                                                                                                    for keyPath: KeyPath<R, V>,
                                                                                                    callback: @escaping (V?) -> Void)
         where T.Container: RealmObject, R.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -500,7 +506,7 @@ extension RealmService {
                                                                                                        for keyPath: KeyPath<R, V>,
                                                                                                        callback: @escaping (Double?) -> Void)
         where T.Container: RealmObject, R.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -552,7 +558,7 @@ extension RealmService {
                                                                         limit: Int? = nil,
                                                                         callback: @escaping ([R]) -> Void)
         where T.Container: Object, R.Container: Object {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -610,16 +616,19 @@ extension RealmService {
             guard item == nil else { return }
             token?.invalidate()
         }, updates: {
-            [weak token] updates in
-            switch updates {
+            [weak token] update in
+            switch update {
             case .delete:
+                DispatchQueue.main.async {
+                    updates(DatabaseObserveUpdate(values: [], deletions: [], insertions: [], modifications: []))
+                }
                 token?.invalidate()
             default:
                 break
             }
         })
 
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             [weak worker, weak self] realmOperator in
@@ -645,7 +654,9 @@ extension RealmService {
 
                 switch change {
                 case let .initial(newResults):
-                    let values = Array(newResults.limited(token.limit).compactMap({ try? R.mappable(for: $0) }))
+                    let values = Array(newResults.limited(token.limit).compactMap({
+                        try? R.mappable(for: $0)
+                    }))
                     let result: [R] = Array(values)
                     DispatchQueue.main.async {
                         relation.cachedValue = result
@@ -655,8 +666,10 @@ extension RealmService {
                     let deletionsInLimit = deletions.filter { token.limit == nil || $0 < (token.limit ?? 0) }
                     let insertionsInLimit = insertions.filter { token.limit == nil || $0 < (token.limit ?? 0) }
                     let modificationsInLimit = modifications.filter { token.limit == nil || $0 < (token.limit ?? 0) }
-                    let newLimit = token.limit.flatMap { $0 + (max(0, insertionsInLimit.count - deletionsInLimit.count)) }
-                    let values = newResults.limited(newLimit).compactMap({ try? R.mappable(for: $0) })
+                    let newLimit = token.limit.flatMap { $0 + (Swift.max(0, insertionsInLimit.count - deletionsInLimit.count)) }
+                    let values = newResults.limited(newLimit).compactMap({
+                        try? R.mappable(for: $0)
+                    })
                     if (token.limit ?? Int.max) < newResults.count {
                         token.updateLimit(newLimit)
                     }
@@ -863,7 +876,7 @@ extension RealmService {
     public func min<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
                                                                              for keyPath: KeyPath<T, R?>,
                                                                              callback: @escaping (R?) -> Void) where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -877,7 +890,7 @@ extension RealmService {
     public func max<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
                                                                              for keyPath: KeyPath<T, R?>,
                                                                              callback: @escaping (R?) -> Void) where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -891,7 +904,7 @@ extension RealmService {
     public func sum<T: DatabaseMappable & KeyPathConvertible, R: AddableType>(with filter: DatabaseFilterType = .unfiltered,
                                                                               for keyPath: KeyPath<T, R?>,
                                                                               callback: @escaping (R) -> Void) where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -906,7 +919,7 @@ extension RealmService {
                                                                                   for keyPath: KeyPath<T, R?>,
                                                                                   callback: @escaping (Double?) -> Void)
         where T.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -946,7 +959,7 @@ extension RealmService {
                                                                                                   for keyPath: KeyPath<R, V?>,
                                                                                                   callback: @escaping (V?) -> Void)
         where T.Container: RealmObject, R.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -963,7 +976,7 @@ extension RealmService {
                                                                                                   for keyPath: KeyPath<R, V?>,
                                                                                                   callback: @escaping (V?) -> Void)
         where T.Container: RealmObject, R.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -980,7 +993,7 @@ extension RealmService {
                                                                                                    for keyPath: KeyPath<R, V?>,
                                                                                                    callback: @escaping (V?) -> Void)
         where T.Container: RealmObject, R.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -997,7 +1010,7 @@ extension RealmService {
                                                                                                        for keyPath: KeyPath<R, V?>,
                                                                                                        callback: @escaping (Double?) -> Void)
         where T.Container: RealmObject, R.Container: RealmObject {
-        let worker = self.nextWorker()
+        let worker = self.readWorker
 
         worker.execute {
             realmOperator in
@@ -1055,9 +1068,11 @@ extension RealmService {
             worker?.execute {
                 _ in
                 guard oldLimit != newLimit, (oldLimit ?? Int.max) < results.count || (newLimit ?? Int.max) < results.count else { return }
-                let values = results.limited(newLimit).compactMap({ try? T.mappable(for: $0) })
-                let old = min(results.count, oldLimit ?? Int.max)
-                let new = min(results.count, newLimit ?? Int.max)
+                let values = results.limited(newLimit).compactMap({
+                    try? T.mappable(for: $0)
+                })
+                let old = Swift.min(results.count, oldLimit ?? Int.max)
+                let new = Swift.min(results.count, newLimit ?? Int.max)
                 let deletions = old > new ? Array(new..<old) : []
                 let insertions = old < new ? Array(old..<new) : []
                 DispatchQueue.main.async {
@@ -1080,7 +1095,9 @@ extension RealmService {
                     return
                 }
                 let newLimit = oldLimit + count
-                let values = results.limited(in: oldLimit..<newLimit).compactMap({ try? T.mappable(for: $0) })
+                let values = results.limited(in: oldLimit..<newLimit).compactMap({
+                    try? T.mappable(for: $0)
+                })
                 let isLast = newLimit >= results.count
                 token?.updateLimit(newLimit)
                 DispatchQueue.main.async {
@@ -1095,40 +1112,23 @@ extension RealmService {
 typealias RealmBlock = @convention(block) (RealmOperator) -> Void
 
 
-class DatabaseRealmBackgroundWorker: DatabaseBackgroundWorker {
-    private lazy var realm: Realm = {
-        return try! Realm(configuration: self.configuration)
-    }()
-
-    private lazy var realmOperator: RealmOperator = {
-        return RealmOperator(realm: self.realm)
-    }()
-
+class DatabaseRealmBackgroundWorker {
     private let configuration: Realm.Configuration
+    private let queue: DispatchQueue
 
-    private var runningCount = 0
-    private let runningCountQueue = DispatchQueue(label: "mm.databaseService.runningCountQueue", qos: .utility)
 
-    var isWorking: Bool {
-        return runningCount > 0
-    }
-
-    init(configuration: Realm.Configuration) {
+    init(configuration: Realm.Configuration, queue: DispatchQueue) {
         self.configuration = configuration
-        super.init()
-    }
-
-    @objc private func run(realmBlock: RealmBlock) {
-        realmBlock(self.realmOperator)
-        runningCountQueue.async { self.runningCount -= 1 }
+        self.queue = queue
     }
 
     internal func execute(realmBlock: @escaping RealmBlock) {
-        runningCountQueue.async { self.runningCount += 1 }
-        perform(#selector(run(realmBlock:)),
-                on: thread,
-                with: realmBlock,
-                waitUntilDone: false,
-                modes: [RunLoop.Mode.default.rawValue])
+        queue.async {
+            [weak self] in
+            guard let `self` = self,
+                  let realm = try? Realm(configuration: self.configuration, queue: self.queue) else { return }
+            let realmOperator = RealmOperator(realm: realm)
+            realmBlock(realmOperator)
+        }
     }
 }
