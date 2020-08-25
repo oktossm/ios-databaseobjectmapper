@@ -1,13 +1,13 @@
 PODS:
   - DatabaseObjectsMapper (0.3.0):
     - DictionaryCoding (~> 1.0)
-    - RealmSwift (~> 5.3.3)
+    - RealmSwift (= 10.0.0-beta.3)
   - DictionaryCoding (1.0.6)
-  - Realm (5.3.3):
-    - Realm/Headers (= 5.3.3)
-  - Realm/Headers (5.3.3)
-  - RealmSwift (5.3.3):
-    - Realm (= 5.3.3)
+  - Realm (10.0.0-beta.3):
+    - Realm/Headers (= 10.0.0-beta.3)
+  - Realm/Headers (10.0.0-beta.3)
+  - RealmSwift (10.0.0-beta.3):
+    - Realm (= 10.0.0-beta.3)
   - Sourcery (0.16.2)
   - SourceryAdditions (0.1.1)
 
@@ -30,10 +30,10 @@ EXTERNAL SOURCES:
     :path: "../../SourceryAdditions"
 
 SPEC CHECKSUMS:
-  DatabaseObjectsMapper: ee4bdd2aa8389292cb8c73397bb57fd6ee527bab
+  DatabaseObjectsMapper: 54e530b643a5f159a78828b363c9eb0f2aa198a9
   DictionaryCoding: 0ebf6aa87afe8be803c544b85b8d894907c0e019
-  Realm: 2d57ea355bf8ca2a0964d6bfb38d28d7ff2addf6
-  RealmSwift: 0a709536ecea30eea1d3c514f6ade2ed078dee3c
+  Realm: f563a59a1016ce551fd87e39df79d393bd06e56d
+  RealmSwift: 4b79ee6f9b67bf71b8122370e2614892912f7172
   Sourcery: 3f406d227efd179773b3c3599ebd1700d1a6013c
   SourceryAdditions: 91ea262d7acabe8d933483a877aa51d791110794
 
