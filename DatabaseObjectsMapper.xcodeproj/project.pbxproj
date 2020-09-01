@@ -8,41 +8,48 @@
 
 /* Begin PBXBuildFile section */
 		56A8599A32A527E4B2D6BE6B /* Pods_DatabaseObjectsMapper_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9790FEDA143443DB9769952 /* Pods_DatabaseObjectsMapper_Tests.framework */; };
-		EFB42E5724FE873000AAC74E /* DatabaseObjectMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = EFB42E5524FE873000AAC74E /* DatabaseObjectMapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EFB42E8824FE874100AAC74E /* KeyPathConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E5D24FE874100AAC74E /* KeyPathConvertible.swift */; };
-		EFB42E8924FE874100AAC74E /* Property.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E5E24FE874100AAC74E /* Property.swift */; };
-		EFB42E8A24FE874100AAC74E /* Predicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E5F24FE874100AAC74E /* Predicate.swift */; };
-		EFB42E8B24FE874100AAC74E /* AnyPredicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6024FE874100AAC74E /* AnyPredicate.swift */; };
-		EFB42E8C24FE874100AAC74E /* SortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6124FE874100AAC74E /* SortDescriptor.swift */; };
-		EFB42E8D24FE874100AAC74E /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6224FE874100AAC74E /* Operators.swift */; };
-		EFB42E8E24FE874100AAC74E /* Operators+Numeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6324FE874100AAC74E /* Operators+Numeric.swift */; };
-		EFB42E8F24FE874100AAC74E /* Operators+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6424FE874100AAC74E /* Operators+String.swift */; };
-		EFB42E9024FE874100AAC74E /* RealmContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6724FE874100AAC74E /* RealmContainer.swift */; };
-		EFB42E9124FE874100AAC74E /* CoreDataContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6824FE874100AAC74E /* CoreDataContainer.swift */; };
-		EFB42E9324FE874100AAC74E /* CoreDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6B24FE874100AAC74E /* CoreDataStorage.swift */; };
-		EFB42E9424FE874100AAC74E /* CoreDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6C24FE874100AAC74E /* CoreDataService.swift */; };
-		EFB42E9524FE874100AAC74E /* NSManagedObjectContext+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6E24FE874100AAC74E /* NSManagedObjectContext+Extensions.swift */; };
-		EFB42E9624FE874100AAC74E /* NSManagedObjectContext+Observers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E6F24FE874100AAC74E /* NSManagedObjectContext+Observers.swift */; };
-		EFB42E9724FE874100AAC74E /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7024FE874100AAC74E /* Utilities.swift */; };
-		EFB42E9824FE874100AAC74E /* ManagedObjectObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7124FE874100AAC74E /* ManagedObjectObserver.swift */; };
-		EFB42E9924FE874100AAC74E /* Managed.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7224FE874100AAC74E /* Managed.swift */; };
-		EFB42E9A24FE874100AAC74E /* FetchRequestObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7324FE874100AAC74E /* FetchRequestObserver.swift */; };
-		EFB42E9B24FE874100AAC74E /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7424FE874100AAC74E /* NSManagedObject+Extensions.swift */; };
-		EFB42E9C24FE874100AAC74E /* Collection+CoreDataExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7524FE874100AAC74E /* Collection+CoreDataExtensions.swift */; };
-		EFB42E9D24FE874100AAC74E /* DatabaseService+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7624FE874100AAC74E /* DatabaseService+CoreData.swift */; };
-		EFB42E9E24FE874100AAC74E /* Dictionary+Archive.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7824FE874100AAC74E /* Dictionary+Archive.swift */; };
-		EFB42E9F24FE874100AAC74E /* OptionalUnwrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7924FE874100AAC74E /* OptionalUnwrap.swift */; };
-		EFB42EA024FE874100AAC74E /* DatabaseBackgroundWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7A24FE874100AAC74E /* DatabaseBackgroundWorker.swift */; };
-		EFB42EA124FE874100AAC74E /* DatabaseServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7B24FE874100AAC74E /* DatabaseServiceProtocol.swift */; };
-		EFB42EA224FE874100AAC74E /* DatabaseRelation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7D24FE874100AAC74E /* DatabaseRelation.swift */; };
-		EFB42EA324FE874100AAC74E /* Database+Relationships.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E7E24FE874100AAC74E /* Database+Relationships.swift */; };
-		EFB42EA424FE874100AAC74E /* Mappable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E8024FE874100AAC74E /* Mappable.swift */; };
-		EFB42EA524FE874100AAC74E /* MappingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E8124FE874100AAC74E /* MappingHelpers.swift */; };
-		EFB42EA624FE874100AAC74E /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E8224FE874100AAC74E /* Container.swift */; };
-		EFB42EA724FE874100AAC74E /* Identifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E8324FE874100AAC74E /* Identifiable.swift */; };
-		EFB42EA824FE874100AAC74E /* RealmService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E8524FE874100AAC74E /* RealmService.swift */; };
-		EFB42EA924FE874100AAC74E /* DatabaseService+Realm.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E8624FE874100AAC74E /* DatabaseService+Realm.swift */; };
-		EFB42EAA24FE874100AAC74E /* RealmStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42E8724FE874100AAC74E /* RealmStorage.swift */; };
+		EFA3233224FED8D60009F9D4 /* DatabaseObjectsMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = EFA3233024FED8D60009F9D4 /* DatabaseObjectsMapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EFA3236224FED9140009F9D4 /* KeyPathConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233824FED9140009F9D4 /* KeyPathConvertible.swift */; };
+		EFA3236324FED9140009F9D4 /* Property.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233924FED9140009F9D4 /* Property.swift */; };
+		EFA3236424FED9140009F9D4 /* Predicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233A24FED9140009F9D4 /* Predicate.swift */; };
+		EFA3236524FED9140009F9D4 /* AnyPredicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233B24FED9140009F9D4 /* AnyPredicate.swift */; };
+		EFA3236624FED9140009F9D4 /* SortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233C24FED9140009F9D4 /* SortDescriptor.swift */; };
+		EFA3236724FED9140009F9D4 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233D24FED9140009F9D4 /* Operators.swift */; };
+		EFA3236824FED9140009F9D4 /* Operators+Numeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233E24FED9140009F9D4 /* Operators+Numeric.swift */; };
+		EFA3236924FED9140009F9D4 /* Operators+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233F24FED9140009F9D4 /* Operators+String.swift */; };
+		EFA3236A24FED9140009F9D4 /* RealmContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234124FED9140009F9D4 /* RealmContainer.swift */; };
+		EFA3236B24FED9140009F9D4 /* CoreDataContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234224FED9140009F9D4 /* CoreDataContainer.swift */; };
+		EFA3236C24FED9140009F9D4 /* .gitkeep in Resources */ = {isa = PBXBuildFile; fileRef = EFA3234324FED9140009F9D4 /* .gitkeep */; };
+		EFA3236D24FED9140009F9D4 /* CoreDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234524FED9140009F9D4 /* CoreDataStorage.swift */; };
+		EFA3236E24FED9140009F9D4 /* CoreDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234624FED9140009F9D4 /* CoreDataService.swift */; };
+		EFA3236F24FED9140009F9D4 /* NSManagedObjectContext+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234824FED9140009F9D4 /* NSManagedObjectContext+Extensions.swift */; };
+		EFA3237024FED9140009F9D4 /* NSManagedObjectContext+Observers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234924FED9140009F9D4 /* NSManagedObjectContext+Observers.swift */; };
+		EFA3237124FED9140009F9D4 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234A24FED9140009F9D4 /* Utilities.swift */; };
+		EFA3237224FED9140009F9D4 /* ManagedObjectObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234B24FED9140009F9D4 /* ManagedObjectObserver.swift */; };
+		EFA3237324FED9140009F9D4 /* Managed.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234C24FED9140009F9D4 /* Managed.swift */; };
+		EFA3237424FED9140009F9D4 /* FetchRequestObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234D24FED9140009F9D4 /* FetchRequestObserver.swift */; };
+		EFA3237524FED9140009F9D4 /* NSManagedObject+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234E24FED9140009F9D4 /* NSManagedObject+Extensions.swift */; };
+		EFA3237624FED9140009F9D4 /* Collection+CoreDataExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3234F24FED9140009F9D4 /* Collection+CoreDataExtensions.swift */; };
+		EFA3237724FED9140009F9D4 /* DatabaseService+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235024FED9140009F9D4 /* DatabaseService+CoreData.swift */; };
+		EFA3237824FED9140009F9D4 /* Dictionary+Archive.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235224FED9140009F9D4 /* Dictionary+Archive.swift */; };
+		EFA3237924FED9140009F9D4 /* OptionalUnwrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235324FED9140009F9D4 /* OptionalUnwrap.swift */; };
+		EFA3237A24FED9140009F9D4 /* DatabaseBackgroundWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235424FED9140009F9D4 /* DatabaseBackgroundWorker.swift */; };
+		EFA3237B24FED9140009F9D4 /* DatabaseServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235524FED9140009F9D4 /* DatabaseServiceProtocol.swift */; };
+		EFA3237C24FED9140009F9D4 /* DatabaseRelation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235724FED9140009F9D4 /* DatabaseRelation.swift */; };
+		EFA3237D24FED9140009F9D4 /* Database+Relationships.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235824FED9140009F9D4 /* Database+Relationships.swift */; };
+		EFA3237E24FED9140009F9D4 /* Mappable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235A24FED9140009F9D4 /* Mappable.swift */; };
+		EFA3237F24FED9140009F9D4 /* MappingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235B24FED9140009F9D4 /* MappingHelpers.swift */; };
+		EFA3238024FED9140009F9D4 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235C24FED9140009F9D4 /* Container.swift */; };
+		EFA3238124FED9140009F9D4 /* Identifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235D24FED9140009F9D4 /* Identifiable.swift */; };
+		EFA3238224FED9140009F9D4 /* RealmService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3235F24FED9140009F9D4 /* RealmService.swift */; };
+		EFA3238324FED9140009F9D4 /* DatabaseService+Realm.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3236024FED9140009F9D4 /* DatabaseService+Realm.swift */; };
+		EFA3238424FED9140009F9D4 /* RealmStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3236124FED9140009F9D4 /* RealmStorage.swift */; };
+		EFA3238524FED99D0009F9D4 /* DictionaryCoding.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EBC24FE88CE00AAC74E /* DictionaryCoding.framework */; };
+		EFA3238624FED99D0009F9D4 /* DictionaryCoding.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EBC24FE88CE00AAC74E /* DictionaryCoding.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EFA3238724FED99D0009F9D4 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EC324FE88D300AAC74E /* RealmSwift.framework */; };
+		EFA3238824FED99D0009F9D4 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EC324FE88D300AAC74E /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EFA3238924FED99D0009F9D4 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EC024FE88D000AAC74E /* Realm.framework */; };
+		EFA3238A24FED99D0009F9D4 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EC024FE88D000AAC74E /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EFB42EB424FE875B00AAC74E /* RealmPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EAC24FE875B00AAC74E /* RealmPerformanceTests.swift */; };
 		EFB42EB524FE875B00AAC74E /* CoreDataPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EAD24FE875B00AAC74E /* CoreDataPerformanceTests.swift */; };
 		EFB42EB624FE875B00AAC74E /* AnyPredicateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EAE24FE875B00AAC74E /* AnyPredicateTests.swift */; };
@@ -51,24 +58,18 @@
 		EFB42EB924FE875B00AAC74E /* RealmRelationshipsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EB124FE875B00AAC74E /* RealmRelationshipsTests.swift */; };
 		EFB42EBA24FE875B00AAC74E /* CoreDataContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EB224FE875B00AAC74E /* CoreDataContainerTests.swift */; };
 		EFB42EBB24FE875B00AAC74E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EFB42EB324FE875B00AAC74E /* Info.plist */; };
-		EFB42EBD24FE88CE00AAC74E /* DictionaryCoding.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EBC24FE88CE00AAC74E /* DictionaryCoding.framework */; };
-		EFB42EBE24FE88CE00AAC74E /* DictionaryCoding.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EBC24FE88CE00AAC74E /* DictionaryCoding.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		EFB42EC124FE88D000AAC74E /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EC024FE88D000AAC74E /* Realm.framework */; };
-		EFB42EC224FE88D000AAC74E /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EC024FE88D000AAC74E /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		EFB42EC424FE88D300AAC74E /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EC324FE88D300AAC74E /* RealmSwift.framework */; };
-		EFB42EC524FE88D300AAC74E /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFB42EC324FE88D300AAC74E /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		EFB42EBF24FE88CE00AAC74E /* Embed Frameworks */ = {
+		EFA3238B24FED99D0009F9D4 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				EFB42EC224FE88D000AAC74E /* Realm.framework in Embed Frameworks */,
-				EFB42EBE24FE88CE00AAC74E /* DictionaryCoding.framework in Embed Frameworks */,
-				EFB42EC524FE88D300AAC74E /* RealmSwift.framework in Embed Frameworks */,
+				EFA3238A24FED99D0009F9D4 /* Realm.framework in Embed Frameworks */,
+				EFA3238824FED99D0009F9D4 /* RealmSwift.framework in Embed Frameworks */,
+				EFA3238624FED99D0009F9D4 /* DictionaryCoding.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -78,43 +79,44 @@
 /* Begin PBXFileReference section */
 		5155AFA79226794F935D747F /* Pods_DatabaseObjectsMapper_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DatabaseObjectsMapper_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACE51AFB9204008FA782 /* DatabaseObjectsMapper_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DatabaseObjectsMapper_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		EFB42E5324FE873000AAC74E /* DatabaseObjectMapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DatabaseObjectMapper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		EFB42E5524FE873000AAC74E /* DatabaseObjectMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DatabaseObjectMapper.h; sourceTree = "<group>"; };
-		EFB42E5624FE873000AAC74E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		EFB42E5D24FE874100AAC74E /* KeyPathConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyPathConvertible.swift; sourceTree = "<group>"; };
-		EFB42E5E24FE874100AAC74E /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Property.swift; sourceTree = "<group>"; };
-		EFB42E5F24FE874100AAC74E /* Predicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Predicate.swift; sourceTree = "<group>"; };
-		EFB42E6024FE874100AAC74E /* AnyPredicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyPredicate.swift; sourceTree = "<group>"; };
-		EFB42E6124FE874100AAC74E /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SortDescriptor.swift; sourceTree = "<group>"; };
-		EFB42E6224FE874100AAC74E /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
-		EFB42E6324FE874100AAC74E /* Operators+Numeric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Operators+Numeric.swift"; sourceTree = "<group>"; };
-		EFB42E6424FE874100AAC74E /* Operators+String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Operators+String.swift"; sourceTree = "<group>"; };
-		EFB42E6724FE874100AAC74E /* RealmContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmContainer.swift; sourceTree = "<group>"; };
-		EFB42E6824FE874100AAC74E /* CoreDataContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataContainer.swift; sourceTree = "<group>"; };
-		EFB42E6B24FE874100AAC74E /* CoreDataStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStorage.swift; sourceTree = "<group>"; };
-		EFB42E6C24FE874100AAC74E /* CoreDataService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataService.swift; sourceTree = "<group>"; };
-		EFB42E6E24FE874100AAC74E /* NSManagedObjectContext+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Extensions.swift"; sourceTree = "<group>"; };
-		EFB42E6F24FE874100AAC74E /* NSManagedObjectContext+Observers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Observers.swift"; sourceTree = "<group>"; };
-		EFB42E7024FE874100AAC74E /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
-		EFB42E7124FE874100AAC74E /* ManagedObjectObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagedObjectObserver.swift; sourceTree = "<group>"; };
-		EFB42E7224FE874100AAC74E /* Managed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Managed.swift; sourceTree = "<group>"; };
-		EFB42E7324FE874100AAC74E /* FetchRequestObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchRequestObserver.swift; sourceTree = "<group>"; };
-		EFB42E7424FE874100AAC74E /* NSManagedObject+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Extensions.swift"; sourceTree = "<group>"; };
-		EFB42E7524FE874100AAC74E /* Collection+CoreDataExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Collection+CoreDataExtensions.swift"; sourceTree = "<group>"; };
-		EFB42E7624FE874100AAC74E /* DatabaseService+CoreData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseService+CoreData.swift"; sourceTree = "<group>"; };
-		EFB42E7824FE874100AAC74E /* Dictionary+Archive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary+Archive.swift"; sourceTree = "<group>"; };
-		EFB42E7924FE874100AAC74E /* OptionalUnwrap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionalUnwrap.swift; sourceTree = "<group>"; };
-		EFB42E7A24FE874100AAC74E /* DatabaseBackgroundWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseBackgroundWorker.swift; sourceTree = "<group>"; };
-		EFB42E7B24FE874100AAC74E /* DatabaseServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseServiceProtocol.swift; sourceTree = "<group>"; };
-		EFB42E7D24FE874100AAC74E /* DatabaseRelation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseRelation.swift; sourceTree = "<group>"; };
-		EFB42E7E24FE874100AAC74E /* Database+Relationships.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Database+Relationships.swift"; sourceTree = "<group>"; };
-		EFB42E8024FE874100AAC74E /* Mappable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mappable.swift; sourceTree = "<group>"; };
-		EFB42E8124FE874100AAC74E /* MappingHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingHelpers.swift; sourceTree = "<group>"; };
-		EFB42E8224FE874100AAC74E /* Container.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
-		EFB42E8324FE874100AAC74E /* Identifiable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Identifiable.swift; sourceTree = "<group>"; };
-		EFB42E8524FE874100AAC74E /* RealmService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmService.swift; sourceTree = "<group>"; };
-		EFB42E8624FE874100AAC74E /* DatabaseService+Realm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseService+Realm.swift"; sourceTree = "<group>"; };
-		EFB42E8724FE874100AAC74E /* RealmStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmStorage.swift; sourceTree = "<group>"; };
+		EFA3232E24FED8D60009F9D4 /* DatabaseObjectsMapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DatabaseObjectsMapper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EFA3233024FED8D60009F9D4 /* DatabaseObjectsMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DatabaseObjectsMapper.h; sourceTree = "<group>"; };
+		EFA3233124FED8D60009F9D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EFA3233824FED9140009F9D4 /* KeyPathConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyPathConvertible.swift; sourceTree = "<group>"; };
+		EFA3233924FED9140009F9D4 /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Property.swift; sourceTree = "<group>"; };
+		EFA3233A24FED9140009F9D4 /* Predicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Predicate.swift; sourceTree = "<group>"; };
+		EFA3233B24FED9140009F9D4 /* AnyPredicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyPredicate.swift; sourceTree = "<group>"; };
+		EFA3233C24FED9140009F9D4 /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SortDescriptor.swift; sourceTree = "<group>"; };
+		EFA3233D24FED9140009F9D4 /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
+		EFA3233E24FED9140009F9D4 /* Operators+Numeric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Operators+Numeric.swift"; sourceTree = "<group>"; };
+		EFA3233F24FED9140009F9D4 /* Operators+String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Operators+String.swift"; sourceTree = "<group>"; };
+		EFA3234124FED9140009F9D4 /* RealmContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmContainer.swift; sourceTree = "<group>"; };
+		EFA3234224FED9140009F9D4 /* CoreDataContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataContainer.swift; sourceTree = "<group>"; };
+		EFA3234324FED9140009F9D4 /* .gitkeep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		EFA3234524FED9140009F9D4 /* CoreDataStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStorage.swift; sourceTree = "<group>"; };
+		EFA3234624FED9140009F9D4 /* CoreDataService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataService.swift; sourceTree = "<group>"; };
+		EFA3234824FED9140009F9D4 /* NSManagedObjectContext+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Extensions.swift"; sourceTree = "<group>"; };
+		EFA3234924FED9140009F9D4 /* NSManagedObjectContext+Observers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Observers.swift"; sourceTree = "<group>"; };
+		EFA3234A24FED9140009F9D4 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		EFA3234B24FED9140009F9D4 /* ManagedObjectObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagedObjectObserver.swift; sourceTree = "<group>"; };
+		EFA3234C24FED9140009F9D4 /* Managed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Managed.swift; sourceTree = "<group>"; };
+		EFA3234D24FED9140009F9D4 /* FetchRequestObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchRequestObserver.swift; sourceTree = "<group>"; };
+		EFA3234E24FED9140009F9D4 /* NSManagedObject+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Extensions.swift"; sourceTree = "<group>"; };
+		EFA3234F24FED9140009F9D4 /* Collection+CoreDataExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Collection+CoreDataExtensions.swift"; sourceTree = "<group>"; };
+		EFA3235024FED9140009F9D4 /* DatabaseService+CoreData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseService+CoreData.swift"; sourceTree = "<group>"; };
+		EFA3235224FED9140009F9D4 /* Dictionary+Archive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary+Archive.swift"; sourceTree = "<group>"; };
+		EFA3235324FED9140009F9D4 /* OptionalUnwrap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionalUnwrap.swift; sourceTree = "<group>"; };
+		EFA3235424FED9140009F9D4 /* DatabaseBackgroundWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseBackgroundWorker.swift; sourceTree = "<group>"; };
+		EFA3235524FED9140009F9D4 /* DatabaseServiceProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseServiceProtocol.swift; sourceTree = "<group>"; };
+		EFA3235724FED9140009F9D4 /* DatabaseRelation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseRelation.swift; sourceTree = "<group>"; };
+		EFA3235824FED9140009F9D4 /* Database+Relationships.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Database+Relationships.swift"; sourceTree = "<group>"; };
+		EFA3235A24FED9140009F9D4 /* Mappable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mappable.swift; sourceTree = "<group>"; };
+		EFA3235B24FED9140009F9D4 /* MappingHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingHelpers.swift; sourceTree = "<group>"; };
+		EFA3235C24FED9140009F9D4 /* Container.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
+		EFA3235D24FED9140009F9D4 /* Identifiable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Identifiable.swift; sourceTree = "<group>"; };
+		EFA3235F24FED9140009F9D4 /* RealmService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmService.swift; sourceTree = "<group>"; };
+		EFA3236024FED9140009F9D4 /* DatabaseService+Realm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DatabaseService+Realm.swift"; sourceTree = "<group>"; };
+		EFA3236124FED9140009F9D4 /* RealmStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmStorage.swift; sourceTree = "<group>"; };
 		EFB42EAC24FE875B00AAC74E /* RealmPerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmPerformanceTests.swift; sourceTree = "<group>"; };
 		EFB42EAD24FE875B00AAC74E /* CoreDataPerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataPerformanceTests.swift; sourceTree = "<group>"; };
 		EFB42EAE24FE875B00AAC74E /* AnyPredicateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyPredicateTests.swift; sourceTree = "<group>"; };
@@ -138,13 +140,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EFB42E5024FE873000AAC74E /* Frameworks */ = {
+		EFA3232B24FED8D60009F9D4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFB42EC124FE88D000AAC74E /* Realm.framework in Frameworks */,
-				EFB42EBD24FE88CE00AAC74E /* DictionaryCoding.framework in Frameworks */,
-				EFB42EC424FE88D300AAC74E /* RealmSwift.framework in Frameworks */,
+				EFA3238924FED99D0009F9D4 /* Realm.framework in Frameworks */,
+				EFA3238724FED99D0009F9D4 /* RealmSwift.framework in Frameworks */,
+				EFA3238524FED99D0009F9D4 /* DictionaryCoding.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,8 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				EFB42EAB24FE875B00AAC74E /* Tests */,
-				EFB42E5B24FE874100AAC74E /* Classes */,
-				EFB42E5424FE873000AAC74E /* DatabaseObjectMapper */,
+				EFA3232F24FED8D60009F9D4 /* DatabaseObjectsMapper */,
 				607FACD11AFB9204008FA782 /* Products */,
 				23CD39B521C1EB3DAF1EA84A /* Frameworks */,
 			);
@@ -178,130 +179,123 @@
 			isa = PBXGroup;
 			children = (
 				607FACE51AFB9204008FA782 /* DatabaseObjectsMapper_Tests.xctest */,
-				EFB42E5324FE873000AAC74E /* DatabaseObjectMapper.framework */,
+				EFA3232E24FED8D60009F9D4 /* DatabaseObjectsMapper.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		EFB42E5424FE873000AAC74E /* DatabaseObjectMapper */ = {
+		EFA3232F24FED8D60009F9D4 /* DatabaseObjectsMapper */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E5524FE873000AAC74E /* DatabaseObjectMapper.h */,
-				EFB42E5624FE873000AAC74E /* Info.plist */,
+				EFA3233624FED9140009F9D4 /* Classes */,
+				EFA3233024FED8D60009F9D4 /* DatabaseObjectsMapper.h */,
+				EFA3233124FED8D60009F9D4 /* Info.plist */,
 			);
-			path = DatabaseObjectMapper;
+			path = DatabaseObjectsMapper;
 			sourceTree = "<group>";
 		};
-		EFB42E5B24FE874100AAC74E /* Classes */ = {
+		EFA3233624FED9140009F9D4 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E5C24FE874100AAC74E /* Predicate */,
-				EFB42E6524FE874100AAC74E /* DatabaseObjects */,
-				EFB42E6A24FE874100AAC74E /* CoreData */,
-				EFB42E7724FE874100AAC74E /* Utilities */,
-				EFB42E7B24FE874100AAC74E /* DatabaseServiceProtocol.swift */,
-				EFB42E7C24FE874100AAC74E /* Relationships */,
-				EFB42E7F24FE874100AAC74E /* Protocols */,
-				EFB42E8424FE874100AAC74E /* Realm */,
+				EFA3233724FED9140009F9D4 /* Predicate */,
+				EFA3234024FED9140009F9D4 /* DatabaseObjects */,
+				EFA3234324FED9140009F9D4 /* .gitkeep */,
+				EFA3234424FED9140009F9D4 /* CoreData */,
+				EFA3235124FED9140009F9D4 /* Utilities */,
+				EFA3235524FED9140009F9D4 /* DatabaseServiceProtocol.swift */,
+				EFA3235624FED9140009F9D4 /* Relationships */,
+				EFA3235924FED9140009F9D4 /* Protocols */,
+				EFA3235E24FED9140009F9D4 /* Realm */,
 			);
-			name = Classes;
-			path = DatabaseObjectsMapper/Classes;
+			path = Classes;
 			sourceTree = "<group>";
 		};
-		EFB42E5C24FE874100AAC74E /* Predicate */ = {
+		EFA3233724FED9140009F9D4 /* Predicate */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E5D24FE874100AAC74E /* KeyPathConvertible.swift */,
-				EFB42E5E24FE874100AAC74E /* Property.swift */,
-				EFB42E5F24FE874100AAC74E /* Predicate.swift */,
-				EFB42E6024FE874100AAC74E /* AnyPredicate.swift */,
-				EFB42E6124FE874100AAC74E /* SortDescriptor.swift */,
-				EFB42E6224FE874100AAC74E /* Operators.swift */,
-				EFB42E6324FE874100AAC74E /* Operators+Numeric.swift */,
-				EFB42E6424FE874100AAC74E /* Operators+String.swift */,
+				EFA3233824FED9140009F9D4 /* KeyPathConvertible.swift */,
+				EFA3233924FED9140009F9D4 /* Property.swift */,
+				EFA3233A24FED9140009F9D4 /* Predicate.swift */,
+				EFA3233B24FED9140009F9D4 /* AnyPredicate.swift */,
+				EFA3233C24FED9140009F9D4 /* SortDescriptor.swift */,
+				EFA3233D24FED9140009F9D4 /* Operators.swift */,
+				EFA3233E24FED9140009F9D4 /* Operators+Numeric.swift */,
+				EFA3233F24FED9140009F9D4 /* Operators+String.swift */,
 			);
 			path = Predicate;
 			sourceTree = "<group>";
 		};
-		EFB42E6524FE874100AAC74E /* DatabaseObjects */ = {
+		EFA3234024FED9140009F9D4 /* DatabaseObjects */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E6624FE874100AAC74E /* Generated */,
-				EFB42E6724FE874100AAC74E /* RealmContainer.swift */,
-				EFB42E6824FE874100AAC74E /* CoreDataContainer.swift */,
+				EFA3234124FED9140009F9D4 /* RealmContainer.swift */,
+				EFA3234224FED9140009F9D4 /* CoreDataContainer.swift */,
 			);
 			path = DatabaseObjects;
 			sourceTree = "<group>";
 		};
-		EFB42E6624FE874100AAC74E /* Generated */ = {
+		EFA3234424FED9140009F9D4 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-			);
-			path = Generated;
-			sourceTree = "<group>";
-		};
-		EFB42E6A24FE874100AAC74E /* CoreData */ = {
-			isa = PBXGroup;
-			children = (
-				EFB42E6B24FE874100AAC74E /* CoreDataStorage.swift */,
-				EFB42E6C24FE874100AAC74E /* CoreDataService.swift */,
-				EFB42E6D24FE874100AAC74E /* CoreDataHelpers */,
-				EFB42E7624FE874100AAC74E /* DatabaseService+CoreData.swift */,
+				EFA3234524FED9140009F9D4 /* CoreDataStorage.swift */,
+				EFA3234624FED9140009F9D4 /* CoreDataService.swift */,
+				EFA3234724FED9140009F9D4 /* CoreDataHelpers */,
+				EFA3235024FED9140009F9D4 /* DatabaseService+CoreData.swift */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
 		};
-		EFB42E6D24FE874100AAC74E /* CoreDataHelpers */ = {
+		EFA3234724FED9140009F9D4 /* CoreDataHelpers */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E6E24FE874100AAC74E /* NSManagedObjectContext+Extensions.swift */,
-				EFB42E6F24FE874100AAC74E /* NSManagedObjectContext+Observers.swift */,
-				EFB42E7024FE874100AAC74E /* Utilities.swift */,
-				EFB42E7124FE874100AAC74E /* ManagedObjectObserver.swift */,
-				EFB42E7224FE874100AAC74E /* Managed.swift */,
-				EFB42E7324FE874100AAC74E /* FetchRequestObserver.swift */,
-				EFB42E7424FE874100AAC74E /* NSManagedObject+Extensions.swift */,
-				EFB42E7524FE874100AAC74E /* Collection+CoreDataExtensions.swift */,
+				EFA3234824FED9140009F9D4 /* NSManagedObjectContext+Extensions.swift */,
+				EFA3234924FED9140009F9D4 /* NSManagedObjectContext+Observers.swift */,
+				EFA3234A24FED9140009F9D4 /* Utilities.swift */,
+				EFA3234B24FED9140009F9D4 /* ManagedObjectObserver.swift */,
+				EFA3234C24FED9140009F9D4 /* Managed.swift */,
+				EFA3234D24FED9140009F9D4 /* FetchRequestObserver.swift */,
+				EFA3234E24FED9140009F9D4 /* NSManagedObject+Extensions.swift */,
+				EFA3234F24FED9140009F9D4 /* Collection+CoreDataExtensions.swift */,
 			);
 			path = CoreDataHelpers;
 			sourceTree = "<group>";
 		};
-		EFB42E7724FE874100AAC74E /* Utilities */ = {
+		EFA3235124FED9140009F9D4 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E7824FE874100AAC74E /* Dictionary+Archive.swift */,
-				EFB42E7924FE874100AAC74E /* OptionalUnwrap.swift */,
-				EFB42E7A24FE874100AAC74E /* DatabaseBackgroundWorker.swift */,
+				EFA3235224FED9140009F9D4 /* Dictionary+Archive.swift */,
+				EFA3235324FED9140009F9D4 /* OptionalUnwrap.swift */,
+				EFA3235424FED9140009F9D4 /* DatabaseBackgroundWorker.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
 		};
-		EFB42E7C24FE874100AAC74E /* Relationships */ = {
+		EFA3235624FED9140009F9D4 /* Relationships */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E7D24FE874100AAC74E /* DatabaseRelation.swift */,
-				EFB42E7E24FE874100AAC74E /* Database+Relationships.swift */,
+				EFA3235724FED9140009F9D4 /* DatabaseRelation.swift */,
+				EFA3235824FED9140009F9D4 /* Database+Relationships.swift */,
 			);
 			path = Relationships;
 			sourceTree = "<group>";
 		};
-		EFB42E7F24FE874100AAC74E /* Protocols */ = {
+		EFA3235924FED9140009F9D4 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E8024FE874100AAC74E /* Mappable.swift */,
-				EFB42E8124FE874100AAC74E /* MappingHelpers.swift */,
-				EFB42E8224FE874100AAC74E /* Container.swift */,
-				EFB42E8324FE874100AAC74E /* Identifiable.swift */,
+				EFA3235A24FED9140009F9D4 /* Mappable.swift */,
+				EFA3235B24FED9140009F9D4 /* MappingHelpers.swift */,
+				EFA3235C24FED9140009F9D4 /* Container.swift */,
+				EFA3235D24FED9140009F9D4 /* Identifiable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
 		};
-		EFB42E8424FE874100AAC74E /* Realm */ = {
+		EFA3235E24FED9140009F9D4 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
-				EFB42E8524FE874100AAC74E /* RealmService.swift */,
-				EFB42E8624FE874100AAC74E /* DatabaseService+Realm.swift */,
-				EFB42E8724FE874100AAC74E /* RealmStorage.swift */,
+				EFA3235F24FED9140009F9D4 /* RealmService.swift */,
+				EFA3236024FED9140009F9D4 /* DatabaseService+Realm.swift */,
+				EFA3236124FED9140009F9D4 /* RealmStorage.swift */,
 			);
 			path = Realm;
 			sourceTree = "<group>";
@@ -325,11 +319,11 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		EFB42E4E24FE873000AAC74E /* Headers */ = {
+		EFA3232924FED8D60009F9D4 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFB42E5724FE873000AAC74E /* DatabaseObjectMapper.h in Headers */,
+				EFA3233224FED8D60009F9D4 /* DatabaseObjectsMapper.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,24 +348,23 @@
 			productReference = 607FACE51AFB9204008FA782 /* DatabaseObjectsMapper_Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		EFB42E5224FE873000AAC74E /* DatabaseObjectMapper */ = {
+		EFA3232D24FED8D60009F9D4 /* DatabaseObjectsMapper */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = EFB42E5824FE873000AAC74E /* Build configuration list for PBXNativeTarget "DatabaseObjectMapper" */;
+			buildConfigurationList = EFA3233324FED8D60009F9D4 /* Build configuration list for PBXNativeTarget "DatabaseObjectsMapper" */;
 			buildPhases = (
-				EFB42E4E24FE873000AAC74E /* Headers */,
-				EFB42E4F24FE873000AAC74E /* Sources */,
-				EFB42E5024FE873000AAC74E /* Frameworks */,
-				EFB42E5124FE873000AAC74E /* Resources */,
-				EFB42EBF24FE88CE00AAC74E /* Embed Frameworks */,
-				EFB42EC624FE88E800AAC74E /* ShellScript */,
+				EFA3232924FED8D60009F9D4 /* Headers */,
+				EFA3232A24FED8D60009F9D4 /* Sources */,
+				EFA3232B24FED8D60009F9D4 /* Frameworks */,
+				EFA3232C24FED8D60009F9D4 /* Resources */,
+				EFA3238B24FED99D0009F9D4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = DatabaseObjectMapper;
-			productName = DatabaseObjectMapper;
-			productReference = EFB42E5324FE873000AAC74E /* DatabaseObjectMapper.framework */;
+			name = DatabaseObjectsMapper;
+			productName = DatabaseObjectsMapper;
+			productReference = EFA3232E24FED8D60009F9D4 /* DatabaseObjectsMapper.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -389,7 +382,7 @@
 						LastSwiftMigration = 0900;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
-					EFB42E5224FE873000AAC74E = {
+					EFA3232D24FED8D60009F9D4 = {
 						CreatedOnToolsVersion = 11.5;
 						ProvisioningStyle = Automatic;
 					};
@@ -410,7 +403,7 @@
 			projectRoot = "";
 			targets = (
 				607FACE41AFB9204008FA782 /* DatabaseObjectsMapper_Tests */,
-				EFB42E5224FE873000AAC74E /* DatabaseObjectMapper */,
+				EFA3232D24FED8D60009F9D4 /* DatabaseObjectsMapper */,
 			);
 		};
 /* End PBXProject section */
@@ -424,10 +417,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EFB42E5124FE873000AAC74E /* Resources */ = {
+		EFA3232C24FED8D60009F9D4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EFA3236C24FED9140009F9D4 /* .gitkeep in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,26 +446,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EFB42EC624FE88E800AAC74E /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/DictionaryCoding.framework",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -489,44 +463,44 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EFB42E4F24FE873000AAC74E /* Sources */ = {
+		EFA3232A24FED8D60009F9D4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFB42E9E24FE874100AAC74E /* Dictionary+Archive.swift in Sources */,
-				EFB42E9D24FE874100AAC74E /* DatabaseService+CoreData.swift in Sources */,
-				EFB42E8924FE874100AAC74E /* Property.swift in Sources */,
-				EFB42E9624FE874100AAC74E /* NSManagedObjectContext+Observers.swift in Sources */,
-				EFB42E9824FE874100AAC74E /* ManagedObjectObserver.swift in Sources */,
-				EFB42E8E24FE874100AAC74E /* Operators+Numeric.swift in Sources */,
-				EFB42E9724FE874100AAC74E /* Utilities.swift in Sources */,
-				EFB42EA724FE874100AAC74E /* Identifiable.swift in Sources */,
-				EFB42EA624FE874100AAC74E /* Container.swift in Sources */,
-				EFB42EA124FE874100AAC74E /* DatabaseServiceProtocol.swift in Sources */,
-				EFB42EA524FE874100AAC74E /* MappingHelpers.swift in Sources */,
-				EFB42E8F24FE874100AAC74E /* Operators+String.swift in Sources */,
-				EFB42EA024FE874100AAC74E /* DatabaseBackgroundWorker.swift in Sources */,
-				EFB42E9924FE874100AAC74E /* Managed.swift in Sources */,
-				EFB42E8A24FE874100AAC74E /* Predicate.swift in Sources */,
-				EFB42EA824FE874100AAC74E /* RealmService.swift in Sources */,
-				EFB42E9A24FE874100AAC74E /* FetchRequestObserver.swift in Sources */,
-				EFB42E9524FE874100AAC74E /* NSManagedObjectContext+Extensions.swift in Sources */,
-				EFB42E9424FE874100AAC74E /* CoreDataService.swift in Sources */,
-				EFB42EA424FE874100AAC74E /* Mappable.swift in Sources */,
-				EFB42EA924FE874100AAC74E /* DatabaseService+Realm.swift in Sources */,
-				EFB42E8B24FE874100AAC74E /* AnyPredicate.swift in Sources */,
-				EFB42E9C24FE874100AAC74E /* Collection+CoreDataExtensions.swift in Sources */,
-				EFB42E8824FE874100AAC74E /* KeyPathConvertible.swift in Sources */,
-				EFB42E8C24FE874100AAC74E /* SortDescriptor.swift in Sources */,
-				EFB42E9324FE874100AAC74E /* CoreDataStorage.swift in Sources */,
-				EFB42EA324FE874100AAC74E /* Database+Relationships.swift in Sources */,
-				EFB42E8D24FE874100AAC74E /* Operators.swift in Sources */,
-				EFB42E9F24FE874100AAC74E /* OptionalUnwrap.swift in Sources */,
-				EFB42EA224FE874100AAC74E /* DatabaseRelation.swift in Sources */,
-				EFB42E9124FE874100AAC74E /* CoreDataContainer.swift in Sources */,
-				EFB42EAA24FE874100AAC74E /* RealmStorage.swift in Sources */,
-				EFB42E9B24FE874100AAC74E /* NSManagedObject+Extensions.swift in Sources */,
-				EFB42E9024FE874100AAC74E /* RealmContainer.swift in Sources */,
+				EFA3237824FED9140009F9D4 /* Dictionary+Archive.swift in Sources */,
+				EFA3237724FED9140009F9D4 /* DatabaseService+CoreData.swift in Sources */,
+				EFA3236324FED9140009F9D4 /* Property.swift in Sources */,
+				EFA3237024FED9140009F9D4 /* NSManagedObjectContext+Observers.swift in Sources */,
+				EFA3237224FED9140009F9D4 /* ManagedObjectObserver.swift in Sources */,
+				EFA3236824FED9140009F9D4 /* Operators+Numeric.swift in Sources */,
+				EFA3237124FED9140009F9D4 /* Utilities.swift in Sources */,
+				EFA3238124FED9140009F9D4 /* Identifiable.swift in Sources */,
+				EFA3238024FED9140009F9D4 /* Container.swift in Sources */,
+				EFA3237B24FED9140009F9D4 /* DatabaseServiceProtocol.swift in Sources */,
+				EFA3237F24FED9140009F9D4 /* MappingHelpers.swift in Sources */,
+				EFA3236924FED9140009F9D4 /* Operators+String.swift in Sources */,
+				EFA3237A24FED9140009F9D4 /* DatabaseBackgroundWorker.swift in Sources */,
+				EFA3237324FED9140009F9D4 /* Managed.swift in Sources */,
+				EFA3236424FED9140009F9D4 /* Predicate.swift in Sources */,
+				EFA3238224FED9140009F9D4 /* RealmService.swift in Sources */,
+				EFA3237424FED9140009F9D4 /* FetchRequestObserver.swift in Sources */,
+				EFA3236F24FED9140009F9D4 /* NSManagedObjectContext+Extensions.swift in Sources */,
+				EFA3236E24FED9140009F9D4 /* CoreDataService.swift in Sources */,
+				EFA3237E24FED9140009F9D4 /* Mappable.swift in Sources */,
+				EFA3238324FED9140009F9D4 /* DatabaseService+Realm.swift in Sources */,
+				EFA3236524FED9140009F9D4 /* AnyPredicate.swift in Sources */,
+				EFA3237624FED9140009F9D4 /* Collection+CoreDataExtensions.swift in Sources */,
+				EFA3236224FED9140009F9D4 /* KeyPathConvertible.swift in Sources */,
+				EFA3236624FED9140009F9D4 /* SortDescriptor.swift in Sources */,
+				EFA3236D24FED9140009F9D4 /* CoreDataStorage.swift in Sources */,
+				EFA3237D24FED9140009F9D4 /* Database+Relationships.swift in Sources */,
+				EFA3236724FED9140009F9D4 /* Operators.swift in Sources */,
+				EFA3237924FED9140009F9D4 /* OptionalUnwrap.swift in Sources */,
+				EFA3237C24FED9140009F9D4 /* DatabaseRelation.swift in Sources */,
+				EFA3236B24FED9140009F9D4 /* CoreDataContainer.swift in Sources */,
+				EFA3238424FED9140009F9D4 /* RealmStorage.swift in Sources */,
+				EFA3237524FED9140009F9D4 /* NSManagedObject+Extensions.swift in Sources */,
+				EFA3236A24FED9140009F9D4 /* RealmContainer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -678,17 +652,14 @@
 			};
 			name = Release;
 		};
-		EFB42E5924FE873000AAC74E /* Debug */ = {
+		EFA3233424FED8D60009F9D4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -702,16 +673,15 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = DatabaseObjectMapper/Info.plist;
+				INFOPLIST_FILE = DatabaseObjectsMapper/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mmulyar.DatabaseObjectMapper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mmulyar.DatabaseObjectsMapper;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SUPPORTS_MACCATALYST = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -720,17 +690,14 @@
 			};
 			name = Debug;
 		};
-		EFB42E5A24FE873000AAC74E /* Release */ = {
+		EFA3233524FED8D60009F9D4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -743,15 +710,14 @@
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = DatabaseObjectMapper/Info.plist;
+				INFOPLIST_FILE = DatabaseObjectsMapper/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mmulyar.DatabaseObjectMapper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mmulyar.DatabaseObjectsMapper;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -780,11 +746,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EFB42E5824FE873000AAC74E /* Build configuration list for PBXNativeTarget "DatabaseObjectMapper" */ = {
+		EFA3233324FED8D60009F9D4 /* Build configuration list for PBXNativeTarget "DatabaseObjectsMapper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				EFB42E5924FE873000AAC74E /* Debug */,
-				EFB42E5A24FE873000AAC74E /* Release */,
+				EFA3233424FED8D60009F9D4 /* Debug */,
+				EFA3233524FED8D60009F9D4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
