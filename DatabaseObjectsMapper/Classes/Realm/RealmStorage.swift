@@ -220,19 +220,34 @@ public struct RealmWriteTransaction {
 /// Provides an interface for performing various actions on a realm.
 class RealmOperator: NSObject {
     private let realm: Realm
+    private var isInWriteTransaction = false
 
     /// Creates a new RealmOperator with the given Realm.
     public init(realm: Realm) {
         self.realm = realm
     }
 
+    func beginWrite() {
+        isInWriteTransaction = true
+        realm.beginWrite()
+    }
+
     /// Performs actions on the Realm within a write transaction.
     /// - parameter block: The actions to perform.
     func write(_ block: (RealmWriteTransaction) throws -> Void) throws {
         let transaction = RealmWriteTransaction(realm: realm)
-        realm.beginWrite()
+        if !realm.isInWriteTransaction {
+            realm.beginWrite()
+        }
         try block(transaction)
+        if !isInWriteTransaction {
+            try realm.commitWrite()
+        }
+    }
+
+    func commitWrite() throws {
         try realm.commitWrite()
+        isInWriteTransaction = false
     }
 
     /// Performs actions on the Realm within a write transaction.

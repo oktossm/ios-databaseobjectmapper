@@ -21,6 +21,8 @@ open class RealmService {
         return self.readWorkers.randomElement()!
     }
 
+    private var isBatchWriting = false
+    private var batchBlocks = [RealmBlock]()
 
     public init(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
         self.configuration = configuration
@@ -35,12 +37,40 @@ open class RealmService {
         let realm = try! Realm(configuration: self.configuration)
         return RealmOperator(realm: realm)
     }
+
+    func processRealmBlock(_ block: @escaping RealmBlock, sync: Bool = false) {
+        if isBatchWriting {
+            self.batchBlocks.append(block)
+        } else if sync {
+            block(syncOperator())
+        } else {
+            self.writeWorker.execute(realmBlock: block)
+        }
+    }
 }
 
 
 extension RealmService {
-    // MARK: Managing
+    // MARK: Batch writes
+    public func beginBatchWrites() {
+        self.isBatchWriting = true
+    }
 
+    public func commitBatchWrites(sync: Bool = false) {
+        self.isBatchWriting = false
+        if sync {
+            let syncOperator = self.syncOperator()
+            syncOperator.beginWrite()
+            self.batchBlocks.forEach { $0(syncOperator) }
+            try? syncOperator.commitWrite()
+        } else {
+            self.writeWorker.execute(realmBlocks: self.batchBlocks)
+        }
+        self.batchBlocks.removeAll()
+    }
+
+
+    // MARK: Managing
     public func deleteAll(sync: Bool = false) {
         let block: RealmBlock = {
             realmOperator in
@@ -49,7 +79,7 @@ extension RealmService {
                 transaction.deleteAll()
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func simpleSave<T: DatabaseMappable>(model: T, sync: Bool = false) where T.Container: RealmObject {
@@ -64,7 +94,7 @@ extension RealmService {
                 try? transaction.add(models, update: false)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func save<T: UniquelyMappable>(model: T, update: Bool = true, sync: Bool = false) where T.Container: RealmObject {
@@ -79,7 +109,7 @@ extension RealmService {
                 try? transaction.add(models, update: update)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func saveSkippingRelations<T: UniquelyMappable>(model: T, sync: Bool = false) where T.Container: RealmObject {
@@ -94,7 +124,7 @@ extension RealmService {
                 try? transaction.addSkippingRelations(models)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func save<T: UniquelyMappable, R: UniquelyMappable>(model: T,
@@ -111,7 +141,7 @@ extension RealmService {
                 transaction.updateRelation(relation, in: model, with: relationUpdate)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func update<T: UniquelyMappable>(model: T, sync: Bool = false) where T.Container: RealmObject {
@@ -130,7 +160,7 @@ extension RealmService {
                 try? transaction.update(models, skipRelations: skipRelations)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func update<T: UniquelyMappable>(modelOf type: T.Type,
@@ -144,7 +174,7 @@ extension RealmService {
                 transaction.update(modelOf: type, with: key, updates: updates)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func update<T: UniquelyMappable & KeyPathConvertible>(modelOf type: T.Type,
@@ -167,7 +197,7 @@ extension RealmService {
                 transaction.updateSingleRelation(in: model, for: keyPath, relationOf: R.self, relationId: relationId)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func updateRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
@@ -182,7 +212,7 @@ extension RealmService {
                 transaction.updateRelation(relation, in: model, with: update)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func delete<T: UniquelyMappable>(model: T, sync: Bool = false) where T.Container: RealmObject {
@@ -197,7 +227,7 @@ extension RealmService {
                 transaction.delete(models)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func deleteAll<T: DatabaseMappable>(modelsOf type: T.Type, sync: Bool = false) where T.Container: RealmObject {
@@ -208,7 +238,7 @@ extension RealmService {
                 transaction.deleteAll(modelsOf: type)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
 
@@ -870,7 +900,7 @@ extension RealmService {
                 transaction.updateSingleRelation(in: model, for: keyPath, relationOf: R.self, relationId: relationId)
             }
         }
-        sync ? block(syncOperator()) : self.writeWorker.execute(realmBlock: block)
+        self.processRealmBlock(block, sync: sync)
     }
 
     public func min<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
@@ -1129,6 +1159,18 @@ class DatabaseRealmBackgroundWorker {
                   let realm = try? Realm(configuration: self.configuration, queue: self.queue) else { return }
             let realmOperator = RealmOperator(realm: realm)
             realmBlock(realmOperator)
+        }
+    }
+
+    internal func execute(realmBlocks: [RealmBlock]) {
+        queue.async {
+            [weak self] in
+            guard let `self` = self,
+                  let realm = try? Realm(configuration: self.configuration, queue: self.queue) else { return }
+            let realmOperator = RealmOperator(realm: realm)
+            realmOperator.beginWrite()
+            realmBlocks.forEach { $0(realmOperator) }
+            try? realmOperator.commitWrite()
         }
     }
 }
