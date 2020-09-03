@@ -244,6 +244,20 @@ extension RealmService {
 
     // MARK: Fetching
 
+    public func count<T: DatabaseMappable>(for model: T.Type,
+                                           with filter: DatabaseFilterType = .unfiltered,
+                                           callback: @escaping (Int) -> Void) where T.Container: RealmObject {
+        let worker = self.readWorker
+
+        worker.execute {
+            realmOperator in
+            let value = realmOperator.values(ofType: T.self).filter(filter).count
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
     public func min<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
                                                                              for keyPath: KeyPath<T, R>,
                                                                              callback: @escaping (R?) -> Void) where T.Container: RealmObject {
@@ -299,6 +313,11 @@ extension RealmService {
                 callback(value)
             }
         }
+    }
+
+    public func countSync<T: DatabaseMappable>(for model: T.Type,
+                                               with filter: DatabaseFilterType = .unfiltered) -> Int where T.Container: RealmObject {
+        return syncOperator().values(ofType: T.self).filter(filter).count
     }
 
     public func minSync<T: DatabaseMappable & KeyPathConvertible, R: MinMaxType>(with filter: DatabaseFilterType = .unfiltered,
@@ -479,6 +498,22 @@ extension RealmService {
 
     // MARK: Relations
 
+    public func count<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                in model: T,
+                                                                with filter: DatabaseFilterType = .unfiltered,
+                                                                callback: @escaping (Int) -> Void)
+        where T.Container: RealmObject, R.Container: RealmObject {
+        let worker = self.readWorker
+
+        worker.execute {
+            realmOperator in
+            let value = realmOperator.relationValues(relation, in: model)?.filter(filter).count ?? 0
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }
+    }
+
     public func min<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,
                                                                                                   in model: T,
                                                                                                   with filter: DatabaseFilterType = .unfiltered,
@@ -545,6 +580,13 @@ extension RealmService {
                 callback(value)
             }
         }
+    }
+
+    public func countSync<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
+                                                                    in model: T,
+                                                                    with filter: DatabaseFilterType = .unfiltered) -> Int
+        where T.Container: RealmObject, R.Container: RealmObject {
+        return syncOperator().relationValues(relation, in: model)?.filter(filter).count ?? 0
     }
 
     public func minSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: MinMaxType>(_ relation: Relation<R>,

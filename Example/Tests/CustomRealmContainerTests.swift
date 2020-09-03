@@ -1129,6 +1129,29 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testCount() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 10, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 7, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2, testModel3, testModel4])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let count = self.service.countSync(for: TestSomeModel.self)
+            let countFiltered = self.service.countSync(for: TestSomeModel.self, with: .query(query: "userAvatar == 'rw'"))
+
+            XCTAssertTrue(count == 4)
+            XCTAssertTrue(countFiltered == 3)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testBatchStoreWithKey() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
