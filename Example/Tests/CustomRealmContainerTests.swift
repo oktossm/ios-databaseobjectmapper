@@ -74,6 +74,7 @@ class CustomRealmContainerTests: XCTestCase {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
 
         service.save(model: testModel, sync: true)
+        //Test duplicate
         service.save(model: testModel, sync: true)
 
         let fetched: TestSomeModel? = self.service.syncFetchUnique(with: testModel.userId)
@@ -1121,6 +1122,91 @@ class CustomRealmContainerTests: XCTestCase {
             XCTAssertTrue(sum == 24)
             XCTAssertTrue(average == 6)
             XCTAssertTrue(averageFiltered == 7)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testCount() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 10, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 7, nestedModel: nil)
+
+        service.save(models: [testModel, testModel2, testModel3, testModel4])
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let count = self.service.countSync(for: TestSomeModel.self)
+            let countFiltered = self.service.countSync(for: TestSomeModel.self, with: .query(query: "userAvatar == 'rw'"))
+
+            XCTAssertTrue(count == 4)
+            XCTAssertTrue(countFiltered == 3)
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testBatchStoreWithKey() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+
+        service.beginBatchWrites()
+        service.save(model: testModel)
+        service.save(model: testModel2)
+        service.commitBatchWrites()
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestSomeModel] = self.service.syncFetch()
+
+            XCTAssertTrue(all.sorted { $0.userId < $1.userId } == [testModel, testModel2])
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testSyncBatchStoreWithKey() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+
+        service.beginBatchWrites()
+        service.save(model: testModel)
+        //Test duplicate
+        service.save(model: testModel)
+        service.save(model: testModel2)
+        service.commitBatchWrites(sync: true)
+
+        let all: [TestSomeModel] = self.service.syncFetch()
+
+        XCTAssertTrue([testModel, testModel2] == all)
+    }
+
+    func testBatchUpdate() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "ad", title: "pl", count: 3, nestedModel: nil)
+
+        service.beginBatchWrites()
+        service.save(models: [testModel, testModel2])
+        service.update(models: [testModel3, testModel4])
+        service.commitBatchWrites()
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestSomeModel] = self.service.syncFetch()
+
+            XCTAssertTrue(all.sorted { $0.userId < $1.userId } == [testModel3, testModel4])
 
             expectation.fulfill()
         }
