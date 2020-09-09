@@ -99,7 +99,6 @@ public func >=<Model: KeyPathConvertible, Property: AnyComparableProperty>(lhs: 
         .anyPredicate
 }
 
-private let dictionaryEncoder = DictionaryEncoder()
 private func processRhs(_ rhs: AnyProperty) -> Any {
     if let date = rhs as? Date {
         return date.encodedValue as? Double ?? 0
@@ -107,7 +106,6 @@ private func processRhs(_ rhs: AnyProperty) -> Any {
         return rhs
     }
 }
-
 
 private func processOptionalRhs(_ rhs: AnyProperty?) -> Any {
     if let optionalDate = rhs as? Optional<Date>, let date = optionalDate {
