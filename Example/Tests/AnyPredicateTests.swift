@@ -43,11 +43,6 @@ class AnyPredicateTests: XCTestCase {
         service.deleteAll(sync: true)
     }
 
-    struct QueryAndIdResult {
-        let query: AnyPredicate<TestSomeModel>
-        let idsResult: [Int]
-    }
-
     var johnSwift: TestSomeModel!
     var johnObjC: TestSomeModel!
 

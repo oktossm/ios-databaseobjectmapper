@@ -18,7 +18,8 @@ import {{ value }}
 {% macro mapVariable var idName %}
     {% if var.typeName.unwrappedTypeName|hasPrefix:"Int" or var.typeName.unwrappedTypeName == "Float" or var.typeName.unwrappedTypeName == "Double" %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<{{var.typeName.unwrappedTypeName}}>(){% else %}@objc public dynamic var {{ var.name }}: {{var.typeName}} = 0{% endif %}{% endif %}
     {% if var.typeName.unwrappedTypeName == "Bool" %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<{{var.typeName.unwrappedTypeName}}>(){% else %}@objc public dynamic var {{ var.name }}: {{var.typeName}} = false{% endif %}{% endif %}
-    {% if var.typeName.unwrappedTypeName == "String" or var.typeName.unwrappedTypeName == "Data" or var.typeName.unwrappedTypeName == "Date" %}@objc public dynamic var {{ var.name }}: {{var.typeName}}{% ifnot var.typeName.isOptional %} = {{var.typeName}}(){% endif %}{% endif %}
+    {% if var.typeName.unwrappedTypeName == "String" or var.typeName.unwrappedTypeName == "Data" %}@objc public dynamic var {{ var.name }}: {{var.typeName}}{% ifnot var.typeName.isOptional %} = {{var.typeName}}(){% endif %}{% endif %}
+    {% if var.typeName.unwrappedTypeName == "Date" %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<Double>(){% else %}@objc public dynamic var {{ var.name }}: Double = 0{% endif %}{% endif %}
     {% if var.typeName.unwrappedTypeName == "URL" %}@objc public dynamic var {{ var.name }}: String{% ifnot var.typeName.isOptional %} = String(){% else %}?{% endif %}{% endif %}
     {% if var.type.based.DatabaseMappable or var.type.based.UniquelyMappable %}@objc public dynamic var {{ var.name }}: {{var.typeName.unwrappedTypeName}}Container?{% endif %}
     {% if var.type.based.DictionaryCodable and not var.type.based.DatabaseMappable and not var.type.based.UniquelyMappable %}@objc public dynamic var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %} = Data(){% endif %}{% endif %}
@@ -27,8 +28,8 @@ import {{ value }}
     {% if var.typeName.isArray and ( var.typeName.array.elementTypeName.based.DictionaryCodable or var.typeName.array.elementTypeName.based.Codable ) %}@objc public dynamic var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %} = Data(){% endif %}{% endif %}
     {% if var.typeName.isDictionary and ( var.typeName.dictionary.keyTypeName.based.DictionaryCodable or var.typeName.dictionary.keyTypeName.based.Codable ) and (var.typeName.dictionary.valueTypeName.based.DictionaryCodable or var.typeName.dictionary.valueTypeName.based.Codable) %}@objc public dynamic var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %} = Data(){% endif %}{% endif %}
     {% if var.typeName.isGeneric and var.typeName.generic.name == "Set" and ( var.typeName.generic.typeParameters.first.typeName.based.DictionaryCodable or var.typeName.generic.typeParameters.first.typeName.based.Codable ) %}@objc public dynamic var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %} = Data(){% endif %}{% endif %}
-    {% if var.type.kind == "enum" and ( var.type.rawTypeName|hasPrefix:"Int" or var.type.rawTypeName.unwrappedTypeName == "Float" or var.type.rawTypeName.unwrappedTypeName == "Double" ) %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<{{var.type.rawTypeName.unwrappedTypeName}}>(){% else %}@objc public dynamic var {{ var.name }}: {{var.type.rawTypeName}} = {{var.type.rawTypeName}}(){% endif %}{% endif %}
-    {% if var.type.kind == "enum" and var.type.rawTypeName.unwrappedTypeName == "String" %}@objc public dynamic var {{ var.name }}: {{var.type.rawTypeName}}{% if var.typeName.isOptional %}?{% else %} = {{var.type.rawTypeName}}(){% endif %}{% endif %}
+    {% if var.type.kind == "enum" and not var.type.hasAssociatedValues and ( var.type.rawTypeName|hasPrefix:"Int" or var.type.rawTypeName.unwrappedTypeName == "Float" or var.type.rawTypeName.unwrappedTypeName == "Double" ) %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<{{var.type.rawTypeName.unwrappedTypeName}}>(){% else %}@objc public dynamic var {{ var.name }}: {{var.type.rawTypeName}} = {{var.type.rawTypeName}}(){% endif %}{% endif %}
+    {% if var.type.kind == "enum" and not var.type.hasAssociatedValues and var.type.rawTypeName.unwrappedTypeName == "String" %}@objc public dynamic var {{ var.name }}: {{var.type.rawTypeName}}{% if var.typeName.isOptional %}?{% else %} = {{var.type.rawTypeName}}(){% endif %}{% endif %}
 {% endmacro %}
 
 // MARK: - AutoDatabaseMappable for classes, structs
@@ -63,3 +64,4 @@ extension {{ type.name }}: KeyPathConvertible {
     }
 }
 {% endfor %}
+

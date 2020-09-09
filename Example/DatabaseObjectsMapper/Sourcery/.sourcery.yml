@@ -1,5 +1,5 @@
 sources:
-  - ../../Pods/SourceryAdditions/SourceryAdditions/Classes/SourceryProtocols.swift
+  - ../../../../SourceryAdditions/SourceryAdditions/Classes/SourceryProtocols.swift
   - ../Models
 templates:
   - ../../../../SourceryAdditions/SourceryAdditions/Templates/AutoCodable.stencil

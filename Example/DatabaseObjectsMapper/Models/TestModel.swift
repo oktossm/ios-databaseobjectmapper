@@ -39,8 +39,9 @@ struct TestSomeModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLense
     let userAvatar: String
     let title: String?
     let count: Int
-    // sourcery: inverseRelation = owner
+    // sourcery: inverseRelation = owner, skipLens, skipObjectDiff
     let inverseModel = Relation<TestRRModel>(type: .inverse)
+    // sourcery: skipLens, skipObjectDiff
     let directModels = Relation<TestRRModel>(type: .direct)
 
 
@@ -87,6 +88,7 @@ struct TestRRModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses 
     let name: String
 
     let owner: TestSomeModel?
+    // sourcery: skipLens, skipDifference, skipUpdatesEquality
     let users = Relation<TestRRModel>(type: .direct)
 }
 
@@ -189,4 +191,15 @@ extension TestRRModel: UniquelyMappable {
 extension TestRNModel: UniquelyMappable {
     typealias Container = TestRNModelContainer
     static var idKey = \TestRNModel.id
+}
+
+// For date tests
+struct TestDateModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
+    let id: Int
+    let date: Date
+}
+
+extension TestDateModel: UniquelyMappable {
+    typealias Container = TestDateModelContainer
+    static var idKey = \TestDateModel.id
 }

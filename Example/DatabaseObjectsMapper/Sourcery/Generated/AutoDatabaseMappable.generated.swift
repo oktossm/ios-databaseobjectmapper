@@ -1,4 +1,4 @@
-// Generated using Sourcery 0.16.2 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.17.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 // MARK: - AutoDatabaseMappable
@@ -49,6 +49,29 @@ extension TestCollectionsModel: KeyPathConvertible {
         case \TestCollectionsModel.set: return "set"
         case \TestCollectionsModel.anotherSet: return "anotherSet"
         case \TestCollectionsModel.someEnum: return "someEnum"
+        default:
+            fatalError("Unhandled key path")
+        }
+    }
+}
+// MARK: - TestDateModel generated container
+internal class TestDateModelContainer: Object, DatabaseContainer {
+    public static var idKey: WritableKeyPath<TestDateModelContainer, Int> = \TestDateModelContainer.id
+    public override static func primaryKey() -> String? {
+        return "id"
+    }
+    public override class func indexedProperties() -> [String] {
+        return []
+    }
+    @objc public dynamic var id: Int = 0
+    @objc public dynamic var date: Double = 0
+}
+
+extension TestDateModel: KeyPathConvertible {
+    public static func key(for keyPath: PartialKeyPath<TestDateModel>) -> String {
+        switch keyPath {
+        case \TestDateModel.id: return "id"
+        case \TestDateModel.date: return "date"
         default:
             fatalError("Unhandled key path")
         }
@@ -180,3 +203,4 @@ extension TestSomeModel: KeyPathConvertible {
         }
     }
 }
+
