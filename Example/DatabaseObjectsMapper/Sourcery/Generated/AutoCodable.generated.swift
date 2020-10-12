@@ -1,4 +1,4 @@
-// Generated using Sourcery 0.16.2 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.17.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 // MARK: - AutoCodable
@@ -25,20 +25,20 @@ public typealias CodingContainerTransformer = DecodingContainerTransformer & Enc
 
 
 public extension KeyedDecodingContainer {
-    func decode<Transformer: DecodingContainerTransformer>(_ key: KeyedDecodingContainer.Key,
+    public func decode<Transformer: DecodingContainerTransformer>(_ key: KeyedDecodingContainer.Key,
                                                                   transformer: Transformer) throws -> Transformer.Output where Transformer.Input: Decodable {
         let decoded: Transformer.Input = try self.decode(key)
         return try transformer.transform(decoded)
     }
 
-    func decode<T>(_ key: KeyedDecodingContainer.Key) throws -> T where T: Decodable {
+    public func decode<T>(_ key: KeyedDecodingContainer.Key) throws -> T where T: Decodable {
         return try self.decode(T.self, forKey: key)
     }
 }
 
 
 public extension KeyedEncodingContainer {
-    mutating func encode<Transformer: EncodingContainerTransformer>(_ value: Transformer.Output,
+    public mutating func encode<Transformer: EncodingContainerTransformer>(_ value: Transformer.Output,
                                                                            forKey key: KeyedEncodingContainer.Key,
                                                                            transformer: Transformer) throws where Transformer.Input: Encodable {
         let transformed: Transformer.Input = try transformer.transform(value)

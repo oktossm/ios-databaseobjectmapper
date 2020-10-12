@@ -80,7 +80,7 @@ public protocol StringEquatableProperty: AnyEquatableProperty {
 extension String: StringEquatableProperty {
 }
 
-// String
+// Numeric
 public protocol NumericComparableProperty: AnyEquatableProperty, Comparable, CustomStringConvertible {
 }
 
