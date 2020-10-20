@@ -854,7 +854,8 @@ class CustomRealmContainerTests: XCTestCase {
                                              anotherDict: [codable: 2],
                                              set: [url],
                                              anotherSet: [codable],
-                                             someEnum: [.secondCase, .thirdCase])
+                                             someEnum: [.secondCase, .thirdCase],
+                                             someList: ["Test", "Test1"])
 
         service.save(model: testModel)
 
@@ -1004,13 +1005,15 @@ class CustomRealmContainerTests: XCTestCase {
                                              anotherDict: [codable: 2],
                                              set: [url],
                                              anotherSet: [codable],
-                                             someEnum: [.secondCase, .thirdCase])
+                                             someEnum: [.secondCase, .thirdCase],
+                                             someList: ["Test3", "Test4"])
 
         service.save(models: [testModel])
         let updates: [RootKeyPathUpdate<TestCollectionsModel>] = [\TestCollectionsModel.intValues <- [0, 5],
                                                                   \TestCollectionsModel.codable <- [newCodable, codable],
                                                                   \TestCollectionsModel.urls <- [url, url2],
-                                                                  \TestCollectionsModel.dict <- [2: newCodable]]
+                                                                  \TestCollectionsModel.dict <- [2: newCodable],
+                                                                  \TestCollectionsModel.someList <- ["Test1", "Test2"]]
 
         service.update(modelOf: TestCollectionsModel.self, with: testModel.id, updates: updates)
 
@@ -1023,6 +1026,7 @@ class CustomRealmContainerTests: XCTestCase {
             XCTAssertTrue(all.first?.codable == [newCodable, codable], "\(all)")
             XCTAssertTrue(all.first?.urls == [url, url2], "\(all)")
             XCTAssertTrue(all.first?.dict == [2: newCodable], "\(all)")
+            XCTAssertTrue(all.first?.someList == ["Test1", "Test2"], "\(all)")
 
             expectation.fulfill()
         }

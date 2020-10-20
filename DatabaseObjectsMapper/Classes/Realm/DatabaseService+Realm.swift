@@ -164,6 +164,9 @@ public extension DatabaseContainer where Self: Object {
                     guard let value = self[$0.name] else {
                         return nil
                     }
+                    if $0.isArray, let array = self[$0.name] as? RLMListBase, let arrayValue = array._rlmArray.value(forKey: "self") {
+                        return ($0.name, arrayValue)
+                    }
                     if $0.type == .data, let data = value as? Data {
                         if let archived: [String: Any] = Dictionary(archive: data) {
                             return ($0.name, archived)
@@ -194,6 +197,12 @@ public extension DatabaseContainer where Self: Object {
                     } else {
                         self[$0] = $1
                     }
+                } else if property.isArray,
+                          property.objectClassName == nil,
+                          let rlmArray = self[$0] as? RLMArray<NSObject>,
+                          let array = $1 as? NSArray {
+                    rlmArray.removeAllObjects()
+                    rlmArray.addObjects(array)
                 } else if let codable = $1 as? DictionaryCodable {
                     self[$0] = codable.encodedValue
                 } else {
