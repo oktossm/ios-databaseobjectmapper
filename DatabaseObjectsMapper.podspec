@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'DatabaseObjectsMapper'
-  s.version          = '0.3.1'
+  s.version          = '0.4'
   s.summary          = 'DatabaseObjectsMapper implementation.'
 
   s.description      = <<-DESC
@@ -32,6 +32,6 @@ DatabaseObjectsMapper implementation.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = 'CoreData'
-  s.dependency 'RealmSwift', '~> 10.0.0'
+  s.dependency 'RealmSwift', '~> 10.5'
   s.dependency 'DictionaryCoding', '~> 1.0'
 end
