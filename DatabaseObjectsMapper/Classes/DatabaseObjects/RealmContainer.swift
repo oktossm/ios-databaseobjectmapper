@@ -8,7 +8,7 @@ import RealmSwift
 
 /// A RealmContainer allows any Codable type to be persisted to a Realm.
 public final class RealmContainer: Object, DatabaseContainer {
-    public static var idKey: WritableKeyPath<RealmContainer, String> = \RealmContainer.id
+    public static var idKey: WritableKeyPath<RealmContainer, String> = \RealmContainer._id
 
     @objc dynamic var _value: Data? = nil
 
@@ -22,10 +22,10 @@ public final class RealmContainer: Object, DatabaseContainer {
     }
 
     /// The unique identifier for the data. This property is used as the primary key.
-    @objc public dynamic var id = ""
+    @objc public dynamic var _id = ""
 
     public override class func primaryKey() -> String? {
-        return "id"
+        return "_id"
     }
 
     public override class func indexedProperties() -> [String] {

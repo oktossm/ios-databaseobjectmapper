@@ -143,6 +143,8 @@ struct TestCollectionsModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, Au
     let set: Set<URL?>
     let anotherSet: Set<SomeCodable>?
     let someEnum: [SomeEnum]
+    // sourcery: list
+    let someList: [String]
 }
 
 extension TestPrimitivesModel: UniquelyMappable {

@@ -1,4 +1,4 @@
-// Generated using Sourcery 0.17.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 1.0.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 // MARK: - AutoDatabaseMappable
@@ -32,6 +32,7 @@ internal class TestCollectionsModelContainer: Object, DatabaseContainer {
     @objc public dynamic var set = Data()
     @objc public dynamic var anotherSet: Data?
     @objc public dynamic var someEnum = Data()
+    let someList = List<String>()
 }
 
 extension TestCollectionsModel: KeyPathConvertible {
@@ -49,6 +50,7 @@ extension TestCollectionsModel: KeyPathConvertible {
         case \TestCollectionsModel.set: return "set"
         case \TestCollectionsModel.anotherSet: return "anotherSet"
         case \TestCollectionsModel.someEnum: return "someEnum"
+        case \TestCollectionsModel.someList: return "someList"
         default:
             fatalError("Unhandled key path")
         }
