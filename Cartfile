@@ -1,2 +1,2 @@
-github "realm/realm-cocoa"
+github "olejnjak/realm-cocoa" "carthage_xcframeworks"
 github "elegantchaos/DictionaryCoding"
