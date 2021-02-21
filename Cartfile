@@ -1,2 +1,2 @@
-github "realm/realm-cocoa" "v10.5.1"
+github "realm/realm-cocoa"
 github "elegantchaos/DictionaryCoding"
