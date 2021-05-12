@@ -16,8 +16,10 @@ public final class Relation<Related: UniquelyMappable>: Codable {
     public enum Update {
         /// Sets already existing models to relation
         case set(keys: [Related.ID])
-        /// Sets already existing models to relation
+        /// Adds already existing models to relation
         case add(keys: [Related.ID])
+        /// Adds already existing models to relation and checks if they already added. Do not add object if it is already added.
+        case addUnique(keys: [Related.ID])
         /// Removes already existing models from relation
         case remove(keys: [Related.ID])
         /// Creates and sets new models to relation

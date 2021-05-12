@@ -1,2 +1,2 @@
-github "olejnjak/realm-cocoa" "carthage_xcframeworks"
+github "realm/realm-cocoa" "v10.7.5"
 github "oollow/DictionaryCoding" "feature/ow_customisations_2"

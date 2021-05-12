@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EF5053BE264BED7E006A1197 /* DictionaryCoding.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA4260B83AC00584C90 /* DictionaryCoding.xcframework */; };
+		EF5053BF264BED7E006A1197 /* DictionaryCoding.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA4260B83AC00584C90 /* DictionaryCoding.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EF5053C0264BED7E006A1197 /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA6260B83AD00584C90 /* Realm.xcframework */; };
+		EF5053C1264BED7E006A1197 /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA6260B83AD00584C90 /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EF5053C2264BED7E006A1197 /* RealmSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA5260B83AC00584C90 /* RealmSwift.xcframework */; };
+		EF5053C3264BED7E006A1197 /* RealmSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA5260B83AC00584C90 /* RealmSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EFA3233224FED8D60009F9D4 /* DatabaseObjectsMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = EFA3233024FED8D60009F9D4 /* DatabaseObjectsMapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EFA3236224FED9140009F9D4 /* KeyPathConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233824FED9140009F9D4 /* KeyPathConvertible.swift */; };
 		EFA3236324FED9140009F9D4 /* Property.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233924FED9140009F9D4 /* Property.swift */; };
@@ -51,10 +57,23 @@
 		EFB42EB924FE875B00AAC74E /* RealmRelationshipsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EB124FE875B00AAC74E /* RealmRelationshipsTests.swift */; };
 		EFB42EBA24FE875B00AAC74E /* CoreDataContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EB224FE875B00AAC74E /* CoreDataContainerTests.swift */; };
 		EFB42EBB24FE875B00AAC74E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EFB42EB324FE875B00AAC74E /* Info.plist */; };
-		EFD5DFA9260B83AD00584C90 /* RealmSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA5260B83AC00584C90 /* RealmSwift.xcframework */; };
-		EFD5DFAB260B83AD00584C90 /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA6260B83AD00584C90 /* Realm.xcframework */; };
-		EFD5DFB5260B83DE00584C90 /* DictionaryCoding.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA4260B83AC00584C90 /* DictionaryCoding.xcframework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		EF5053C4264BED7E006A1197 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				EF5053BF264BED7E006A1197 /* DictionaryCoding.xcframework in Embed Frameworks */,
+				EF5053C3264BED7E006A1197 /* RealmSwift.xcframework in Embed Frameworks */,
+				EF5053C1264BED7E006A1197 /* Realm.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		607FACE51AFB9204008FA782 /* DatabaseObjectsMapper_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DatabaseObjectsMapper_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -121,9 +140,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EFD5DFA9260B83AD00584C90 /* RealmSwift.xcframework in Frameworks */,
-				EFD5DFAB260B83AD00584C90 /* Realm.xcframework in Frameworks */,
-				EFD5DFB5260B83DE00584C90 /* DictionaryCoding.xcframework in Frameworks */,
+				EF5053BE264BED7E006A1197 /* DictionaryCoding.xcframework in Frameworks */,
+				EF5053C2264BED7E006A1197 /* RealmSwift.xcframework in Frameworks */,
+				EF5053C0264BED7E006A1197 /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,6 +350,7 @@
 				EFA3232A24FED8D60009F9D4 /* Sources */,
 				EFA3232B24FED8D60009F9D4 /* Frameworks */,
 				EFA3232C24FED8D60009F9D4 /* Resources */,
+				EF5053C4264BED7E006A1197 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -640,7 +660,6 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
@@ -653,7 +672,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = DatabaseObjectsMapper/Info.plist;
@@ -666,6 +685,11 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lz",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mmulyar.DatabaseObjectsMapper;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -682,7 +706,6 @@
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
@@ -694,7 +717,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = DatabaseObjectsMapper/Info.plist;
@@ -706,6 +729,11 @@
 					"@loader_path/Frameworks",
 				);
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lz",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mmulyar.DatabaseObjectsMapper;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

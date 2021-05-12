@@ -161,6 +161,11 @@ public struct RealmWriteTransaction {
         case .add(let keys):
             let objects = keys.compactMap { realm.object(ofType: R.Container.self, forPrimaryKey: R.idMapping($0)) }
             list.append(objectsIn: objects)
+        case .addUnique(let keys):
+            let objects = keys.compactMap { realm.object(ofType: R.Container.self, forPrimaryKey: R.idMapping($0)) }
+            for object in objects where list.index(of: object) == nil {
+                list.append(object)
+            }
         case .remove(let keys):
             let objects = keys.compactMap { realm.object(ofType: R.Container.self, forPrimaryKey: R.idMapping($0)) }
             objects.forEach { list.index(of: $0).flatMap { list.remove(at: $0) } }
