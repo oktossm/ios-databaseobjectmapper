@@ -8,11 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		EF5053BE264BED7E006A1197 /* DictionaryCoding.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA4260B83AC00584C90 /* DictionaryCoding.xcframework */; };
-		EF5053BF264BED7E006A1197 /* DictionaryCoding.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA4260B83AC00584C90 /* DictionaryCoding.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EF5053C0264BED7E006A1197 /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA6260B83AD00584C90 /* Realm.xcframework */; };
-		EF5053C1264BED7E006A1197 /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA6260B83AD00584C90 /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EF5053C2264BED7E006A1197 /* RealmSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA5260B83AC00584C90 /* RealmSwift.xcframework */; };
-		EF5053C3264BED7E006A1197 /* RealmSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA5260B83AC00584C90 /* RealmSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EFA3233224FED8D60009F9D4 /* DatabaseObjectsMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = EFA3233024FED8D60009F9D4 /* DatabaseObjectsMapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EFA3236224FED9140009F9D4 /* KeyPathConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233824FED9140009F9D4 /* KeyPathConvertible.swift */; };
 		EFA3236324FED9140009F9D4 /* Property.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3233924FED9140009F9D4 /* Property.swift */; };
@@ -58,22 +55,6 @@
 		EFB42EBA24FE875B00AAC74E /* CoreDataContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EB224FE875B00AAC74E /* CoreDataContainerTests.swift */; };
 		EFB42EBB24FE875B00AAC74E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EFB42EB324FE875B00AAC74E /* Info.plist */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		EF5053C4264BED7E006A1197 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				EF5053BF264BED7E006A1197 /* DictionaryCoding.xcframework in Embed Frameworks */,
-				EF5053C3264BED7E006A1197 /* RealmSwift.xcframework in Embed Frameworks */,
-				EF5053C1264BED7E006A1197 /* Realm.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		607FACE51AFB9204008FA782 /* DatabaseObjectsMapper_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DatabaseObjectsMapper_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -350,7 +331,6 @@
 				EFA3232A24FED8D60009F9D4 /* Sources */,
 				EFA3232B24FED8D60009F9D4 /* Frameworks */,
 				EFA3232C24FED8D60009F9D4 /* Resources */,
-				EF5053C4264BED7E006A1197 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
