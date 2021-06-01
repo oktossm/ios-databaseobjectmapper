@@ -24,6 +24,9 @@ open class RealmService {
     private var isBatchWriting = false
     private var batchBlocks = [RealmBlock]()
 
+    private let batchQueue = DispatchQueue(label: "mm.databaseService.writeQueue")
+    private let batchLock = NSLock()
+
     public init(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
         self.configuration = configuration
         self.writeWorker = DatabaseRealmBackgroundWorker(configuration: configuration, queue: DispatchQueue(label: "mm.databaseService.writeQueue"))
@@ -40,7 +43,9 @@ open class RealmService {
 
     func processRealmBlock(_ block: @escaping RealmBlock, sync: Bool = false) {
         if isBatchWriting {
-            self.batchBlocks.append(block)
+            batchQueue.sync {
+                self.batchBlocks.append(block)
+            }
         } else if sync {
             block(syncOperator())
         } else {
@@ -53,20 +58,26 @@ open class RealmService {
 extension RealmService {
     // MARK: Batch writes
     public func beginBatchWrites() {
-        self.isBatchWriting = true
+        batchLock.lock(before: Date(timeIntervalSinceNow: 1))
+        batchQueue.sync {
+            self.isBatchWriting = true
+        }
     }
 
     public func commitBatchWrites(sync: Bool = false) {
-        self.isBatchWriting = false
-        if sync {
-            let syncOperator = self.syncOperator()
-            syncOperator.beginWrite()
-            self.batchBlocks.forEach { $0(syncOperator) }
-            try? syncOperator.commitWrite()
-        } else {
-            self.writeWorker.execute(realmBlocks: self.batchBlocks)
+        batchQueue.sync {
+            self.isBatchWriting = false
+            if sync {
+                let syncOperator = self.syncOperator()
+                syncOperator.beginWrite()
+                self.batchBlocks.forEach { $0(syncOperator) }
+                try? syncOperator.commitWrite()
+            } else {
+                self.writeWorker.execute(realmBlocks: self.batchBlocks)
+            }
+            self.batchBlocks.removeAll()
         }
-        self.batchBlocks.removeAll()
+        batchLock.unlock()
     }
 
 
