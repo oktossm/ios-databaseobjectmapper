@@ -1,2 +1,2 @@
-github "realm/realm-cocoa" "v10.7.5"
+github "realm/realm-cocoa" "v10.12.0"
 github "oollow/DictionaryCoding" "feature/ow_customisations_2"

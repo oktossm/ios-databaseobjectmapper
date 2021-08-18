@@ -164,7 +164,7 @@ public extension DatabaseContainer where Self: Object {
                     guard let value = self[$0.name] else {
                         return nil
                     }
-                    if $0.isArray, let array = self[$0.name] as? RLMListBase, let arrayValue = array._rlmArray.value(forKey: "self") {
+                    if $0.isArray, let array = self[$0.name] as? RLMSwiftCollectionBase, let arrayValue = array._rlmCollection.value(forKey: "self") {
                         return ($0.name, arrayValue)
                     }
                     if $0.type == .data, let data = value as? Data {
