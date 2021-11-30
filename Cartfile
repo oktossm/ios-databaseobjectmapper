@@ -1,2 +1,2 @@
-github "realm/realm-cocoa" "v10.20.0"
+github "realm/realm-cocoa" "py/carthage_arm64"
 github "oollow/DictionaryCoding" "feature/ow_customisations_2"
