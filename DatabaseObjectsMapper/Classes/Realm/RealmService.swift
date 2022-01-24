@@ -13,9 +13,14 @@ public typealias AddableType = RealmSwift.AddableType
 
 open class RealmService {
 
-    private let writeWorker: DatabaseRealmBackgroundWorker
-    private let readWorkers: [DatabaseRealmBackgroundWorker]
     private let configuration: Realm.Configuration
+
+    private lazy var writeWorker = DatabaseRealmBackgroundWorker(configuration: configuration,
+                                                                 queue: DispatchQueue(label: "mm.databaseService.writeQueue"))
+    private lazy var readWorkers = (1...3).map {
+        _ in
+        DatabaseRealmBackgroundWorker(configuration: configuration, queue: DispatchQueue(label: "mm.databaseService.readQueue"))
+    }
 
     private var readWorker: DatabaseRealmBackgroundWorker {
         readWorkers.randomElement()!
@@ -25,15 +30,9 @@ open class RealmService {
     private var batchBlocks = [RealmBlock]()
 
     private let batchQueue = DispatchQueue(label: "mm.databaseService.writeQueue")
-    private let batchLock = NSLock()
 
     public init(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
         self.configuration = configuration
-        writeWorker = DatabaseRealmBackgroundWorker(configuration: configuration, queue: DispatchQueue(label: "mm.databaseService.writeQueue"))
-        readWorkers = (1...3).map {
-            _ in
-            DatabaseRealmBackgroundWorker(configuration: configuration, queue: DispatchQueue(label: "mm.databaseService.readQueue"))
-        }
     }
 
     func syncOperator() -> RealmOperator {
@@ -57,8 +56,15 @@ open class RealmService {
 
 extension RealmService {
     // MARK: Batch writes
-    public func beginBatchWrites() {
-        batchLock.lock(before: Date(timeIntervalSinceNow: 1))
+
+    public func startBatchService() -> RealmService {
+        let service = RealmService(configuration: configuration)
+        service.beginBatchWrites()
+
+        return service
+    }
+
+    private func beginBatchWrites() {
         batchQueue.sync {
             isBatchWriting = true
         }
@@ -77,7 +83,6 @@ extension RealmService {
             }
             batchBlocks.removeAll()
         }
-        batchLock.unlock()
     }
 
 
