@@ -30,7 +30,7 @@ extension DictionaryCodable {
 
 public extension DatabaseMappable {
     static func databaseType() -> Container.Type {
-        return Container.self
+        Container.self
     }
 }
 
@@ -39,9 +39,11 @@ extension CodingUserInfoKey {
     static let context: CodingUserInfoKey = CodingUserInfoKey(rawValue: "context")!
 }
 
+
 protocol DictionaryCodableCollection {
     var encodedCollectionValue: Any { get }
 }
+
 
 extension Collection where Element: Codable {
     var encodedCollectionValue: Any {
@@ -53,11 +55,19 @@ extension Collection where Element: Codable {
     }
 }
 
+
 extension Array: DictionaryCodable where Element: Codable {}
+
+
 extension Set: DictionaryCodable where Element: Codable {}
+
+
 extension Dictionary: DictionaryCodable where Key: Codable, Value: Codable {}
 
+
 extension Array: DictionaryCodableCollection where Element: Codable {}
+
+
 extension Set: DictionaryCodableCollection where Element: Codable {}
 
 

@@ -1,5 +1,6 @@
 import Foundation
 
+
 private class _AnyPredicateBase<PredicateModelType: KeyPathConvertible>: Predicate {
     typealias ModelType = PredicateModelType
 
@@ -12,6 +13,7 @@ private class _AnyPredicateBase<PredicateModelType: KeyPathConvertible>: Predica
     var predicate: NSPredicate { fatalError("Must override") }
 }
 
+
 private final class _AnyPredicateBox<Concrete: Predicate>: _AnyPredicateBase<Concrete.ModelType> {
     var concrete: Concrete
     typealias ModelType = Concrete.ModelType
@@ -23,16 +25,18 @@ private final class _AnyPredicateBox<Concrete: Predicate>: _AnyPredicateBase<Con
     override var predicate: NSPredicate { concrete.predicate }
 }
 
+
 public struct AnyPredicate<PredicateModelType: KeyPathConvertible>: Predicate {
     public typealias ModelType = PredicateModelType
     private let box: _AnyPredicateBase<ModelType>
 
     public init<Concrete: Predicate>(_ concrete: Concrete) where Concrete.ModelType == PredicateModelType {
-        self.box = _AnyPredicateBox(concrete)
+        box = _AnyPredicateBox(concrete)
     }
 
     public var predicate: NSPredicate { box.predicate }
 }
+
 
 extension Predicate {
     public var anyPredicate: AnyPredicate<ModelType> { AnyPredicate(self) }

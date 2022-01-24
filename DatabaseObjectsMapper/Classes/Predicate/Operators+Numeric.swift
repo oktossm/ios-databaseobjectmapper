@@ -1,5 +1,6 @@
 import Foundation
 
+
 public enum NumericPredicateRightHandExpression<T: NumericComparableProperty> {
     /**
      Right hand collection contains `Property value`
@@ -12,24 +13,23 @@ public enum NumericPredicateRightHandExpression<T: NumericComparableProperty> {
     case betweenValues(T, T)
 }
 
+
 /**
  Utils for numeric range queries
  */
-public func ~<Model: KeyPathConvertible, Property: NumericComparableProperty>(
-    lhs: KeyPath<Model, Property>,
-    rhs: NumericPredicateRightHandExpression<Property>
-) -> AnyPredicate<Model> {
+public func ~<Model: KeyPathConvertible, Property: NumericComparableProperty>
+    (lhs: KeyPath<Model, Property>, rhs: NumericPredicateRightHandExpression<Property>) -> AnyPredicate<Model> {
 
     switch rhs {
 
     case .in(let possibleValues):
         let inValues = possibleValues.lazy
-            .map {
-                $0.description
-                    .replacingOccurrences(of: "\\", with: "\\\\") // replace \ -> \\
-                    .replacingOccurrences(of: "'", with: "\'") // escape ' -> \'
-            }
-            .joined(separator: ", ")
+                                     .map {
+                                         $0.description
+                                           .replacingOccurrences(of: "\\", with: "\\\\") // replace \ -> \\
+                                           .replacingOccurrences(of: "'", with: "\'") // escape ' -> \'
+                                     }
+                                     .joined(separator: ", ")
 
 
         return BasicPredicate<Model>(
@@ -39,7 +39,7 @@ public func ~<Model: KeyPathConvertible, Property: NumericComparableProperty>(
 
             ]
         )
-            .anyPredicate
+                .anyPredicate
     case .between(let range):
         return BasicPredicate<Model>(
             format: "%K BETWEEN {%@,%@}",
@@ -49,12 +49,12 @@ public func ~<Model: KeyPathConvertible, Property: NumericComparableProperty>(
                 range.upperBound
             ]
         )
-            .anyPredicate
+                .anyPredicate
     case .betweenValues(let startInclusive, let endInclusive):
         return BasicPredicate<Model>(
             format: "%K BETWEEN {%@,%@}",
             arguments: [Model.key(for: lhs), startInclusive, endInclusive]
         )
-            .anyPredicate
+                .anyPredicate
     }
 }

@@ -9,7 +9,7 @@ import Realm
 
 
 extension AnyRealmCollection {
-    func sort(_ sort: DatabaseSortType) -> AnyRealmCollection<Element> {
+    func sort(_ sort: DatabaseSortType) -> AnyRealmCollection<Element> where Element: KeypathSortable {
         switch sort {
         case .unsorted: return self
         case .byKeyPath(let path, let ascending): return AnyRealmCollection(self.sorted(byKeyPath: path, ascending: ascending))
@@ -291,7 +291,7 @@ class RealmOperator: NSObject {
     /// - parameter keyPath: KeyPath for relation.
     /// - returns: A `QPResults` containing all the values.
     func relationValues<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T)
-            -> AnyRealmCollection<R.Container>? where T.Container: Object, R.Container: Object {
+        -> AnyRealmCollection<R.Container>? where T.Container: Object, R.Container: Object {
         guard let key = Mirror(reflecting: model).children.first(where: { relation === (unwrapUsingProtocol($0.value) as AnyObject) })?.label,
               let object = realm.object(ofType: T.Container.self, forPrimaryKey: model.objectKeyValue) else { return nil }
         switch relation.type {

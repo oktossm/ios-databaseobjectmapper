@@ -12,7 +12,7 @@ public protocol KeyPathConvertible {
 
 public class RootKeyPathUpdate<Root: KeyPathConvertible> {
     var update: (String, Any) {
-        return ("", NSNull())
+        ("", NSNull())
     }
 }
 
@@ -27,6 +27,6 @@ public class KeyPathUpdate<Root: KeyPathConvertible, Value>: RootKeyPathUpdate<R
     }
 
     override var update: (String, Any) {
-        return (Root.key(for: keyPath), value)
+        (Root.key(for: keyPath), value)
     }
 }

@@ -8,7 +8,7 @@ import Foundation
 
 extension Dictionary where Key == String, Value == Any {
     var archived: Data {
-        return (try? PropertyListSerialization.data(fromPropertyList: self, format: .binary, options: 0)) ?? Data()
+        (try? PropertyListSerialization.data(fromPropertyList: self, format: .binary, options: 0)) ?? Data()
     }
 
     init?(archive: Data) {
@@ -17,9 +17,10 @@ extension Dictionary where Key == String, Value == Any {
     }
 }
 
+
 extension Array where Element == Any {
     var archived: Data {
-        return (try? PropertyListSerialization.data(fromPropertyList: self, format: .binary, options: 0)) ?? Data()
+        (try? PropertyListSerialization.data(fromPropertyList: self, format: .binary, options: 0)) ?? Data()
     }
 
     init?(archive: Data) {

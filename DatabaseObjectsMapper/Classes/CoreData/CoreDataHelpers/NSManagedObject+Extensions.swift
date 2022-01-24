@@ -18,10 +18,11 @@ extension NSManagedObject {
 
 extension NSManagedObject {
     public func changedValue(forKey key: String) -> Any? {
-        return changedValues()[key]
+        changedValues()[key]
     }
+
     public func committedValue(forKey key: String) -> Any? {
-        return committedValues(forKeys: [key])[key]
+        committedValues(forKeys: [key])[key]
     }
 }
 

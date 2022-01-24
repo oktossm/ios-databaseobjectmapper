@@ -9,7 +9,7 @@ import Realm
 
 public extension DatabaseMappable where Container: Object {
     func container(with userInfo: Any?) throws -> Container {
-        return try self.realmObject(with: userInfo)
+        try realmObject(with: userInfo)
     }
 
     func realmObject(with userInfo: Any?) throws -> Container {
@@ -22,12 +22,12 @@ public extension DatabaseMappable where Container: Object {
 
 public extension DatabaseMappable where Container: Object & SharedDatabaseContainer {
     func container(with userInfo: Any?) throws -> Container {
-        return try self.realmObject(with: userInfo)
+        try realmObject(with: userInfo)
     }
 
     func containerSkippingRelation(with userInfo: Any?) throws -> Container {
         let object = Container()
-        self.updateSkippingRelations(object, updates: encodedValue)
+        updateSkippingRelations(object, updates: encodedValue)
         return object
     }
 
@@ -45,7 +45,7 @@ public extension DatabaseMappable where Container: Object & SharedDatabaseContai
     }
 
     static func internalPredicate() -> NSPredicate? {
-        return NSPredicate(format: "typeName == %@", argumentArray: [Self.typeName])
+        NSPredicate(format: "typeName == %@", argumentArray: [Self.typeName])
     }
 }
 
@@ -58,7 +58,7 @@ public extension UniquelyMappable where Container: Object {
 
     func containerSkippingRelation(with userInfo: Any?) throws -> Container {
         let object = Container()
-        self.updateSkippingRelations(object, updates: encodedValue)
+        updateSkippingRelations(object, updates: encodedValue)
         return object
     }
 
@@ -146,36 +146,38 @@ public extension DatabaseContainer where Self: Object {
     var propertiesValue: [String: Any] {
         let properties = objectSchema.properties
         let encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
-            .filter { $0.objectClassName == nil }
-            .compactMap {
-                guard let value = self[$0.name] else {
-                    return nil
-                }
-                return ($0.name, value)
-            })
+                .filter { $0.objectClassName == nil }
+                .compactMap {
+                    guard let value = self[$0.name] else {
+                        return nil
+                    }
+                    return ($0.name, value)
+                })
         return encoded
     }
     var encodedValue: [String: Any] {
         get {
             let properties = objectSchema.properties
             var encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
-                .filter { $0.objectClassName == nil }
-                .compactMap {
-                    guard let value = self[$0.name] else {
-                        return nil
-                    }
-                    if $0.isArray, let array = self[$0.name] as? RLMSwiftCollectionBase, let arrayValue = array._rlmCollection.value(forKey: "self") {
-                        return ($0.name, arrayValue)
-                    }
-                    if $0.type == .data, let data = value as? Data {
-                        if let archived: [String: Any] = Dictionary(archive: data) {
-                            return ($0.name, archived)
-                        } else if let archived: [Any] = Array(archive: data) {
-                            return ($0.name, archived)
+                    .filter { $0.objectClassName == nil }
+                    .compactMap {
+                        guard let value = self[$0.name] else {
+                            return nil
                         }
-                    }
-                    return ($0.name, value)
-                })
+                        if $0.isArray,
+                           let array = self[$0.name] as? RLMSwiftCollectionBase,
+                           let arrayValue = array._rlmCollection.value(forKey: "self") {
+                            return ($0.name, arrayValue)
+                        }
+                        if $0.type == .data, let data = value as? Data {
+                            if let archived: [String: Any] = Dictionary(archive: data) {
+                                return ($0.name, archived)
+                            } else if let archived: [Any] = Array(archive: data) {
+                                return ($0.name, archived)
+                            }
+                        }
+                        return ($0.name, value)
+                    })
             properties.filter { $0.objectClassName != nil && !$0.isArray && $0.type != .linkingObjects }.forEach {
                 if let object = self[$0.name] as? AnyDatabaseContainer {
                     encoded[$0.name] = object.encodedValue

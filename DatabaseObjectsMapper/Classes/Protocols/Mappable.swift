@@ -44,15 +44,15 @@ public extension DatabaseMappable {
     }
 
     static func internalPredicate() -> NSPredicate? {
-        return nil
+        nil
     }
 
     static var typeName: String {
-        return String(describing: Self.self)
+        String(describing: Self.self)
     }
 
     static var databaseTypeName: String {
-        return String(describing: Self.Container.self)
+        String(describing: Self.Container.self)
     }
 }
 
@@ -67,11 +67,11 @@ public protocol UniquelyMappable: DatabaseMappable, Identifiable {
 
 public extension UniquelyMappable {
     var idValue: ID {
-        return self[keyPath: Self.idKey]
+        self[keyPath: Self.idKey]
     }
 
     var objectKeyValue: Container.ID {
-        return Self.idMapping(idValue)
+        Self.idMapping(idValue)
     }
 
     static func idMapping(_ id: ID) -> Container.ID {
@@ -88,7 +88,7 @@ public extension UniquelyMappable {
 
 public extension UniquelyMappable where Container.ID == String, Container: SharedDatabaseContainer {
     static func idMapping(_ id: ID) -> Container.ID {
-        return Self.typeName + "_" + String(id)
+        Self.typeName + "_" + String(id)
     }
 }
 
@@ -103,7 +103,7 @@ public protocol AnyDatabaseMappable {
 
 public extension DatabaseMappable {
     func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
-        return nil
+        nil
     }
 
     func container(with userInfo: Any?) throws -> AnyDatabaseContainer {
@@ -113,6 +113,6 @@ public extension DatabaseMappable {
 
     func update(_ container: AnyDatabaseContainer) {
         guard let container = container as? Container else { fatalError("Wrong container type") }
-        self.update(container)
+        update(container)
     }
 }

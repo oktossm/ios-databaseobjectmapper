@@ -22,7 +22,7 @@ public struct BasicPredicate<Model: KeyPathConvertible>: Predicate {
     let arguments: [Any]
 
     public var predicate: NSPredicate {
-        return NSPredicate(format: format, argumentArray: arguments)
+        NSPredicate(format: format, argumentArray: arguments)
     }
 }
 
@@ -34,7 +34,7 @@ public struct AndPredicate<Model: KeyPathConvertible>: Predicate {
     let right: AnyPredicate<Model>
 
     public var predicate: NSPredicate {
-        return NSCompoundPredicate(type: .and, subpredicates: [left.predicate, right.predicate])
+        NSCompoundPredicate(type: .and, subpredicates: [left.predicate, right.predicate])
     }
 }
 
@@ -57,6 +57,6 @@ public struct NotPredicate<Model: KeyPathConvertible>: Predicate {
     let original: AnyPredicate<Model>
 
     public var predicate: NSPredicate {
-        return NSCompoundPredicate(notPredicateWithSubpredicate: original.predicate)
+        NSCompoundPredicate(notPredicateWithSubpredicate: original.predicate)
     }
 }

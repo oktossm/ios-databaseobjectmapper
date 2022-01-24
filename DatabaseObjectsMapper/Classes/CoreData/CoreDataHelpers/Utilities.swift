@@ -11,7 +11,7 @@ import Foundation
 
 extension Sequence where Self.Element: AnyObject {
     public func containsObjectIdentical(to object: AnyObject) -> Bool {
-        return contains { $0 === object }
+        contains { $0 === object }
     }
 }
 

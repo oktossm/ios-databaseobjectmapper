@@ -68,12 +68,12 @@ public class DatabaseUpdatesToken {
     /// Updates limit. Setting limit will call updates block with all values including new.
     public var limit: Int? {
         get {
-            return limitValue
+            limitValue
         }
         set {
             guard !isInvalidated else { return }
             limitation?(limitValue, newValue)
-            limitQueue.sync { self.limitValue = newValue }
+            limitQueue.sync { limitValue = newValue }
         }
     }
 
@@ -91,8 +91,8 @@ public class DatabaseUpdatesToken {
 
     /// Invalidates token. Updates will no longer be listened.
     public func invalidate() {
-        self.isInvalidated = true
-        self.invalidation?()
+        isInvalidated = true
+        invalidation?()
     }
 
     /// Loads next page. Updates limit according to load count. Will call next block with only new values fetched. Current limit must be non nil
@@ -284,14 +284,14 @@ public protocol DatabaseServiceProtocol {
     func fetchRelation<T: UniquelyMappable,
                       R: UniquelyMappable,
                       P: Predicate>
-            (_ relation: Relation<R>,
-             in model: T,
-             predicate: P,
-             sorted sort: [SortDescriptor<R>],
-             limit: Int?,
-             callback: @escaping ([R]) -> Void,
-             next: (([R], Bool) -> Void)?,
-             updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
+        (_ relation: Relation<R>,
+         in model: T,
+         predicate: P,
+         sorted sort: [SortDescriptor<R>],
+         limit: Int?,
+         callback: @escaping ([R]) -> Void,
+         next: (([R], Bool) -> Void)?,
+         updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken
 
     func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                  in model: T,

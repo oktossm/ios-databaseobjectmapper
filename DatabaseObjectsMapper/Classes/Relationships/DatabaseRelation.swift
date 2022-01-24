@@ -40,6 +40,6 @@ public final class Relation<Related: UniquelyMappable>: Codable {
 
 extension Relation: Equatable {
     public static func ==(lhs: Relation<Related>, rhs: Relation<Related>) -> Bool {
-        return lhs.type == rhs.type
+        lhs.type == rhs.type
     }
 }

@@ -50,7 +50,6 @@ internal enum FetchRequestChange<T> {
         default: return false
         }
     }
-
 }
 
 
@@ -59,7 +58,7 @@ internal class FetchRequestObserver<T: NSManagedObject>: NSObject, NSFetchedResu
     // MARK: - Attributes
     internal var fetchRequest: NSFetchRequest<T> {
         didSet {
-            _ = try? self.fetchedResultsController.performFetch()
+            _ = try? fetchedResultsController.performFetch()
         }
     }
     internal var observer: ((DatabaseObserveUpdate<T>) -> Void)?
@@ -70,17 +69,17 @@ internal class FetchRequestObserver<T: NSManagedObject>: NSObject, NSFetchedResu
     // MARK: - Init
     internal init(fetchRequest: NSFetchRequest<T>, context: NSManagedObjectContext) {
         self.fetchRequest = fetchRequest
-        self.fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-                                                                   managedObjectContext: context,
-                                                                   sectionNameKeyPath: nil,
-                                                                   cacheName: nil)
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
+                                                              managedObjectContext: context,
+                                                              sectionNameKeyPath: nil,
+                                                              cacheName: nil)
 
         super.init()
 
-        self.fetchedResultsController.delegate = self
+        fetchedResultsController.delegate = self
 
         do {
-            try self.fetchedResultsController.performFetch()
+            try fetchedResultsController.performFetch()
         } catch let error as NSError {
             CoreDataStorage.printError("Failed to fetch objects: \(error.userInfo)")
         }
@@ -89,7 +88,7 @@ internal class FetchRequestObserver<T: NSManagedObject>: NSObject, NSFetchedResu
     // MARK: - Dispose Method
 
     func dispose() {
-        self.fetchedResultsController.delegate = nil
+        fetchedResultsController.delegate = nil
     }
 
 
@@ -109,26 +108,26 @@ internal class FetchRequestObserver<T: NSManagedObject>: NSObject, NSFetchedResu
 
         switch type {
         case .delete:
-            self.batchChanges.append(.delete(index!, anObject as! T))
+            batchChanges.append(.delete(index!, anObject as! T))
         case .insert:
-            self.batchChanges.append(.insert(newIndex!, anObject as! T))
+            batchChanges.append(.insert(newIndex!, anObject as! T))
         case .update:
-            self.batchChanges.append(.update(index!, anObject as! T))
+            batchChanges.append(.update(index!, anObject as! T))
         default: break
         }
     }
 
     public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.batchChanges = []
+        batchChanges = []
     }
 
     public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        let deleted = self.batchChanges.filter { $0.isDeletion }.map { $0.index() }
-        let inserted = self.batchChanges.filter { $0.isInsertion }.map { $0.index() }
-        let updated = self.batchChanges.filter { $0.isUpdate }.map { $0.index() }
-        self.observer?(DatabaseObserveUpdate(values: self.fetchedResultsController.fetchedObjects ?? [T](),
-                                             deletions: deleted,
-                                             insertions: inserted,
-                                             modifications: updated))
+        let deleted = batchChanges.filter { $0.isDeletion }.map { $0.index() }
+        let inserted = batchChanges.filter { $0.isInsertion }.map { $0.index() }
+        let updated = batchChanges.filter { $0.isUpdate }.map { $0.index() }
+        observer?(DatabaseObserveUpdate(values: fetchedResultsController.fetchedObjects ?? [T](),
+                                        deletions: deleted,
+                                        insertions: inserted,
+                                        modifications: updated))
     }
 }

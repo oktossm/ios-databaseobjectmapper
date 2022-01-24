@@ -16,11 +16,10 @@ internal class DatabaseWorker: NSObject {
     }
 
     internal func start(_ block: @escaping () -> Void) {
-        self.execute(block: block)
+        execute(block: block)
     }
 
     internal func stop() {
-
     }
 }
 

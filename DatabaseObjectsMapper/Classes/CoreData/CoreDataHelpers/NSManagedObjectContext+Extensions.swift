@@ -116,6 +116,9 @@ extension NSManagedObjectContext {
     ///
     /// - Parameters:
     ///   - predicate: NSPredicate for search
+    ///   - sortDescriptors:
+    ///   - fetchLimit:
+    ///   - fetchOffset:
     /// - Returns: array of NSManagedObject's subclass instances
     public func findAll<A: NSManagedObject>(with predicate: NSPredicate? = nil,
                                             sortDescriptors: [NSSortDescriptor]? = nil,
@@ -129,7 +132,6 @@ extension NSManagedObjectContext {
                 request.fetchLimit = fetchLimit
                 request.fetchOffset = fetchLimit
             }
-
         } catch {
             CoreDataStorage.printError("Failed to fetch request of \(A.entityName), error: \(error.localizedDescription)")
             return []
@@ -139,6 +141,7 @@ extension NSManagedObjectContext {
     /// Find all objects
     ///
     /// - Parameters:
+    ///   - predicate:
     ///   - sortedBy: column name to sort by
     ///   - ascending: direction to sort by
     /// - Returns: array of NSManagedObject's subclass instances
@@ -153,6 +156,7 @@ extension NSManagedObjectContext {
     ///
     /// - Parameters:
     ///   - entity: NSManagedObject entity for detect type
+    ///   - predicate:
     public func deleteAll<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate? = nil) {
         do {
             try entity.delete(in: self) {
@@ -162,7 +166,6 @@ extension NSManagedObjectContext {
         } catch {
             CoreDataStorage.printError("Failed to delete entities of \(T.entityName), error: \(error.localizedDescription)")
         }
-
     }
 
     public func deleteAllEntities() {
@@ -176,7 +179,7 @@ extension NSManagedObjectContext {
                 batchRequest.resultType = .resultTypeStatusOnly
 
                 do {
-                    try self.execute(batchRequest)
+                    try execute(batchRequest)
                 } catch {
                     CoreDataStorage.printError("Failed to delete entities of \(name), error: \(error.localizedDescription)")
                     return
@@ -207,7 +210,6 @@ extension NSManagedObjectContext {
             _ = self.saveOrRollback()
         }
     }
-
 }
 
 
@@ -233,8 +235,7 @@ extension NSManagedObjectContext {
     /// Find first object
     ///
     /// - Parameters:
-    ///   - entity: NSManagedObject entity for detect type
-    ///   - primaryKey: key to find object
+    ///   - key: key to find object
     /// - Returns: object or nil
     func findFirst<A: DatabaseContainer>(with key: A.ID) -> A? where A: NSManagedObject {
         guard let keyPath = A.idKey._kvcKeyPathString else { return nil }

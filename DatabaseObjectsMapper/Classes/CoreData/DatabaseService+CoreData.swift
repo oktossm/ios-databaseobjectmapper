@@ -8,7 +8,7 @@ import CoreData
 
 public extension DatabaseMappable where Container: NSManagedObject {
     func container(with userInfo: Any?) throws -> Container {
-        return try self.managedObject(with: userInfo)
+        try managedObject(with: userInfo)
     }
 
     func managedObject(with userInfo: Any?) throws -> Container {
@@ -25,7 +25,7 @@ public extension DatabaseMappable where Container: NSManagedObject {
 
 public extension DatabaseMappable where Container: NSManagedObject & SharedDatabaseContainer {
     func container(with userInfo: Any?) throws -> Container {
-        return try self.managedObject(with: userInfo)
+        try managedObject(with: userInfo)
     }
 
     func update(_ container: Container, updates: [String: Any]) {
@@ -35,7 +35,7 @@ public extension DatabaseMappable where Container: NSManagedObject & SharedDatab
     }
 
     static func internalPredicate() -> NSPredicate? {
-        return NSPredicate(format: "typeName == %@", argumentArray: [Self.typeName])
+        NSPredicate(format: "typeName == %@", argumentArray: [Self.typeName])
     }
 }
 
@@ -43,10 +43,10 @@ public extension DatabaseMappable where Container: NSManagedObject & SharedDatab
 public extension UniquelyMappable where Container: NSManagedObject {
     func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
         guard let context = userInfo as? NSManagedObjectContext else { return nil }
-        let container: Container? = context.findFirst(with: self.objectKeyValue)
+        let container: Container? = context.findFirst(with: objectKeyValue)
         return container
     }
-    
+
     func update(_ container: Container, updates: [String: Any]) {
         defaultUpdate(container, updates: updates)
         updateId(for: container)

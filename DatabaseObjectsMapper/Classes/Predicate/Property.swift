@@ -72,6 +72,7 @@ extension Data: AnyEquatableProperty {
 extension NSData: AnyEquatableProperty {
 }
 
+
 // String
 public protocol StringEquatableProperty: AnyEquatableProperty {
 }
@@ -80,9 +81,11 @@ public protocol StringEquatableProperty: AnyEquatableProperty {
 extension String: StringEquatableProperty {
 }
 
+
 // Numeric
 public protocol NumericComparableProperty: AnyEquatableProperty, Comparable, CustomStringConvertible {
 }
+
 
 extension Int: NumericComparableProperty {
 }
