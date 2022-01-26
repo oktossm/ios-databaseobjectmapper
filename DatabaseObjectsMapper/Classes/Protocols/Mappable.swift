@@ -40,7 +40,7 @@ public extension DatabaseMappable {
     }
 
     func update(_ container: Container) {
-        self.update(container, updates: encodedValue)
+        update(container, updates: encodedValue)
     }
 
     static func internalPredicate() -> NSPredicate? {

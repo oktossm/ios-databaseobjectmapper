@@ -11,6 +11,11 @@ public typealias MinMaxType = RealmSwift.MinMaxType
 public typealias AddableType = RealmSwift.AddableType
 
 
+public extension DatabaseMappable {
+    typealias Query = (RealmSwift.Query<Container>) -> RealmSwift.Query<Bool>
+}
+
+
 open class RealmService {
 
     private let configuration: Realm.Configuration
@@ -270,7 +275,7 @@ extension RealmService {
 
     public func count<T: DatabaseMappable>
         (for model: T.Type,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<T.Container> = .unfiltered,
          callback: @escaping (Int) -> Void) where T.Container: RealmObject {
 
         readWorker.execute {
@@ -283,7 +288,7 @@ extension RealmService {
     }
 
     public func min<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R>,
          callback: @escaping (R?) -> Void) where T.Container: RealmObject, R.PersistedType: MinMaxType {
 
@@ -297,7 +302,7 @@ extension RealmService {
     }
 
     public func max<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R>,
          callback: @escaping (R?) -> Void) where T.Container: RealmObject, R.PersistedType: MinMaxType {
 
@@ -311,7 +316,7 @@ extension RealmService {
     }
 
     public func sum<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R>,
          callback: @escaping (R) -> Void) where T.Container: RealmObject, R.PersistedType: AddableType {
 
@@ -325,7 +330,7 @@ extension RealmService {
     }
 
     public func average<T: DatabaseMappable & KeyPathConvertible, R: AddableType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R>,
          callback: @escaping (Double?) -> Void)
         where T.Container: RealmObject {
@@ -340,35 +345,35 @@ extension RealmService {
     }
 
     public func countSync<T: DatabaseMappable>(for model: T.Type,
-                                               with filter: DatabaseFilterType = .unfiltered) -> Int where T.Container: RealmObject {
+                                               with filter: DatabaseFilterType<T.Container> = .unfiltered) -> Int where T.Container: RealmObject {
         syncOperator().values(ofType: T.self).filter(filter).count
     }
 
-    public func minSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>(with filter: DatabaseFilterType = .unfiltered,
+    public func minSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                                                                         for keyPath: KeyPath<T, R>) -> R?
         where T.Container: RealmObject, R.PersistedType: MinMaxType {
         syncOperator().values(ofType: T.self).filter(filter).min(ofProperty: T.key(for: keyPath))
     }
 
-    public func maxSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>(with filter: DatabaseFilterType = .unfiltered,
+    public func maxSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                                                                         for keyPath: KeyPath<T, R>) -> R?
         where T.Container: RealmObject, R.PersistedType: MinMaxType {
         syncOperator().values(ofType: T.self).filter(filter).max(ofProperty: T.key(for: keyPath))
     }
 
-    public func sumSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>(with filter: DatabaseFilterType = .unfiltered,
+    public func sumSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                                                                         for keyPath: KeyPath<T, R>) -> R
         where T.Container: RealmObject, R.PersistedType: AddableType {
         syncOperator().values(ofType: T.self).filter(filter).sum(ofProperty: T.key(for: keyPath))
     }
 
-    public func averageSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>(with filter: DatabaseFilterType = .unfiltered,
+    public func averageSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                                                                             for keyPath: KeyPath<T, R>) -> Double?
         where T.Container: RealmObject, R.PersistedType: AddableType {
         syncOperator().values(ofType: T.self).filter(filter).average(ofProperty: T.key(for: keyPath))
     }
 
-    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                            sorted sort: DatabaseSortType = .unsorted,
                                            limit: Int? = nil,
                                            callback: @escaping ([T]) -> Void) where T.Container: RealmObject {
@@ -384,7 +389,7 @@ extension RealmService {
         }
     }
 
-    public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+    public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                                sorted sort: DatabaseSortType = .unsorted,
                                                limit: Int? = nil) -> [T] where T.Container: RealmObject {
         let values = syncOperator().values(ofType: T.self).filter(filter).sort(sort).limited(limit).compactMap({
@@ -394,7 +399,7 @@ extension RealmService {
     }
 
     public func fetch<T: DatabaseMappable>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          sorted sort: DatabaseSortType = .unsorted,
          limit: Int? = nil,
          callback: @escaping ([T]) -> Void,
@@ -523,7 +528,7 @@ extension RealmService {
     public func count<T: UniquelyMappable, R: UniquelyMappable>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          callback: @escaping (Int) -> Void) where T.Container: RealmObject, R.Container: RealmObject {
 
         readWorker.execute {
@@ -538,7 +543,7 @@ extension RealmService {
     public func min<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V>,
          callback: @escaping (V?) -> Void) where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
 
@@ -554,7 +559,7 @@ extension RealmService {
     public func max<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V>,
          callback: @escaping (V?) -> Void) where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
 
@@ -570,7 +575,7 @@ extension RealmService {
     public func sum<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V>,
          callback: @escaping (V?) -> Void) where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
 
@@ -586,7 +591,7 @@ extension RealmService {
     public func average<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V>,
          callback: @escaping (Double?) -> Void) where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
 
@@ -602,7 +607,7 @@ extension RealmService {
     public func countSync<T: UniquelyMappable, R: UniquelyMappable>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered) -> Int where T.Container: RealmObject, R.Container: RealmObject {
+         with filter: DatabaseFilterType<R.Container> = .unfiltered) -> Int where T.Container: RealmObject, R.Container: RealmObject {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).count ?? 0
     }
@@ -610,7 +615,7 @@ extension RealmService {
     public func minSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V>) -> V? where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).min(ofProperty: R.key(for: keyPath))
@@ -619,7 +624,7 @@ extension RealmService {
     public func maxSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V>) -> V? where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).max(ofProperty: R.key(for: keyPath))
@@ -628,7 +633,7 @@ extension RealmService {
     public func sumSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V>) -> V? where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).sum(ofProperty: R.key(for: keyPath))
@@ -637,7 +642,7 @@ extension RealmService {
     public func averageSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V>) -> Double? where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).average(ofProperty: R.key(for: keyPath))
@@ -646,7 +651,7 @@ extension RealmService {
     public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          sorted sort: DatabaseSortType = .unsorted,
          limit: Int? = nil,
          callback: @escaping ([R]) -> Void) where T.Container: Object, R.Container: Object {
@@ -674,7 +679,7 @@ extension RealmService {
     public func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          sorted sort: DatabaseSortType = .unsorted,
          limit: Int? = nil) -> [R] where T.Container: Object, R.Container: Object {
 
@@ -693,7 +698,7 @@ extension RealmService {
     public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          sorted sort: DatabaseSortType = .unsorted,
          limit: Int? = nil,
          callback: @escaping ([R]) -> Void,
@@ -790,14 +795,13 @@ extension RealmService {
     }
 
     // MARK: Type safe Fetching
-
-    public func fetch<T: DatabaseMappable, P: Predicate>
-        (_ predicate: P,
+    public func fetch<T: DatabaseMappable>
+        (_ query: @escaping T.Query,
          sorted sort: [SortDescriptor<T>] = [],
          limit: Int? = nil,
-         callback: @escaping ([T]) -> Void) where T.Container: RealmObject, P.ModelType == T {
+         callback: @escaping ([T]) -> Void) where T.Container: RealmObject {
 
-        fetch(with: .predicate(predicate: predicate.predicate),
+        fetch(with: .safeQuery(query: query),
               sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
               limit: limit,
               callback: callback)
@@ -814,12 +818,12 @@ extension RealmService {
               callback: callback)
     }
 
-    public func syncFetch<T: DatabaseMappable, P: Predicate>
-        (_ predicate: P,
+    public func syncFetch<T: DatabaseMappable>
+        (_ query: @escaping T.Query,
          sorted sort: [SortDescriptor<T>] = [],
-         limit: Int? = nil) -> [T] where T.Container: RealmObject, P.ModelType == T {
+         limit: Int? = nil) -> [T] where T.Container: RealmObject {
 
-        syncFetch(with: .predicate(predicate: predicate.predicate),
+        syncFetch(with: .safeQuery(query: query),
                   sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
                   limit: limit)
     }
@@ -833,15 +837,15 @@ extension RealmService {
                   limit: limit)
     }
 
-    public func fetch<T: DatabaseMappable, P: Predicate>
-        (_ predicate: P,
+    public func fetch<T: DatabaseMappable>
+        (_ query: @escaping T.Query,
          sorted sort: [SortDescriptor<T>] = [],
          limit: Int? = nil,
          callback: @escaping ([T]) -> Void,
          next: (([T], Bool) -> Void)? = nil,
-         updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject, P.ModelType == T {
+         updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject {
 
-        fetch(with: .predicate(predicate: predicate.predicate),
+        fetch(with: .safeQuery(query: query),
               sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
               limit: limit,
               callback: callback,
@@ -983,7 +987,7 @@ extension RealmService {
     }
 
     public func min<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R?>,
          callback: @escaping (R?) -> Void) where T.Container: RealmObject, R.PersistedType: MinMaxType {
 
@@ -997,7 +1001,7 @@ extension RealmService {
     }
 
     public func max<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R?>,
          callback: @escaping (R?) -> Void) where T.Container: RealmObject, R.PersistedType: MinMaxType {
 
@@ -1011,7 +1015,7 @@ extension RealmService {
     }
 
     public func sum<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R?>,
          callback: @escaping (R) -> Void) where T.Container: RealmObject, R.PersistedType: AddableType {
 
@@ -1025,7 +1029,7 @@ extension RealmService {
     }
 
     public func average<T: DatabaseMappable & KeyPathConvertible, R: AddableType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R?>,
          callback: @escaping (Double?) -> Void) where T.Container: RealmObject {
 
@@ -1039,28 +1043,28 @@ extension RealmService {
     }
 
     public func minSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R?>) -> R? where T.Container: RealmObject, R.PersistedType: MinMaxType {
 
         syncOperator().values(ofType: T.self).filter(filter).min(ofProperty: T.key(for: keyPath))
     }
 
     public func maxSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R?>) -> R? where T.Container: RealmObject, R.PersistedType: MinMaxType {
 
         syncOperator().values(ofType: T.self).filter(filter).max(ofProperty: T.key(for: keyPath))
     }
 
     public func sumSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R?>) -> R where T.Container: RealmObject, R.PersistedType: AddableType {
 
         syncOperator().values(ofType: T.self).filter(filter).sum(ofProperty: T.key(for: keyPath))
     }
 
     public func averageSync<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
-        (with filter: DatabaseFilterType = .unfiltered,
+        (with filter: DatabaseFilterType<T.Container> = .unfiltered,
          for keyPath: KeyPath<T, R?>) -> Double? where T.Container: RealmObject, R.PersistedType: AddableType {
 
         syncOperator().values(ofType: T.self).filter(filter).average(ofProperty: T.key(for: keyPath))
@@ -1069,7 +1073,7 @@ extension RealmService {
     public func min<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V?>,
          callback: @escaping (V?) -> Void) where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
 
@@ -1085,7 +1089,7 @@ extension RealmService {
     public func max<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V?>,
          callback: @escaping (V?) -> Void) where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
 
@@ -1101,7 +1105,7 @@ extension RealmService {
     public func sum<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V?>,
          callback: @escaping (V?) -> Void) where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
 
@@ -1117,7 +1121,7 @@ extension RealmService {
     public func average<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V?>,
          callback: @escaping (Double?) -> Void) where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
 
@@ -1133,7 +1137,7 @@ extension RealmService {
     public func minSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V?>) -> V? where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).min(ofProperty: R.key(for: keyPath))
@@ -1142,7 +1146,7 @@ extension RealmService {
     public func maxSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V?>) -> V? where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).max(ofProperty: R.key(for: keyPath))
@@ -1151,7 +1155,7 @@ extension RealmService {
     public func sumSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V?>) -> V? where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).sum(ofProperty: R.key(for: keyPath))
@@ -1160,7 +1164,7 @@ extension RealmService {
     public func averageSync<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
-         with filter: DatabaseFilterType = .unfiltered,
+         with filter: DatabaseFilterType<R.Container> = .unfiltered,
          for keyPath: KeyPath<R, V?>) -> Double? where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
 
         syncOperator().relationValues(relation, in: model)?.filter(filter).average(ofProperty: R.key(for: keyPath))

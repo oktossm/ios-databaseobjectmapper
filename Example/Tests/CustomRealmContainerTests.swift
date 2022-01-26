@@ -360,11 +360,11 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let models = self.service.syncFetch(\TestSomeModel.userName == "rt")
+            let models: [TestSomeModel] = self.service.syncFetch { $0.userName == "rt" }
             XCTAssertTrue(models == [testModel])
-            let models2 = self.service.syncFetch(\TestSomeModel.userId > 1)
+            let models2: [TestSomeModel] = self.service.syncFetch { $0.userId > 1 }
             XCTAssertTrue(models2 == [testModel2])
-            let models3 = self.service.syncFetch(\TestSomeModel.title != "pl")
+            let models3: [TestSomeModel] = self.service.syncFetch { $0.title != "pl" }
             XCTAssertTrue(models3 == [testModel])
             expectation.fulfill()
         }
@@ -382,13 +382,13 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
         expectation.expectedFulfillmentCount = 2
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.service.fetch(\TestSomeModel.userName == "rt" && \TestSomeModel.count == 2) {
+            self.service.fetch({ $0.userName == "rt" && $0.count == 2 }) {
                 (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [testModel])
                 expectation.fulfill()
             }
-            self.service.fetch(\TestSomeModel.userName == "rt" || \TestSomeModel.userAvatar == "rw") {
+            self.service.fetch({ $0.userName == "rt" || $0.userAvatar == "rw" }) {
                 (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all.count == 2)
@@ -1160,7 +1160,7 @@ class CustomRealmContainerTests: XCTestCase {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
-        service.beginBatchWrites()
+        let service = service.startBatchService()
         service.save(model: testModel)
         service.save(model: testModel2)
         service.commitBatchWrites()
@@ -1182,7 +1182,7 @@ class CustomRealmContainerTests: XCTestCase {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
-        service.beginBatchWrites()
+        let service = service.startBatchService()
         service.save(model: testModel)
         //Test duplicate
         service.save(model: testModel)
@@ -1200,7 +1200,7 @@ class CustomRealmContainerTests: XCTestCase {
         let testModel3 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3, nestedModel: nil)
         let testModel4 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "ad", title: "pl", count: 3, nestedModel: nil)
 
-        service.beginBatchWrites()
+        let service = service.startBatchService()
         service.save(models: [testModel, testModel2])
         service.update(models: [testModel3, testModel4])
         service.commitBatchWrites()

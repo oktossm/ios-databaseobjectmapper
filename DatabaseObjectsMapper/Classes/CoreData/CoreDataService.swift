@@ -158,7 +158,7 @@ extension CoreDataService {
         }
     }
 
-    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                            sorted sort: DatabaseSortType = .unsorted,
                                            callback: @escaping (Array<T>) -> Void) where T.Container: CoreDataObject {
         readContext.perform {
@@ -176,7 +176,7 @@ extension CoreDataService {
         }
     }
 
-    public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+    public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                                sorted sort: DatabaseSortType = .unsorted) -> Array<T> where T.Container: CoreDataObject {
         var result = [T]()
 
@@ -197,7 +197,7 @@ extension CoreDataService {
         return result
     }
 
-    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T.Container> = .unfiltered,
                                            sorted sort: DatabaseSortType = .unsorted,
                                            callback: @escaping (Array<T>) -> Void,
                                            updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.Container: CoreDataObject {

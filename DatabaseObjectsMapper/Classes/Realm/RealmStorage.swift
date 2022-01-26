@@ -23,11 +23,12 @@ extension AnyRealmCollection {
         }
     }
 
-    func filter(_ filter: DatabaseFilterType) -> AnyRealmCollection<Element> {
+    func filter(_ filter: DatabaseFilterType<Element>) -> AnyRealmCollection<Element> {
         switch filter {
         case .unfiltered: return self
         case .query(let query): return AnyRealmCollection(self.filter(query))
         case .predicate(let predicate): return AnyRealmCollection(self.filter(predicate))
+        case .safeQuery(let query): return AnyRealmCollection(self.where(query))
         }
     }
 

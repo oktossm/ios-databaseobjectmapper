@@ -27,7 +27,7 @@ class AnyPredicateTests: XCTestCase {
                     // Realm will automatically detect new properties and removed properties
                     // And will update the schema on disk automatically
                 }
-        },
+            },
             deleteRealmIfMigrationNeeded: true)
 
         // Tell Realm to use this new configuration object for the default Realm
@@ -51,6 +51,7 @@ class AnyPredicateTests: XCTestCase {
     var uniqueUser: TestSomeModel!
 
     var savedModels: [TestSomeModel] = []
+
     func saveModels() {
         johnSwift = TestSomeModel(
             userId: 1,
@@ -115,68 +116,60 @@ class AnyPredicateTests: XCTestCase {
         saveModels()
 
         let expectation = XCTestExpectation()
-        expectation.expectedFulfillmentCount = 5
+        expectation.expectedFulfillmentCount = 4
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 
-            let predicate1 = (\TestSomeModel.userId == 1 && \TestSomeModel.userId == 2) ||
-                (\TestSomeModel.userId == 3 && \TestSomeModel.count == 3)
+            let query1: TestSomeModel.Query = { ($0.userId == 1 && $0.userId == 2) || ($0.userId == 3 && $0.count == 3) }
             self.service.fetch(
-                predicate1,
+                query1,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
+                models in
 
-                    XCTAssertTrue([self.helenSwift] == models)
-                    expectation.fulfill()
+                XCTAssertTrue([self.helenSwift] == models)
+                expectation.fulfill()
             }
 
-            let predicate2 = \TestSomeModel.userName ~ .contains("Swift") || \TestSomeModel.userName ~ .contains("ObjC") &&
-                \TestSomeModel.count > 1
-
+            let query2: TestSomeModel.Query = { $0.userName.contains("Swift") || $0.userName.contains("ObjC") && $0.count > 1 }
             self.service.fetch(
-                predicate2,
+                query2,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
+                models in
 
-                    XCTAssertTrue([self.johnSwift, self.johnObjC, self.helenSwift, self.helenObjC] == models)
-                    expectation.fulfill()
+                XCTAssertTrue([self.johnSwift, self.johnObjC, self.helenSwift, self.helenObjC] == models)
+                expectation.fulfill()
             }
 
-            let predicate2twin = \TestSomeModel.userName ~ .contains("Swift") || (\TestSomeModel.userName ~ .contains("ObjC") &&
-                \TestSomeModel.count > 1)
-
+            let query3: TestSomeModel.Query = { $0.userName.contains("Swift") || ($0.userName.contains("ObjC") && $0.count > 1) }
             self.service.fetch(
-                predicate2twin,
+                query3,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
+                models in
 
-                    XCTAssertTrue([self.johnSwift, self.johnObjC, self.helenSwift, self.helenObjC] == models)
-                    expectation.fulfill()
+                XCTAssertTrue([self.johnSwift, self.johnObjC, self.helenSwift, self.helenObjC] == models)
+                expectation.fulfill()
             }
 
-
-            let predicate4 = (\TestSomeModel.userName ~ .contains("Swift") || \TestSomeModel.userName ~ .contains("ObjC")) &&
-                \TestSomeModel.count > 1
-
+            let query4: TestSomeModel.Query = { ($0.userName.contains("Swift") || $0.userName.contains("ObjC")) && $0.count > 1 }
             self.service.fetch(
-                predicate4,
+                query4,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
+                models in
 
-                    XCTAssertTrue([self.johnObjC, self.helenSwift, self.helenObjC] == models)
-                    expectation.fulfill()
+                XCTAssertTrue([self.johnObjC, self.helenSwift, self.helenObjC] == models)
+                expectation.fulfill()
             }
 
-            let predicate5 = \TestSomeModel.userId ~ .in([1,2,3])
-
-            self.service.fetch(
-                predicate5,
-                sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
-
-                    XCTAssertTrue(self.savedModels.filter { [1,2,3].contains($0.userId) } == models)
-                    expectation.fulfill()
-            }
+            // In not supported yet by Realm.Query
+            //            let query5: TestSomeModel.Query = { $0.userId.in([1, 2, 3]) }
+            //            self.service.fetch(
+            //                query5,
+            //                sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
+            //                    models in
+            //
+            //                    XCTAssertTrue(self.savedModels.filter { [1,2,3].contains($0.userId) } == models)
+            //                    expectation.fulfill()
+            //            }
         }
 
         wait(for: [expectation], timeout: 1)
@@ -258,7 +251,6 @@ class AnyPredicateTests: XCTestCase {
             "userAvatar LIKE \"John.*\"",
             predicate3.predicate.description
         )
-
     }
 
     func testFetchWithStringPredicates() {
@@ -268,57 +260,58 @@ class AnyPredicateTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 
-            let predicate1 = \TestSomeModel.userName ~ .hasPrefix("Helen")
+            let query1: TestSomeModel.Query = { $0.userName.starts(with: "Helen") }
             self.service.fetch(
-                predicate1,
+                query1,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
+                models in
 
-                    XCTAssertTrue([self.helenSwift, self.helenObjC] == models)
-                    expectation.fulfill()
+                XCTAssertTrue([self.helenSwift, self.helenObjC] == models)
+                expectation.fulfill()
             }
 
-            let predicate2 = \TestSomeModel.userName ~ .hasSuffix("Swift")
+            let query2: TestSomeModel.Query = { $0.userName.ends(with: "Swift") }
             self.service.fetch(
-                predicate2,
+                query2,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
+                models in
 
-                    XCTAssertTrue([self.johnSwift, self.helenSwift] == models)
-                    expectation.fulfill()
+                XCTAssertTrue([self.johnSwift, self.helenSwift] == models)
+                expectation.fulfill()
             }
 
-            let predicate3 = \TestSomeModel.userName ~ .in(["John Swift", "Helen Swift"])
+            // In not supported yet by Realm.Query
+            //            let query3: TestSomeModel.Query = { $0.userName.in(["John Swift", "Helen Swift"]) }
+            //            self.service.fetch(
+            //                query3,
+            //                sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
+            //                    models in
+            //
+            //                    XCTAssertTrue([self.johnSwift, self.helenSwift] == models)
+            //                    expectation.fulfill()
+            //            }
+
+            let query4: TestSomeModel.Query = { $0.userAvatar.contains("low") }
             self.service.fetch(
-                predicate3,
+                query4,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
+                models in
 
-                    XCTAssertTrue([self.johnSwift, self.helenSwift] == models)
-                    expectation.fulfill()
+                XCTAssertTrue([self.johnSwift, self.helenSwift] == models)
+                expectation.fulfill()
             }
 
-            let predicate4 = \TestSomeModel.userAvatar ~ .contains("low")
+            let query5: TestSomeModel.Query = { $0.userName.contains("ohn Swi") }
+            self.service.fetch(query5) {
+                (models: [TestSomeModel]) in
+
+                XCTAssertTrue([self.johnSwift] == models)
+                expectation.fulfill()
+            }
+
+            let query6: TestSomeModel.Query = { $0.userName.like("Helen*") }
             self.service.fetch(
-                predicate4,
-                sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
-
-                    XCTAssertTrue([self.johnSwift, self.helenSwift] == models)
-                    expectation.fulfill()
-            }
-
-            let predicate5 = \TestSomeModel.userName ~ .contains("ohn Swi")
-            self.service.fetch(predicate5) {
-                    models in
-
-                    XCTAssertTrue([self.johnSwift] == models)
-                    expectation.fulfill()
-            }
-
-            let predicate6 = \TestSomeModel.userName ~ .like("Helen*")
-            self.service.fetch(
-                predicate6,
+                query6,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]
             ) {
                 models in
@@ -328,7 +321,7 @@ class AnyPredicateTests: XCTestCase {
             }
         }
 
-        expectation.expectedFulfillmentCount = 6
+        expectation.expectedFulfillmentCount = 5
         wait(for: [expectation], timeout: 1)
     }
 
@@ -339,38 +332,29 @@ class AnyPredicateTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 
-            let predicate1 = \TestSomeModel.userId ~ .in([1, 3])
+            // In not supported yet by Realm.Query
+            //            let query1: TestSomeModel.Query = { $0.userId.in([1, 3]) }
+            //            self.service.fetch(
+            //                query1,
+            //                sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
+            //                models in
+            //
+            //                XCTAssertTrue([self.johnSwift, self.helenSwift] == models)
+            //                expectation.fulfill()
+            //            }
+
+            let query2: TestSomeModel.Query = { $0.userId.contains(2...4) }
             self.service.fetch(
-                predicate1,
+                query2,
                 sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
+                models in
 
-                    XCTAssertTrue([self.johnSwift, self.helenSwift] == models)
-                    expectation.fulfill()
-            }
-
-            let predicate2 = \TestSomeModel.userId ~ .between(2...4)
-            self.service.fetch(
-                predicate2,
-                sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
-
-                    XCTAssertTrue([self.johnObjC, self.helenSwift, self.helenObjC] == models)
-                    expectation.fulfill()
-            }
-
-            let predicate2twin = \TestSomeModel.userId ~ .betweenValues(2, 4)
-            self.service.fetch(
-                predicate2twin,
-                sorted: [SortDescriptor(\TestSomeModel.userId, ascending: true)]) {
-                    models in
-
-                    XCTAssertTrue([self.johnObjC, self.helenSwift, self.helenObjC] == models)
-                    expectation.fulfill()
+                XCTAssertTrue([self.johnObjC, self.helenSwift, self.helenObjC] == models)
+                expectation.fulfill()
             }
         }
 
-        expectation.expectedFulfillmentCount = 3
+        expectation.expectedFulfillmentCount = 1
         wait(for: [expectation], timeout: 1)
     }
 }

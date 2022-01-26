@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 
 public enum DatabaseSortType {
@@ -25,16 +26,22 @@ public enum DatabaseSortType {
 }
 
 
-public enum DatabaseFilterType {
+public enum DatabaseFilterType<T> {
     case unfiltered
     case query(query: String)
     case predicate(predicate: NSPredicate)
+    case safeQuery(query: (Query<T>) -> Query<Bool>)
 
+    // Used only for Core Data
     var predicate: NSPredicate? {
         switch self {
         case .unfiltered: return nil
         case .query(let query): return NSPredicate(format: query, argumentArray: nil)
         case .predicate(let predicate): return predicate
+        case .safeQuery(let query):
+            // Not used
+            let predicate = query(._constructForTesting())._constructPredicate()
+            return NSPredicate(format: predicate.0, argumentArray: predicate.1)
         }
     }
 }
@@ -152,19 +159,19 @@ public protocol DatabaseServiceProtocol {
     // MARK: Fetching
 
     /// Fetches models of given type with optional filter and sorting. Objects returns async in `callback`.
-    func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType,
+    func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T.Container>,
                                     sorted sort: DatabaseSortType,
                                     limit: Int?,
                                     callback: @escaping (Array<T>) -> Void)
 
     /// Fetches models of given type with optional filter and sorting. Returns models array.
-    func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType, sorted sort: DatabaseSortType, limit: Int?) -> Array<T>
+    func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T.Container>, sorted sort: DatabaseSortType, limit: Int?) -> Array<T>
 
     /// Fetches models of given type with optional filter and sorting and subscribes on their updates. First fetch returns async in `callback`.
     /// Further updates send in `updates` closure.
     /// Next block called when loadNext() called for DatabaseUpdatesToken, and returns array of only new values and boolean - isLast values.
     /// - returns: `DatabaseUpdatesToken` to stop observing `updates` and handle limits and pagination.
-    func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType,
+    func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T.Container>,
                                     sorted sort: DatabaseSortType,
                                     limit: Int?,
                                     callback: @escaping (Array<T>) -> Void,
@@ -189,7 +196,7 @@ public protocol DatabaseServiceProtocol {
     /// Fetches relation models of given type with optional filter and sorting. Objects returns async in `callback`.
     func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                  in model: T,
-                                                                 with filter: DatabaseFilterType,
+                                                                 with filter: DatabaseFilterType<T.Container>,
                                                                  sorted sort: DatabaseSortType,
                                                                  limit: Int?,
                                                                  callback: @escaping (Array<R>) -> Void)
@@ -197,7 +204,7 @@ public protocol DatabaseServiceProtocol {
     /// Fetches relation models of given type with optional filter and sorting. Returns models array.
     func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                      in model: T,
-                                                                     with filter: DatabaseFilterType,
+                                                                     with filter: DatabaseFilterType<T.Container>,
                                                                      sorted sort: DatabaseSortType,
                                                                      limit: Int?) -> Array<R>
 
@@ -206,7 +213,7 @@ public protocol DatabaseServiceProtocol {
     /// - returns: `DatabaseUpdatesToken` to stop observing `updates`.
     func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>,
                                                                  in model: T,
-                                                                 with filter: DatabaseFilterType,
+                                                                 with filter: DatabaseFilterType<T.Container>,
                                                                  sorted sort: DatabaseSortType,
                                                                  limit: Int?,
                                                                  callback: @escaping (Array<R>) -> Void,
