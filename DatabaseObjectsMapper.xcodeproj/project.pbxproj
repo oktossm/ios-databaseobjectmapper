@@ -7,7 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EF5053BE264BED7E006A1197 /* DictionaryCoding.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA4260B83AC00584C90 /* DictionaryCoding.xcframework */; };
+		10CB54EE27AA7C5400EFF8A8 /* DateFieldTestes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54EC27AA7C5400EFF8A8 /* DateFieldTestes.swift */; };
+		10CB54EF27AA7C5400EFF8A8 /* QueryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54ED27AA7C5400EFF8A8 /* QueryTests.swift */; };
+		10CB54FA27AA7CF400EFF8A8 /* DatabaseEncoderHelperClasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54F527AA7CF400EFF8A8 /* DatabaseEncoderHelperClasses.swift */; };
+		10CB54FB27AA7CF400EFF8A8 /* DatabaseCodingKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54F627AA7CF400EFF8A8 /* DatabaseCodingKey.swift */; };
+		10CB54FC27AA7CF400EFF8A8 /* DatabaseCodingErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54F727AA7CF400EFF8A8 /* DatabaseCodingErrors.swift */; };
+		10CB54FD27AA7CF400EFF8A8 /* DatabaseEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54F827AA7CF400EFF8A8 /* DatabaseEncoder.swift */; };
+		10CB54FE27AA7CF400EFF8A8 /* DatabaseDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54F927AA7CF400EFF8A8 /* DatabaseDecoder.swift */; };
 		EF5053C0264BED7E006A1197 /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA6260B83AD00584C90 /* Realm.xcframework */; };
 		EF5053C2264BED7E006A1197 /* RealmSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD5DFA5260B83AC00584C90 /* RealmSwift.xcframework */; };
 		EFA3233224FED8D60009F9D4 /* DatabaseObjectsMapper.h in Headers */ = {isa = PBXBuildFile; fileRef = EFA3233024FED8D60009F9D4 /* DatabaseObjectsMapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -48,7 +54,6 @@
 		EFA3238424FED9140009F9D4 /* RealmStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA3236124FED9140009F9D4 /* RealmStorage.swift */; };
 		EFB42EB424FE875B00AAC74E /* RealmPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EAC24FE875B00AAC74E /* RealmPerformanceTests.swift */; };
 		EFB42EB524FE875B00AAC74E /* CoreDataPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EAD24FE875B00AAC74E /* CoreDataPerformanceTests.swift */; };
-		EFB42EB624FE875B00AAC74E /* AnyPredicateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EAE24FE875B00AAC74E /* AnyPredicateTests.swift */; };
 		EFB42EB724FE875B00AAC74E /* CustomRealmContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EAF24FE875B00AAC74E /* CustomRealmContainerTests.swift */; };
 		EFB42EB824FE875B00AAC74E /* RealmContainerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EB024FE875B00AAC74E /* RealmContainerTests.swift */; };
 		EFB42EB924FE875B00AAC74E /* RealmRelationshipsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB42EB124FE875B00AAC74E /* RealmRelationshipsTests.swift */; };
@@ -57,6 +62,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		10CB54EC27AA7C5400EFF8A8 /* DateFieldTestes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateFieldTestes.swift; sourceTree = "<group>"; };
+		10CB54ED27AA7C5400EFF8A8 /* QueryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueryTests.swift; sourceTree = "<group>"; };
+		10CB54F527AA7CF400EFF8A8 /* DatabaseEncoderHelperClasses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseEncoderHelperClasses.swift; sourceTree = "<group>"; };
+		10CB54F627AA7CF400EFF8A8 /* DatabaseCodingKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseCodingKey.swift; sourceTree = "<group>"; };
+		10CB54F727AA7CF400EFF8A8 /* DatabaseCodingErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseCodingErrors.swift; sourceTree = "<group>"; };
+		10CB54F827AA7CF400EFF8A8 /* DatabaseEncoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseEncoder.swift; sourceTree = "<group>"; };
+		10CB54F927AA7CF400EFF8A8 /* DatabaseDecoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseDecoder.swift; sourceTree = "<group>"; };
 		607FACE51AFB9204008FA782 /* DatabaseObjectsMapper_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DatabaseObjectsMapper_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EFA3232E24FED8D60009F9D4 /* DatabaseObjectsMapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DatabaseObjectsMapper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EFA3233024FED8D60009F9D4 /* DatabaseObjectsMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DatabaseObjectsMapper.h; sourceTree = "<group>"; };
@@ -98,7 +110,6 @@
 		EFA3236124FED9140009F9D4 /* RealmStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmStorage.swift; sourceTree = "<group>"; };
 		EFB42EAC24FE875B00AAC74E /* RealmPerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmPerformanceTests.swift; sourceTree = "<group>"; };
 		EFB42EAD24FE875B00AAC74E /* CoreDataPerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataPerformanceTests.swift; sourceTree = "<group>"; };
-		EFB42EAE24FE875B00AAC74E /* AnyPredicateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyPredicateTests.swift; sourceTree = "<group>"; };
 		EFB42EAF24FE875B00AAC74E /* CustomRealmContainerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRealmContainerTests.swift; sourceTree = "<group>"; };
 		EFB42EB024FE875B00AAC74E /* RealmContainerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmContainerTests.swift; sourceTree = "<group>"; };
 		EFB42EB124FE875B00AAC74E /* RealmRelationshipsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmRelationshipsTests.swift; sourceTree = "<group>"; };
@@ -121,7 +132,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF5053BE264BED7E006A1197 /* DictionaryCoding.xcframework in Frameworks */,
 				EF5053C2264BED7E006A1197 /* RealmSwift.xcframework in Frameworks */,
 				EF5053C0264BED7E006A1197 /* Realm.xcframework in Frameworks */,
 			);
@@ -130,6 +140,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		10CB54F427AA7CF400EFF8A8 /* DatabaseCoding */ = {
+			isa = PBXGroup;
+			children = (
+				10CB54F527AA7CF400EFF8A8 /* DatabaseEncoderHelperClasses.swift */,
+				10CB54F627AA7CF400EFF8A8 /* DatabaseCodingKey.swift */,
+				10CB54F727AA7CF400EFF8A8 /* DatabaseCodingErrors.swift */,
+				10CB54F827AA7CF400EFF8A8 /* DatabaseEncoder.swift */,
+				10CB54F927AA7CF400EFF8A8 /* DatabaseDecoder.swift */,
+			);
+			path = DatabaseCoding;
+			sourceTree = "<group>";
+		};
 		23CD39B521C1EB3DAF1EA84A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -172,6 +194,7 @@
 		EFA3233624FED9140009F9D4 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				10CB54F427AA7CF400EFF8A8 /* DatabaseCoding */,
 				EFA3233724FED9140009F9D4 /* Predicate */,
 				EFA3234024FED9140009F9D4 /* DatabaseObjects */,
 				EFA3234324FED9140009F9D4 /* .gitkeep */,
@@ -278,9 +301,10 @@
 		EFB42EAB24FE875B00AAC74E /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				10CB54EC27AA7C5400EFF8A8 /* DateFieldTestes.swift */,
+				10CB54ED27AA7C5400EFF8A8 /* QueryTests.swift */,
 				EFB42EAC24FE875B00AAC74E /* RealmPerformanceTests.swift */,
 				EFB42EAD24FE875B00AAC74E /* CoreDataPerformanceTests.swift */,
-				EFB42EAE24FE875B00AAC74E /* AnyPredicateTests.swift */,
 				EFB42EAF24FE875B00AAC74E /* CustomRealmContainerTests.swift */,
 				EFB42EB024FE875B00AAC74E /* RealmContainerTests.swift */,
 				EFB42EB124FE875B00AAC74E /* RealmRelationshipsTests.swift */,
@@ -431,9 +455,10 @@
 				EFB42EB924FE875B00AAC74E /* RealmRelationshipsTests.swift in Sources */,
 				EFB42EB724FE875B00AAC74E /* CustomRealmContainerTests.swift in Sources */,
 				EFB42EB424FE875B00AAC74E /* RealmPerformanceTests.swift in Sources */,
-				EFB42EB624FE875B00AAC74E /* AnyPredicateTests.swift in Sources */,
+				10CB54EF27AA7C5400EFF8A8 /* QueryTests.swift in Sources */,
 				EFB42EB524FE875B00AAC74E /* CoreDataPerformanceTests.swift in Sources */,
 				EFB42EBA24FE875B00AAC74E /* CoreDataContainerTests.swift in Sources */,
+				10CB54EE27AA7C5400EFF8A8 /* DateFieldTestes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,12 +467,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				EFA3237824FED9140009F9D4 /* Dictionary+Archive.swift in Sources */,
+				10CB54FA27AA7CF400EFF8A8 /* DatabaseEncoderHelperClasses.swift in Sources */,
 				EFA3237724FED9140009F9D4 /* DatabaseService+CoreData.swift in Sources */,
 				EFA3236324FED9140009F9D4 /* Property.swift in Sources */,
 				EFA3237024FED9140009F9D4 /* NSManagedObjectContext+Observers.swift in Sources */,
 				EFA3237224FED9140009F9D4 /* ManagedObjectObserver.swift in Sources */,
 				EFA3236824FED9140009F9D4 /* Operators+Numeric.swift in Sources */,
 				EFA3237124FED9140009F9D4 /* Utilities.swift in Sources */,
+				10CB54FB27AA7CF400EFF8A8 /* DatabaseCodingKey.swift in Sources */,
 				EFA3238124FED9140009F9D4 /* Identifiable.swift in Sources */,
 				EFA3238024FED9140009F9D4 /* Container.swift in Sources */,
 				EFA3237B24FED9140009F9D4 /* DatabaseServiceProtocol.swift in Sources */,
@@ -456,6 +483,8 @@
 				EFA3237A24FED9140009F9D4 /* DatabaseBackgroundWorker.swift in Sources */,
 				EFA3237324FED9140009F9D4 /* Managed.swift in Sources */,
 				EFA3236424FED9140009F9D4 /* Predicate.swift in Sources */,
+				10CB54FE27AA7CF400EFF8A8 /* DatabaseDecoder.swift in Sources */,
+				10CB54FC27AA7CF400EFF8A8 /* DatabaseCodingErrors.swift in Sources */,
 				EFA3238224FED9140009F9D4 /* RealmService.swift in Sources */,
 				EFA3237424FED9140009F9D4 /* FetchRequestObserver.swift in Sources */,
 				EFA3236F24FED9140009F9D4 /* NSManagedObjectContext+Extensions.swift in Sources */,
@@ -463,6 +492,7 @@
 				EFA3237E24FED9140009F9D4 /* Mappable.swift in Sources */,
 				EFA3238324FED9140009F9D4 /* DatabaseService+Realm.swift in Sources */,
 				EFA3236524FED9140009F9D4 /* AnyPredicate.swift in Sources */,
+				10CB54FD27AA7CF400EFF8A8 /* DatabaseEncoder.swift in Sources */,
 				EFA3237624FED9140009F9D4 /* Collection+CoreDataExtensions.swift in Sources */,
 				EFA3236224FED9140009F9D4 /* KeyPathConvertible.swift in Sources */,
 				EFA3236624FED9140009F9D4 /* SortDescriptor.swift in Sources */,
