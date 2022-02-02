@@ -8,7 +8,6 @@ import DatabaseObjectsMapper
 // swiftlint:disable file_length
 
 
-
 // MARK: - AutoDatabaseMappable for classes, structs
 // MARK: - TestCollectionsModel generated container
 internal class TestCollectionsModelContainer: Object, DatabaseContainer {
@@ -170,4 +169,3 @@ extension TestSomeModel: KeyPathConvertible {
         }
     }
 }
-
