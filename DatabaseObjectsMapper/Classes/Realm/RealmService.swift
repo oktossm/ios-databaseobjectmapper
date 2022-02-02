@@ -868,17 +868,17 @@ extension RealmService {
               updates: updates)
     }
 
-    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable, P: Predicate>
+    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>
         (_ relation: Relation<R>,
          in model: T,
-         predicate: P,
+         query: @escaping R.Query,
          sorted sort: [SortDescriptor<R>] = [],
          limit: Int? = nil,
-         callback: @escaping ([R]) -> Void) where T.Container: Object, R.Container: Object, P.ModelType == R {
+         callback: @escaping ([R]) -> Void) where T.Container: Object, R.Container: Object {
 
         fetchRelation(relation,
                       in: model,
-                      with: .predicate(predicate: predicate.predicate),
+                      with: .safeQuery(query: query),
                       sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
                       limit: limit,
                       callback: callback)
@@ -899,16 +899,16 @@ extension RealmService {
                       callback: callback)
     }
 
-    public func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable, P: Predicate>
+    public func syncFetchRelation<T: UniquelyMappable, R: UniquelyMappable>
         (_ relation: Relation<R>,
          in model: T,
-         predicate: P,
+         query: @escaping R.Query,
          sorted sort: [SortDescriptor<R>] = [],
-         limit: Int? = nil) -> [R] where T.Container: Object, R.Container: Object, P.ModelType == R {
+         limit: Int? = nil) -> [R] where T.Container: Object, R.Container: Object {
 
         syncFetchRelation(relation,
                           in: model,
-                          with: .predicate(predicate: predicate.predicate),
+                          with: .safeQuery(query: query),
                           sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
                           limit: limit)
     }
@@ -926,19 +926,19 @@ extension RealmService {
                           limit: limit)
     }
 
-    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable, P: Predicate>
+    public func fetchRelation<T: UniquelyMappable, R: UniquelyMappable>
         (_ relation: Relation<R>,
          in model: T,
-         predicate: P,
+         query: @escaping R.Query,
          sorted sort: [SortDescriptor<R>] = [],
          limit: Int? = nil,
          callback: @escaping ([R]) -> Void,
          next: (([R], Bool) -> Void)? = nil,
-         updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken where T.Container: Object, R.Container: Object, P.ModelType == R {
+         updates: @escaping (DatabaseObserveUpdate<R>) -> Void) -> DatabaseUpdatesToken where T.Container: Object, R.Container: Object {
 
         fetchRelation(relation,
                       in: model,
-                      with: .predicate(predicate: predicate.predicate),
+                      with: .safeQuery(query: query),
                       sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
                       limit: limit,
                       callback: callback,

@@ -127,16 +127,16 @@ class RealmRelationshipsTests: XCTestCase {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 
-            let models = self.service.syncFetchRelation(subModel.directModels, in: subModel, predicate: \TestRRModel.id == 2)
+            let models = self.service.syncFetchRelation(subModel.directModels, in: subModel, query: { $0.id == 2 })
             XCTAssertTrue(models == [testModel2])
 
             let models2 = self.service.syncFetchRelation(subModel.directModels,
                                                          in: subModel,
-                                                         predicate: \TestRRModel.name == "kk",
+                                                         query: { $0.name == "kk" },
                                                          sorted: [SortDescriptor(\TestRRModel.id, ascending: true)])
             XCTAssertTrue(models2 == [testModel3, testModel4])
 
-            self.service.fetchRelation(subModel.directModels, in: subModel, predicate: \TestRRModel.id < 3) {
+            self.service.fetchRelation(subModel.directModels, in: subModel, query: { $0.id < 3 }) {
                 (all: [TestRRModel]) in
                 XCTAssertTrue(all == [testModel1, testModel2])
                 expectation.fulfill()
