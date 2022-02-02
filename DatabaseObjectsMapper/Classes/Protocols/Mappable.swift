@@ -18,13 +18,13 @@ public protocol DatabaseMappable: DictionaryCodable, AnyDatabaseMappable {
     static func mappable(for container: Container) throws -> Self
 
     /// Updates an instance of a `Container` type.
-    /// By default uses `func update(_ container: Container, updates: [String: Any])` passing encoded value
+    /// By default uses `func update(_ container: Container, updates: [String: Any?])` passing encoded value
     func update(_ container: Container)
 
     /// Updates an instance of a `Container` type using updates.
     /// - parameter container: Container that should be updated.
     /// - parameter updates: updates dictionary.
-    func update(_ container: Container, updates: [String: Any])
+    func update(_ container: Container, updates: [String: Any?])
 
     /// Used for type fetching for example in case when single Container can store multiple different types (used by DatabaseContainerProtocol).
     static func internalPredicate() -> NSPredicate?

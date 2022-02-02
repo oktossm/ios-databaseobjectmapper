@@ -842,16 +842,18 @@ class CustomRealmContainerTests: XCTestCase {
 
     func testCollectionsStoring() {
         let codable = SomeCodable(key: "k", index: 4)
-        let url = URL(string: "https://google.com")
+        let persistable = SomePersistable(persistedValue: 2)
+        let url = URL(string: "https://google.com")!
         let testModel = TestCollectionsModel(id: 1,
                                              strings: ["one", "two"],
                                              intValues: [0, 3],
                                              doubleValues: nil,
                                              dates: [Date()],
                                              codable: [codable],
+                                             persistable: [persistable],
                                              urls: [url],
-                                             dict: [1: codable],
-                                             anotherDict: [codable: 2],
+                                             dict: ["key": persistable],
+                                             anotherDict: [codable: .secondCase],
                                              set: [url],
                                              anotherSet: [codable],
                                              someEnum: [.secondCase, .thirdCase],
@@ -929,7 +931,7 @@ class CustomRealmContainerTests: XCTestCase {
 
         service.update(modelOf: TestPrimitivesModel.self,
                        with: testModel.id,
-                       updates: ["doubleValue": 5,
+                       updates: ["doubleValue": 5.0,
                                  "someEnum": SomeEnum.firstCase,
                                  "someEnumOpt": nil,
                                  "stringEnumOpt": SomeStringEnum.thirdCase,
@@ -992,17 +994,20 @@ class CustomRealmContainerTests: XCTestCase {
     func testCollectionsUpdate() {
         let codable = SomeCodable(key: "k", index: 4)
         let newCodable = SomeCodable(key: "b", index: 5)
-        let url = URL(string: "https://google.com")
-        let url2 = URL(string: "https://yahoo.com")
+        let persistable = SomePersistable(persistedValue: 6)
+        let newPersistable = SomePersistable(persistedValue: 7)
+        let url = URL(string: "https://google.com")!
+        let url2 = URL(string: "https://yahoo.com")!
         let testModel = TestCollectionsModel(id: 1,
                                              strings: ["one", "two"],
                                              intValues: [0, 3],
                                              doubleValues: nil,
                                              dates: [Date()],
                                              codable: [codable],
+                                             persistable: [persistable],
                                              urls: [url],
-                                             dict: [1: codable],
-                                             anotherDict: [codable: 2],
+                                             dict: ["key": persistable],
+                                             anotherDict: [codable: .firstCase],
                                              set: [url],
                                              anotherSet: [codable],
                                              someEnum: [.secondCase, .thirdCase],
@@ -1012,7 +1017,7 @@ class CustomRealmContainerTests: XCTestCase {
         let updates: [RootKeyPathUpdate<TestCollectionsModel>] = [\TestCollectionsModel.intValues <- [0, 5],
                                                                   \TestCollectionsModel.codable <- [newCodable, codable],
                                                                   \TestCollectionsModel.urls <- [url, url2],
-                                                                  \TestCollectionsModel.dict <- [2: newCodable],
+                                                                  \TestCollectionsModel.dict <- ["key2": newPersistable],
                                                                   \TestCollectionsModel.someList <- ["Test1", "Test2"]]
 
         service.update(modelOf: TestCollectionsModel.self, with: testModel.id, updates: updates)
@@ -1025,7 +1030,7 @@ class CustomRealmContainerTests: XCTestCase {
             XCTAssertTrue(all.first?.intValues == [0, 5], "\(all)")
             XCTAssertTrue(all.first?.codable == [newCodable, codable], "\(all)")
             XCTAssertTrue(all.first?.urls == [url, url2], "\(all)")
-            XCTAssertTrue(all.first?.dict == [2: newCodable], "\(all)")
+            XCTAssertTrue(all.first?.dict == ["key2": newPersistable], "\(all)")
             XCTAssertTrue(all.first?.someList == ["Test1", "Test2"], "\(all)")
 
             expectation.fulfill()

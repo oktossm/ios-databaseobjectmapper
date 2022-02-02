@@ -1,6 +1,5 @@
-// Generated using Sourcery 1.0.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 1.6.1 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
-
 // MARK: - AutoDatabaseMappable
 import RealmSwift
 import DatabaseObjectsMapper
@@ -14,25 +13,20 @@ import DatabaseObjectsMapper
 // MARK: - TestCollectionsModel generated container
 internal class TestCollectionsModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestCollectionsModelContainer, Int> = \TestCollectionsModelContainer.id
-    public override static func primaryKey() -> String? {
-        return "id"
-    }
-    public override class func indexedProperties() -> [String] {
-        return []
-    }
-    @objc public dynamic var id: Int = 0
-    @objc public dynamic var strings = Data()
-    @objc public dynamic var intValues: Data?
-    @objc public dynamic var doubleValues: Data?
-    @objc public dynamic var dates: Data?
-    @objc public dynamic var codable = Data()
-    @objc public dynamic var urls = Data()
-    @objc public dynamic var dict = Data()
-    @objc public dynamic var anotherDict = Data()
-    @objc public dynamic var set = Data()
-    @objc public dynamic var anotherSet: Data?
-    @objc public dynamic var someEnum = Data()
-    let someList = List<String>()
+    @Persisted(primaryKey: true) var id: Int
+    @Persisted var strings: List<String>
+    @Persisted var intValues: Data
+    @Persisted var doubleValues: Data?
+    @Persisted var dates: Data?
+    @Persisted var codable: Data
+    @Persisted var persistable: List<SomePersistable>
+    @Persisted var urls: List<URL>
+    @Persisted var dict: Map<String, SomePersistable>
+    @Persisted var anotherDict: Data
+    @Persisted var set: MutableSet<URL>
+    @Persisted var anotherSet: Data
+    @Persisted var someEnum: List<SomeEnum>
+    @Persisted var someList: List<String>
 }
 
 extension TestCollectionsModel: KeyPathConvertible {
@@ -44,6 +38,7 @@ extension TestCollectionsModel: KeyPathConvertible {
         case \TestCollectionsModel.doubleValues: return "doubleValues"
         case \TestCollectionsModel.dates: return "dates"
         case \TestCollectionsModel.codable: return "codable"
+        case \TestCollectionsModel.persistable: return "persistable"
         case \TestCollectionsModel.urls: return "urls"
         case \TestCollectionsModel.dict: return "dict"
         case \TestCollectionsModel.anotherDict: return "anotherDict"
@@ -59,14 +54,8 @@ extension TestCollectionsModel: KeyPathConvertible {
 // MARK: - TestDateModel generated container
 internal class TestDateModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestDateModelContainer, Int> = \TestDateModelContainer.id
-    public override static func primaryKey() -> String? {
-        return "id"
-    }
-    public override class func indexedProperties() -> [String] {
-        return []
-    }
-    @objc public dynamic var id: Int = 0
-    @objc public dynamic var date: Double = 0
+    @Persisted(primaryKey: true) var id: Int
+    @Persisted var date: Date
 }
 
 extension TestDateModel: KeyPathConvertible {
@@ -82,22 +71,16 @@ extension TestDateModel: KeyPathConvertible {
 // MARK: - TestPrimitivesModel generated container
 internal class TestPrimitivesModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestPrimitivesModelContainer, Int> = \TestPrimitivesModelContainer.id
-    public override static func primaryKey() -> String? {
-        return "id"
-    }
-    public override class func indexedProperties() -> [String] {
-        return []
-    }
-    @objc public dynamic var id: Int = 0
-    let value = RealmOptional<Int32>()
-    @objc public dynamic var doubleValue: Double = 0
-    let floatValue = RealmOptional<Float>()
-    let boolValue = RealmOptional<Bool>()
-    @objc public dynamic var urlValue: String?
-    @objc public dynamic var someEnum: Int = Int()
-    let someEnumOpt = RealmOptional<Int>()
-    @objc public dynamic var stringEnum: String = String()
-    @objc public dynamic var stringEnumOpt: String?
+    @Persisted(primaryKey: true) var id: Int
+    @Persisted var value: Int32?
+    @Persisted var doubleValue: Double
+    @Persisted var floatValue: Float?
+    @Persisted var boolValue: Bool?
+    @Persisted var urlValue: URL?
+    @Persisted var someEnum: SomeEnum
+    @Persisted var someEnumOpt: SomeEnum?
+    @Persisted var stringEnum: String
+    @Persisted var stringEnumOpt: String?
 }
 
 extension TestPrimitivesModel: KeyPathConvertible {
@@ -121,15 +104,9 @@ extension TestPrimitivesModel: KeyPathConvertible {
 // MARK: - TestRNModel generated container
 internal class TestRNModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestRNModelContainer, Int> = \TestRNModelContainer.id
-    public override static func primaryKey() -> String? {
-        return "id"
-    }
-    public override class func indexedProperties() -> [String] {
-        return []
-    }
-    @objc public dynamic var id: Int = 0
-    @objc public dynamic var name: String = String()
-    @objc public dynamic var owner: TestSomeModelContainer?
+    @Persisted(primaryKey: true) var id: Int
+    @Persisted var name: String
+    @Persisted var owner: TestSomeModelContainer?
 }
 
 extension TestRNModel: KeyPathConvertible {
@@ -146,16 +123,10 @@ extension TestRNModel: KeyPathConvertible {
 // MARK: - TestRRModel generated container
 internal class TestRRModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestRRModelContainer, Int> = \TestRRModelContainer.id
-    public override static func primaryKey() -> String? {
-        return "id"
-    }
-    public override class func indexedProperties() -> [String] {
-        return []
-    }
-    @objc public dynamic var id: Int = 0
-    @objc public dynamic var name: String = String()
-    @objc public dynamic var owner: TestSomeModelContainer?
-    let users = List<TestRRModelContainer>()
+    @Persisted(primaryKey: true) var id: Int
+    @Persisted var name: String
+    @Persisted var owner: TestSomeModelContainer?
+    @Persisted var users: List<TestRRModelContainer>
 }
 
 extension TestRRModel: KeyPathConvertible {
@@ -173,20 +144,14 @@ extension TestRRModel: KeyPathConvertible {
 // MARK: - TestSomeModel generated container
 internal class TestSomeModelContainer: Object, DatabaseContainer {
     public static var idKey: WritableKeyPath<TestSomeModelContainer, Int> = \TestSomeModelContainer.userId
-    public override static func primaryKey() -> String? {
-        return "userId"
-    }
-    public override class func indexedProperties() -> [String] {
-        return ["userName", "title"]
-    }
-    @objc public dynamic var userId: Int = 0
-    @objc public dynamic var userName: String = String()
-    @objc public dynamic var userAvatar: String = String()
-    @objc public dynamic var title: String?
-    @objc public dynamic var count: Int = 0
-    let inverseModel = LinkingObjects(fromType: TestRRModelContainer.self, property: "owner")
-    let directModels = List<TestRRModelContainer>()
-    @objc public dynamic var nestedModel: Data?
+    @Persisted(primaryKey: true) var userId: Int
+    @Persisted(indexed: true) var userName: String
+    @Persisted var userAvatar: String
+    @Persisted(indexed: true) var title: String?
+    @Persisted var count: Int
+    @Persisted(originProperty: "owner") var inverseModel: LinkingObjects<TestRRModelContainer>
+    @Persisted var directModels: List<TestRRModelContainer>
+    @Persisted var nestedModel: Data?
 }
 
 extension TestSomeModel: KeyPathConvertible {

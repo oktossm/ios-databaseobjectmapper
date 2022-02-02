@@ -4,7 +4,7 @@ import DatabaseObjectsMapper
 @testable import DatabaseObjectsMapper_Example
 
 
-class AnyPredicateTests: XCTestCase {
+class QueryTests: XCTestCase {
 
     var service: RealmService!
 
@@ -173,84 +173,6 @@ class AnyPredicateTests: XCTestCase {
         }
 
         wait(for: [expectation], timeout: 1)
-    }
-
-    func testAnyPredicate() {
-        let predicate1 = \TestSomeModel.userId == 1 && \TestSomeModel.count <= 2
-        XCTAssertEqual(
-            "userId == 1 AND count <= 2",
-            predicate1.predicate.description
-        )
-
-        let predicate2 = \TestSomeModel.userId >= 1 || \TestSomeModel.count < 3
-        XCTAssertEqual(
-            "userId >= 1 OR count < 3",
-            predicate2.predicate.description
-        )
-
-        let predicate3 = (\TestSomeModel.userId != 1 || \TestSomeModel.count <= 3) && (\TestSomeModel.count > 1 && \TestSomeModel.count < 3)
-        XCTAssertEqual(
-            "(userId != 1 OR count <= 3) AND (count > 1 AND count < 3)",
-            predicate3.predicate.description
-        )
-
-        let predicate4 = (\TestSomeModel.userId > 1 && \TestSomeModel.userId < 3) || (\TestSomeModel.count > 1 && \TestSomeModel.count < 2)
-        XCTAssertEqual(
-            "(userId > 1 AND userId < 3) OR (count > 1 AND count < 2)",
-            predicate4.predicate.description
-        )
-
-        let predicate5 = (\TestSomeModel.userId > 1 && \TestSomeModel.userId < 3) || \TestSomeModel.count > 1
-        XCTAssertEqual(
-            "(userId > 1 AND userId < 3) OR count > 1",
-            predicate5.predicate.description
-        )
-    }
-
-    func testNumericPredicateDescriptions() {
-        let predicate1 = \TestSomeModel.userId ~ .in([1, 2, 5])
-        XCTAssertEqual(
-            "userId IN {1, 2, 5}",
-            predicate1.predicate.description
-        )
-
-        let predicate2 = \TestSomeModel.count ~ .between(10...1024) || \TestSomeModel.count ~ .betweenValues(11, 200)
-        XCTAssertEqual(
-            "count BETWEEN {10, 1024} OR count BETWEEN {11, 200}",
-            predicate2.predicate.description
-        )
-
-        let predicate3 = \TestSomeModel.userId ~ .in([])
-        XCTAssertEqual(
-            "userId IN {}",
-            predicate3.predicate.description
-        )
-
-        let predicate4 = \TestSomeModel.userId ~ .between(0...0)
-        XCTAssertEqual(
-            "userId BETWEEN {0, 0}",
-            predicate4.predicate.description
-        )
-    }
-
-    func testStringPredicateDescriptions() {
-        let predicate1 = \TestSomeModel.userName ~ .in(["Swift", "ObjC", "Hello World's", "Hello World\"s"])
-        XCTAssertEqual(
-            "userName IN {\"Swift\", \"ObjC\", \"Hello World\'s\", \"Hello World\\\"s\"}",
-            predicate1.predicate.description
-        )
-
-        let predicate2 = \TestSomeModel.userName ~ .hasPrefix("John") && \TestSomeModel.userName ~ .hasSuffix("Swift")
-        XCTAssertEqual(
-            "userName BEGINSWITH \"John\" AND userName ENDSWITH \"Swift\"",
-            predicate2.predicate.description
-        )
-
-        let predicate3 = \TestSomeModel.userAvatar ~ .like("John.*")
-        XCTAssertEqual(
-            "userAvatar LIKE \"John.*\"",
-            predicate3.predicate.description
-        )
     }
 
     func testFetchWithStringPredicates() {

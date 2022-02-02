@@ -16,21 +16,40 @@ import {{ value }}
 {% endmacro %}
 
 {% macro mapVariable var idName %}
-    {% if var.typeName.unwrappedTypeName|hasPrefix:"Int" or var.typeName.unwrappedTypeName == "Float" or var.typeName.unwrappedTypeName == "Double" %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<{{var.typeName.unwrappedTypeName}}>(){% else %}@objc public dynamic var {{ var.name }}: {{var.typeName}} = 0{% endif %}{% endif %}
-    {% if var.typeName.unwrappedTypeName == "Bool" %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<{{var.typeName.unwrappedTypeName}}>(){% else %}@objc public dynamic var {{ var.name }}: {{var.typeName}} = false{% endif %}{% endif %}
-    {% if var.typeName.unwrappedTypeName == "String" or var.typeName.unwrappedTypeName == "Data" %}@objc public dynamic var {{ var.name }}: {{var.typeName}}{% ifnot var.typeName.isOptional %} = {{var.typeName}}(){% endif %}{% endif %}
-    {% if var.typeName.unwrappedTypeName == "Date" %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<Double>(){% else %}@objc public dynamic var {{ var.name }}: Double = 0{% endif %}{% endif %}
-    {% if var.typeName.unwrappedTypeName == "URL" %}@objc public dynamic var {{ var.name }}: String{% ifnot var.typeName.isOptional %} = String(){% else %}?{% endif %}{% endif %}
-    {% if var.type.based.DatabaseMappable or var.type.based.UniquelyMappable %}@objc public dynamic var {{ var.name }}: {{var.typeName.unwrappedTypeName}}Container?{% endif %}
-    {% if var.type.based.DictionaryCodable and not var.type.based.DatabaseMappable and not var.type.based.UniquelyMappable %}@objc public dynamic var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %} = Data(){% endif %}{% endif %}
-    {% if var.typeName.name|hasPrefix:"Relation" and var.typeName.isGeneric and var.defaultValue|contains:"type: .inverse" %}let {{ var.name }} = LinkingObjects(fromType: {{var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName}}Container.self, property: "{{var.annotations.inverseRelation}}"){% endif %}
-    {% if var.typeName.name|hasPrefix:"Relation" and var.typeName.isGeneric and var.defaultValue|contains:"type: .direct" %}let {{ var.name }} = List<{{var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName}}Container>(){% endif %}
-    {% if var.typeName.isArray and var.annotations.list %}let {{ var.name }} = List<{{var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName}}>(){% endif %}
-    {% if var.typeName.isArray and not var.annotations.list and ( var.typeName.array.elementTypeName.based.DictionaryCodable or var.typeName.array.elementTypeName.based.Codable ) %}@objc public dynamic var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %} = Data(){% endif %}{% endif %}
-    {% if var.typeName.isDictionary and ( var.typeName.dictionary.keyTypeName.based.DictionaryCodable or var.typeName.dictionary.keyTypeName.based.Codable ) and (var.typeName.dictionary.valueTypeName.based.DictionaryCodable or var.typeName.dictionary.valueTypeName.based.Codable) %}@objc public dynamic var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %} = Data(){% endif %}{% endif %}
-    {% if var.typeName.isGeneric and var.typeName.generic.name == "Set" and ( var.typeName.generic.typeParameters.first.typeName.based.DictionaryCodable or var.typeName.generic.typeParameters.first.typeName.based.Codable ) %}@objc public dynamic var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %} = Data(){% endif %}{% endif %}
-    {% if var.type.kind == "enum" and not var.type.hasAssociatedValues and ( var.type.rawTypeName|hasPrefix:"Int" or var.type.rawTypeName.unwrappedTypeName == "Float" or var.type.rawTypeName.unwrappedTypeName == "Double" ) %}{% if var.typeName.isOptional %}let {{ var.name }} = RealmOptional<{{var.type.rawTypeName.unwrappedTypeName}}>(){% else %}@objc public dynamic var {{ var.name }}: {{var.type.rawTypeName}} = {{var.type.rawTypeName}}(){% endif %}{% endif %}
-    {% if var.type.kind == "enum" and not var.type.hasAssociatedValues and var.type.rawTypeName.unwrappedTypeName == "String" %}@objc public dynamic var {{ var.name }}: {{var.type.rawTypeName}}{% if var.typeName.isOptional %}?{% else %} = {{var.type.rawTypeName}}(){% endif %}{% endif %}
+    {# Supported base persistable types #}
+    {% if var.typeName.unwrappedTypeName|hasPrefix:"Int" or var.typeName.unwrappedTypeName == "Float" or var.typeName.unwrappedTypeName == "Double" or var.typeName.unwrappedTypeName == "Bool" or var.typeName.unwrappedTypeName == "String" or var.typeName.unwrappedTypeName == "Data" or var.typeName.unwrappedTypeName == "Date" or var.typeName.unwrappedTypeName == "Decimal128" or var.typeName.unwrappedTypeName == "ObjectId" or var.typeName.unwrappedTypeName == "URL" or var.type.based.FailableCustomPersistable or var.type.based.CustomPersistable or var.type.based.PersistableEnum %}
+    @Persisted{% if var.annotations.indexed %}(indexed: true){% endif %} var {{ var.name }}: {{var.typeName}}
+    {% endif %}
+    {# Supported codable types types #}
+    {% if var.type.based.DictionaryCodable and not var.type.based.DatabaseMappable and not var.type.based.UniquelyMappable %}@Persisted var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %}: Data{% endif %}{% endif %}
+    {# Persisted objects #}
+    {% if var.type.based.DatabaseMappable or var.type.based.UniquelyMappable %}@Persisted var {{ var.name }}: {{var.typeName.unwrappedTypeName}}Container?{% endif %}
+    {# Relations #}
+    {% if var.typeName.name|hasPrefix:"Relation" and var.typeName.isGeneric and var.defaultValue|contains:"type: .inverse" %}@Persisted(originProperty: "{{var.annotations.inverseRelation}}") var {{ var.name }}: LinkingObjects<{{var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName}}Container>{% endif %}
+    {% if var.typeName.name|hasPrefix:"Relation" and var.typeName.isGeneric and var.defaultValue|contains:"type: .direct" %}@Persisted var {{ var.name }}: List<{{var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName}}Container>{% endif %}
+    {# Arrays -> List or Data #}
+    {% if var.typeName.isArray %}
+    {% if not var.typeName.isOptional and not var.typeName.generic.typeParameters.first.typeName.isOptional and (var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName|hasPrefix:"Int" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Float" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Double" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Bool" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "String" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Data" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Date" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Decimal128" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "ObjectId" or var.typeName.array.elementType.based.FailableCustomPersistable or var.typeName.array.elementType.based.CustomPersistable or var.typeName.array.elementType.based.PersistableEnum) %}
+    @Persisted var {{ var.name }}: List<{{var.typeName.generic.typeParameters.first.typeName}}>
+    {% elif var.typeName.array.elementType.based.DictionaryCodable or var.typeName.array.elementType.based.Codable or var.typeName.generic.typeParameters.first.typeName|hasPrefix:"Int" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Float" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Double" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Bool" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "String" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Data" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Date" %}@Persisted var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %}: Data{% endif %}
+    {% endif %}
+    {% endif %}
+    {# Dictionary -> Map or Data #}
+    {% if var.typeName.isDictionary %}
+    {% if not var.typeName.isOptional and var.typeName.dictionary.keyTypeName.name == "String" and not var.typeName.dictionary.valueTypeName.isOptional and (var.typeName.dictionary.valueTypeName.unwrappedTypeName|hasPrefix:"Int" or var.typeName.dictionary.valueTypeName.unwrappedTypeName == "Float" or var.typeName.dictionary.valueTypeName.unwrappedTypeName == "Double" or var.typeName.dictionary.valueTypeName.unwrappedTypeName == "Bool" or var.typeName.dictionary.valueTypeName.unwrappedTypeName == "String" or var.typeName.dictionary.valueTypeName.unwrappedTypeName == "Data" or var.typeName.dictionary.valueTypeName.unwrappedTypeName == "Date" or var.typeName.dictionary.valueTypeName.unwrappedTypeName == "Decimal128" or var.typeName.dictionary.valueTypeName.unwrappedTypeName == "ObjectId" or var.typeName.dictionary.valueType.based.FailableCustomPersistable or var.typeName.dictionary.valueType.based.CustomPersistable or var.typeName.dictionary.valueType.based.PersistableEnum) %}
+    @Persisted var {{ var.name }}: Map<String, {{ var.typeName.dictionary.valueTypeName }}>
+    {% elif (var.typeName.dictionary.keyType.based.DictionaryCodable or var.typeName.dictionary.keyType.based.Codable) and (var.typeName.dictionary.valueType.based.DictionaryCodable or var.typeName.dictionary.valueType.based.Codable) %}
+    @Persisted var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %}: Data{% endif %}
+    {% endif %}
+    {% endif %}
+    {# Set -> MutableSet or Data #}
+    {% if var.typeName.isGeneric and var.typeName.generic.name == "Set" %}
+    {% if not var.typeName.isOptional and not var.typeName.generic.typeParameters.first.typeName.isOptional and (var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName|hasPrefix:"Int" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Float" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Double" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Bool" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "String" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Data" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Date" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "Decimal128" or var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName == "ObjectId" or var.typeName.generic.typeParameters.first.type.based.FailableCustomPersistable or var.typeName.generic.typeParameters.first.type.based.CustomPersistable or var.typeName.generic.typeParameters.first.type.based.PersistableEnum) %}
+    @Persisted var {{ var.name }}: MutableSet<{{var.typeName.generic.typeParameters.first.typeName}}>
+    {% elif var.typeName.generic.typeParameters.first.type.based.DictionaryCodable or var.typeName.generic.typeParameters.first.type.based.Codable %}@Persisted var {{ var.name }}{% if var.typeName.isOptional %}: Data?{% else %}: Data{% endif %}{% endif %}
+    {% endif %}
+    {% if var.type.kind == "enum" and not var.type.based.PersistableEnum and not var.type.hasAssociatedValues and ( var.type.rawTypeName|hasPrefix:"Int" or var.type.rawTypeName.name == "Float" or var.type.rawTypeName.name == "Double" ) %}@Persisted var {{ var.name }}: {{var.type.rawTypeName.name}}{% if var.typeName.isOptional %}?{% endif %}{% endif %}
+    {% if var.type.kind == "enum" and not var.type.based.PersistableEnum and not var.type.hasAssociatedValues and var.type.rawTypeName.name == "String" %}@Persisted var {{ var.name }}: {{var.type.rawTypeName.name}}{% if var.typeName.isOptional %}?{% endif %}{% endif %}
 {% endmacro %}
 
 // MARK: - AutoDatabaseMappable for classes, structs
@@ -41,13 +60,7 @@ import {{ value }}
 {% set idName variable.defaultValue|replace:"\",""|replace:type.name,""|replace:".","" %}
 {% for var in type.storedVariables where var.name == idName %}
     public static var idKey: WritableKeyPath<{{ type.name }}Container, {{ var.typeName }}> = \{{ type.name }}Container.{{ idName }}
-    public override static func primaryKey() -> String? {
-        return "{{ idName }}"
-    }
-    public override class func indexedProperties() -> [String] {
-        return [{% for prop in type.annotations.indexedProperties %}{%ifnot forloop.first%}, {% endif%}"{{prop}}"{% endfor%}]
-    }
-    @objc public dynamic var {{ idName }}: {{ var.typeName }} = {% if var.typeName.unwrappedTypeName == "String" %}""{% else %}0{% endif%}
+    @Persisted(primaryKey: true) var {{ idName }}: {{ var.typeName }}
 {% endfor %}
 {% call iterateVariables type.storedVariables idName %}
 {% endfor %}

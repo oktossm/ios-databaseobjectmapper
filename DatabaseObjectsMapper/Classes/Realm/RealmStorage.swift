@@ -116,7 +116,16 @@ public struct RealmWriteTransaction {
                                             updates: [String: Any?]) where T.Container: Object {
         let updates: [String: Any?] = updates.mapValues {
             value in
-            if let mappable = value as? DictionaryCodableCollection {
+            if let mappable = value as? [_ObjcBridgeable] {
+                return mappable.map { $0._rlmObjcValue }
+            } else if let mappable = value as? Set<AnyHashable>,
+                      let array = Array(mappable) as? [_ObjcBridgeable] {
+                return array.map { $0._rlmObjcValue }
+            } else if let mappable = value as? Dictionary<String, _ObjcBridgeable> {
+                return mappable.mapValues { $0._rlmObjcValue }
+            } else if let mappable = value as? _ObjcBridgeable {
+                return mappable._rlmObjcValue
+            } else if let mappable = value as? DictionaryCodableCollection {
                 return mappable.encodedCollectionValue
             } else if let mappable = value as? Encodable {
                 return mappable.encodedValue

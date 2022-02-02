@@ -14,6 +14,19 @@ public protocol AutoDatabaseMappable {
 }
 
 
+extension URL: FailableCustomPersistable {
+    public typealias PersistedType = String
+
+    public init?(persistedValue: String) {
+        self.init(string: persistedValue)
+    }
+
+    public var persistableValue: PersistedType {
+        self.absoluteString
+    }
+}
+
+
 // sourcery: AutoImport=DatabaseObjectsMapper
 struct TestModel: Equatable, AutoObjectDiff, AutoLenses {
     let id: Int
@@ -32,11 +45,12 @@ struct TestModel: Equatable, AutoObjectDiff, AutoLenses {
 }
 
 
-// sourcery: indexedProperties=["userName","title"]
 struct TestSomeModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
     let userId: Int
+    // sourcery: indexed
     let userName: String
     let userAvatar: String
+    // sourcery: indexed
     let title: String?
     let count: Int
     // sourcery: inverseRelation = owner, skipLens, skipObjectDiff
@@ -92,6 +106,7 @@ struct TestRRModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses 
     let users = Relation<TestRRModel>(type: .direct)
 }
 
+
 struct TestRNModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
     let id: Int
     let name: String
@@ -99,23 +114,41 @@ struct TestRNModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses 
     let owner: TestSomeModel
 }
 
+
 struct SomeCodable: Codable, Equatable, Hashable {
     let key: String
     let index: Int
 }
 
 
-enum SomeEnum: Int, Codable {
-   case firstCase
-   case secondCase
-   case thirdCase
+struct SomePersistable: DictionaryCodable, Equatable, Hashable, CustomPersistable {
+    let index: Int
+
+    public typealias PersistedType = Int
+
+    public init(persistedValue: Int) {
+        self.index = persistedValue
+    }
+
+    public var persistableValue: PersistedType {
+        self.index
+    }
 }
+
+
+enum SomeEnum: Int, Codable, PersistableEnum {
+    case firstCase
+    case secondCase
+    case thirdCase
+}
+
 
 enum SomeStringEnum: String, Codable {
     case firstCase
     case secondCase
     case thirdCase
 }
+
 
 struct TestPrimitivesModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
     let id: Int
@@ -130,32 +163,36 @@ struct TestPrimitivesModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, Aut
     let stringEnumOpt: SomeStringEnum?
 }
 
+
 struct TestCollectionsModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
     let id: Int
     let strings: [String]
-    let intValues: [Int64?]?
+    let intValues: [Int64?]
     let doubleValues: [Double]?
     let dates: [Date]?
     let codable: [SomeCodable]
-    let urls: Array<URL?>
-    let dict: [Int: SomeCodable]
-    let anotherDict: [SomeCodable: Int]
-    let set: Set<URL?>
-    let anotherSet: Set<SomeCodable>?
+    let persistable: [SomePersistable]
+    let urls: Array<URL>
+    let dict: [String: SomePersistable]
+    let anotherDict: [SomeCodable: SomeStringEnum]
+    let set: Set<URL>
+    let anotherSet: Set<SomeCodable?>
     let someEnum: [SomeEnum]
-    // sourcery: list
     let someList: [String]
 }
+
 
 extension TestPrimitivesModel: UniquelyMappable {
     typealias Container = TestPrimitivesModelContainer
     static var idKey = \TestPrimitivesModel.id
 }
 
+
 extension TestCollectionsModel: UniquelyMappable {
     typealias Container = TestCollectionsModelContainer
     static var idKey = \TestCollectionsModel.id
 }
+
 
 extension TestModel: UniquelyMappable {
     typealias Container = RealmContainer
@@ -190,16 +227,19 @@ extension TestRRModel: UniquelyMappable {
     static var idKey = \TestRRModel.id
 }
 
+
 extension TestRNModel: UniquelyMappable {
     typealias Container = TestRNModelContainer
     static var idKey = \TestRNModel.id
 }
+
 
 // For date tests
 struct TestDateModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
     let id: Int
     let date: Date
 }
+
 
 extension TestDateModel: UniquelyMappable {
     typealias Container = TestDateModelContainer

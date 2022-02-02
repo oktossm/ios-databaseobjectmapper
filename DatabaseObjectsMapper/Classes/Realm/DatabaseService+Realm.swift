@@ -31,13 +31,13 @@ public extension DatabaseMappable where Container: Object & SharedDatabaseContai
         return object
     }
 
-    func updateSkippingRelations(_ container: Container, updates: [String: Any]) {
+    func updateSkippingRelations(_ container: Container, updates: [String: Any?]) {
         container.typeName = Self.typeName
         updateProperties(for: container, updates: updates)
         updateId(for: container)
     }
 
-    func update(_ container: Container, updates: [String: Any]) {
+    func update(_ container: Container, updates: [String: Any?]) {
         container.typeName = Self.typeName
         updateProperties(for: container, updates: updates)
         updateRelationships(for: container)
@@ -62,28 +62,27 @@ public extension UniquelyMappable where Container: Object {
         return object
     }
 
-    func updateSkippingRelations(_ container: Container, updates: [String: Any]) {
+    func updateSkippingRelations(_ container: Container, updates: [String: Any?]) {
         updateProperties(for: container, updates: updates)
         updateId(for: container)
     }
 
-    func update(_ container: Container, updates: [String: Any]) {
+    func update(_ container: Container, updates: [String: Any?]) {
         updateProperties(for: container, updates: updates)
         updateRelationships(for: container)
         updateId(for: container)
     }
 
     internal func updateId(for container: Container) {
-        guard let keyPath = Container.idKey._kvcKeyPathString,
-              container.realm == nil,
-              Container.primaryKey() == keyPath else { return }
+        guard let keyPath = container.objectSchema.primaryKeyProperty?.name,
+              container.realm == nil else { return }
         container.setValue(objectKeyValue, forKey: keyPath)
     }
 }
 
 
 public extension UniquelyMappable where Container: Object & SharedDatabaseContainer {
-    func update(_ container: Container, updates: [String: Any]) {
+    func update(_ container: Container, updates: [String: Any?]) {
         container.typeName = Self.typeName
         updateProperties(for: container, updates: updates)
         updateRelationships(for: container)
@@ -91,30 +90,28 @@ public extension UniquelyMappable where Container: Object & SharedDatabaseContai
     }
 
     internal func updateId(for container: Container) {
-        guard let keyPath = Container.idKey._kvcKeyPathString,
-              container.realm == nil,
-              Container.primaryKey() == keyPath else { return }
+        guard let keyPath = Container.primaryKey(),
+              container.realm == nil else { return }
         container.setValue(objectKeyValue, forKey: keyPath)
     }
 }
 
 
 public extension DatabaseMappable where Container: Object {
-    func update(_ container: Container, updates: [String: Any]) {
+    func update(_ container: Container, updates: [String: Any?]) {
         updateProperties(for: container, updates: updates)
         updateRelationships(for: container)
         updateId(for: container)
     }
 
     internal func updateId(for container: Container) {
-        guard let keyPath = Container.idKey._kvcKeyPathString,
+        guard let keyPath = container.objectSchema.primaryKeyProperty?.name,
               Container.ID.self == String.self,
-              container.realm == nil,
-              Container.primaryKey() == keyPath else { return }
+              container.realm == nil else { return }
         container.setValue(UUID().uuidString, forKey: keyPath)
     }
 
-    internal func updateProperties(for container: Container, updates: [String: Any]) {
+    internal func updateProperties(for container: Container, updates: [String: Any?]) {
         container.encodedValue = updates
     }
 
@@ -142,10 +139,13 @@ public extension DatabaseMappable where Container: Object {
 }
 
 
+typealias ObjCHashable = _ObjcBridgeable & Hashable
+
+
 public extension DatabaseContainer where Self: Object {
-    var propertiesValue: [String: Any] {
+    var propertiesValue: [String: Any?] {
         let properties = objectSchema.properties
-        let encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
+        let encoded: [String: Any?] = Dictionary(uniqueKeysWithValues: properties
                 .filter { $0.objectClassName == nil }
                 .compactMap {
                     guard let value = self[$0.name] else {
@@ -155,10 +155,10 @@ public extension DatabaseContainer where Self: Object {
                 })
         return encoded
     }
-    var encodedValue: [String: Any] {
+    var encodedValue: [String: Any?] {
         get {
             let properties = objectSchema.properties
-            var encoded: [String: Any] = Dictionary(uniqueKeysWithValues: properties
+            var encoded: [String: Any?] = Dictionary(uniqueKeysWithValues: properties
                     .filter { $0.objectClassName == nil }
                     .compactMap {
                         guard let value = self[$0.name] else {
@@ -169,10 +169,20 @@ public extension DatabaseContainer where Self: Object {
                            let arrayValue = array._rlmCollection.value(forKey: "self") {
                             return ($0.name, arrayValue)
                         }
+                        if $0.isSet,
+                           let set = self[$0.name] as? RLMSwiftCollectionBase,
+                           let setValue = set._rlmCollection.value(forKey: "self") as? NSSet {
+                            return ($0.name, setValue.allObjects)
+                        }
+                        if $0.isMap,
+                           let set = self[$0.name] as? RLMSwiftCollectionBase,
+                           let dictValue = set._rlmCollection as? RLMDictionary<NSString, AnyObject> {
+                            return ($0.name, Dictionary(uniqueKeysWithValues: zip(dictValue.allKeys, dictValue.allValues)))
+                        }
                         if $0.type == .data, let data = value as? Data {
-                            if let archived: [String: Any] = Dictionary(archive: data) {
+                            if let archived: [String: Any?] = Dictionary(archive: data) {
                                 return ($0.name, archived)
-                            } else if let archived: [Any] = Array(archive: data) {
+                            } else if let archived: [Any?] = Array(archive: data) {
                                 return ($0.name, archived)
                             }
                         }
@@ -186,15 +196,15 @@ public extension DatabaseContainer where Self: Object {
             return encoded
         }
         set {
-            let keyPath = Container.idKey._kvcKeyPathString
+            let keyPath = objectSchema.primaryKeyProperty?.name
             let properties = Dictionary(uniqueKeysWithValues: objectSchema.properties.filter { $0.objectClassName == nil }.map { ($0.name, $0) })
             newValue.forEach {
                 guard $0 != keyPath, let property = properties[$0] else { return }
                 if property.type == .data {
                     // Processing codable properties
-                    if let dictValue = $1 as? [String: Any] {
+                    if let dictValue = $1 as? [String: Any?] {
                         self[$0] = dictValue.archived
-                    } else if let arrayValue = $1 as? [Any] {
+                    } else if let arrayValue = $1 as? [Any?] {
                         self[$0] = arrayValue.archived
                     } else {
                         self[$0] = $1
@@ -205,6 +215,16 @@ public extension DatabaseContainer where Self: Object {
                           let array = $1 as? NSArray {
                     rlmArray.removeAllObjects()
                     rlmArray.addObjects(array)
+                } else if property.isSet,
+                          let rlmSet = self[$0] as? RLMSet<NSObject>,
+                          let array = $1 as? Array<NSObject> {
+                    rlmSet.removeAllObjects()
+                    rlmSet.addObjects(array as NSArray)
+                } else if property.isMap,
+                          let rlmDict = self[$0] as? RLMDictionary<NSString, NSObject>,
+                          let dict = $1 as? NSDictionary {
+                    rlmDict.removeAllObjects()
+                    rlmDict.setDictionary(dict)
                 } else if let codable = $1 as? DictionaryCodable {
                     self[$0] = codable.encodedValue
                 } else {
