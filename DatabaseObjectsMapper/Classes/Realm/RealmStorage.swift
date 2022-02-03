@@ -23,7 +23,7 @@ extension AnyRealmCollection {
         }
     }
 
-    func filter(_ filter: DatabaseFilterType<Element>) -> AnyRealmCollection<Element> {
+    func filter<T: DatabaseMappable>(_ filter: DatabaseFilterType<T>) -> AnyRealmCollection<Element> where Element == T.Container {
         switch filter {
         case .unfiltered: return self
         case .query(let query): return AnyRealmCollection(self.filter(query))

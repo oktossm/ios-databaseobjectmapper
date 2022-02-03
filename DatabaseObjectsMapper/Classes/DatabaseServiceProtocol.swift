@@ -26,11 +26,11 @@ public enum DatabaseSortType {
 }
 
 
-public enum DatabaseFilterType<T> {
+public enum DatabaseFilterType<T: DatabaseMappable> {
     case unfiltered
     case query(query: String)
     case predicate(predicate: NSPredicate)
-    case safeQuery(query: (Query<T>) -> Query<Bool>)
+    case safeQuery(query: (Query<T.Container>) -> Query<Bool>)
 
     // Used only for Core Data
     var predicate: NSPredicate? {
