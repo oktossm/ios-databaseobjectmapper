@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		101A9E0627AD301100E9FCC1 /* RealmMappingHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101A9E0527AD301100E9FCC1 /* RealmMappingHelpers.swift */; };
 		10CB54EE27AA7C5400EFF8A8 /* DateFieldTestes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54EC27AA7C5400EFF8A8 /* DateFieldTestes.swift */; };
 		10CB54EF27AA7C5400EFF8A8 /* QueryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54ED27AA7C5400EFF8A8 /* QueryTests.swift */; };
 		10CB54FA27AA7CF400EFF8A8 /* DatabaseEncoderHelperClasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10CB54F527AA7CF400EFF8A8 /* DatabaseEncoderHelperClasses.swift */; };
@@ -62,6 +63,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		101A9E0527AD301100E9FCC1 /* RealmMappingHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmMappingHelpers.swift; sourceTree = "<group>"; };
 		10CB54EC27AA7C5400EFF8A8 /* DateFieldTestes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateFieldTestes.swift; sourceTree = "<group>"; };
 		10CB54ED27AA7C5400EFF8A8 /* QueryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueryTests.swift; sourceTree = "<group>"; };
 		10CB54F527AA7CF400EFF8A8 /* DatabaseEncoderHelperClasses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseEncoderHelperClasses.swift; sourceTree = "<group>"; };
@@ -291,6 +293,7 @@
 		EFA3235E24FED9140009F9D4 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
+				101A9E0527AD301100E9FCC1 /* RealmMappingHelpers.swift */,
 				EFA3235F24FED9140009F9D4 /* RealmService.swift */,
 				EFA3236024FED9140009F9D4 /* DatabaseService+Realm.swift */,
 				EFA3236124FED9140009F9D4 /* RealmStorage.swift */,
@@ -502,6 +505,7 @@
 				EFA3237924FED9140009F9D4 /* OptionalUnwrap.swift in Sources */,
 				EFA3237C24FED9140009F9D4 /* DatabaseRelation.swift in Sources */,
 				EFA3236B24FED9140009F9D4 /* CoreDataContainer.swift in Sources */,
+				101A9E0627AD301100E9FCC1 /* RealmMappingHelpers.swift in Sources */,
 				EFA3238424FED9140009F9D4 /* RealmStorage.swift in Sources */,
 				EFA3237524FED9140009F9D4 /* NSManagedObject+Extensions.swift in Sources */,
 				EFA3236A24FED9140009F9D4 /* RealmContainer.swift in Sources */,
