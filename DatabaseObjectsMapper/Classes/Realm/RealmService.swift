@@ -18,10 +18,10 @@ public extension DatabaseMappable {
 
 open class RealmService {
 
-    private let configuration: Realm.Configuration
+    fileprivate let configuration: Realm.Configuration
 
-    private lazy var writeWorker = DatabaseRealmBackgroundWorker(configuration: configuration,
-                                                                 queue: DispatchQueue(label: "mm.databaseService.writeQueue"))
+    fileprivate lazy var writeWorker = DatabaseRealmBackgroundWorker(configuration: configuration,
+                                                                     queue: DispatchQueue(label: "mm.databaseService.writeQueue"))
     private lazy var readWorkers = (1...3).map {
         _ in
         DatabaseRealmBackgroundWorker(configuration: configuration, queue: DispatchQueue(label: "mm.databaseService.readQueue"))
@@ -31,10 +31,10 @@ open class RealmService {
         readWorkers.randomElement()!
     }
 
-    private var isBatchWriting = false
-    private var batchBlocks = [RealmBlock]()
+    fileprivate var isBatchWriting = false
+    fileprivate var batchBlocks = [RealmBlock]()
 
-    private let batchQueue = DispatchQueue(label: "mm.databaseService.writeQueue")
+    fileprivate let batchQueue = DispatchQueue(label: "mm.databaseService.writeQueue")
 
     public init(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
         self.configuration = configuration
@@ -59,17 +59,9 @@ open class RealmService {
 }
 
 
-extension RealmService {
-    // MARK: Batch writes
-
-    public func startBatchService() -> RealmService {
-        let service = RealmService(configuration: configuration)
-        service.beginBatchWrites()
-
-        return service
-    }
-
-    private func beginBatchWrites() {
+// MARK: Batch writes
+open class RealmBatchService: RealmService {
+    fileprivate func beginBatchWrites() {
         batchQueue.sync {
             isBatchWriting = true
         }
@@ -85,11 +77,31 @@ extension RealmService {
                 try? syncOperator.commitWrite()
             } else {
                 writeWorker.execute(realmBlocks: batchBlocks)
+                writeWorker.execute { _ in
+                    // retain self until writes completed
+                    _ = self
+                }
             }
             batchBlocks.removeAll()
         }
     }
+}
 
+
+extension RealmService {
+    // MARK: Batch writes
+    public func startBatchService() -> RealmBatchService {
+        let service = RealmBatchService(configuration: configuration)
+        service.beginBatchWrites()
+
+        return service
+    }
+
+    public func withBatchWrites(_ batchWrites: (RealmService) -> Void, sync: Bool = false) {
+        let batchService = startBatchService()
+        batchWrites(batchService)
+        batchService.commitBatchWrites(sync: sync)
+    }
 
     // MARK: Managing
     public func deleteAll(sync: Bool = false) {

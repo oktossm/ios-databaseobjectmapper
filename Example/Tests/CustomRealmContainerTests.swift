@@ -1194,6 +1194,28 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testBatchStoreBlockWithKey() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+
+        let service = service.withBatchWrites { service in
+            service.save(model: testModel)
+            service.save(model: testModel2)
+        }
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestSomeModel] = self.service.syncFetch()
+
+            XCTAssertTrue(all.sorted { $0.userId < $1.userId } == [testModel, testModel2])
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testSyncBatchStoreWithKey() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
