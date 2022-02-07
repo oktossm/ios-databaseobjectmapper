@@ -230,13 +230,26 @@ open class DatabaseEncoder {
                                                                    debugDescription: "Top-level \(T.self) did not encode any values."))
         }
 
-        if !(topLevel is [String: Any?]) {
+        if !(topLevel is BoxedDictionary<String, Any?>) {
             throw EncodingError.invalidValue(value,
                                              EncodingError.Context(codingPath: [],
                                                                    debugDescription: "Top-level \(T.self) encoded as non Dictionary fragment."))
         }
 
-        return (topLevel as! [String: Any?])
+        return removeBoxes(in: topLevel) as! [String: Any?]
+    }
+
+    private func removeBoxes(in value: Any?) -> Any? {
+        if let value = value as? [Any?] {
+            return value.map { removeBoxes(in: $0) }
+        } else if let value = value as? BoxedArray<Any?> {
+            return value.map { removeBoxes(in: $0) }
+        } else if let value = value as? [String: Any?] {
+            return value.mapValues { removeBoxes(in: $0) }
+        } else if let value = value as? BoxedDictionary<String, Any?> {
+            return value.dictionary.mapValues { removeBoxes(in: $0) }
+        }
+        return value
     }
 }
 
@@ -281,7 +294,7 @@ fileprivate class _DictionaryEncoder: Encoder {
 
     // MARK: - Encoder Methods
     public func container<Key>(keyedBy: Key.Type) -> KeyedEncodingContainer<Key> {
-        // If an existing keyewd container was already requested, return that one.
+        // If an existing keyed container was already requested, return that one.
         let topContainer: BoxedDictionary<String, Any?>
         if self.canEncodeNewValue {
             // We haven't yet pushed a container at this level; do so here.
@@ -396,73 +409,73 @@ fileprivate struct DictionaryCodingKeyedEncodingContainer<K: CodingKey>: KeyedEn
     }
 
     // MARK: - KeyedEncodingContainerProtocol Methods
-    public mutating func encodeNil(forKey key: Key) throws {
+    public func encodeNil(forKey key: Key) throws {
         _ = self.container.updateValue(nil, forKey: _converted(key).stringValue)
     }
 
-    public mutating func encode(_ value: Bool, forKey key: Key) throws {
+    public func encode(_ value: Bool, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: Int, forKey key: Key) throws {
+    public func encode(_ value: Int, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: Int8, forKey key: Key) throws {
+    public func encode(_ value: Int8, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: Int16, forKey key: Key) throws {
+    public func encode(_ value: Int16, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: Int32, forKey key: Key) throws {
+    public func encode(_ value: Int32, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: Int64, forKey key: Key) throws {
+    public func encode(_ value: Int64, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: UInt, forKey key: Key) throws {
+    public func encode(_ value: UInt, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: UInt8, forKey key: Key) throws {
+    public func encode(_ value: UInt8, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: UInt16, forKey key: Key) throws {
+    public func encode(_ value: UInt16, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: UInt32, forKey key: Key) throws {
+    public func encode(_ value: UInt32, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: UInt64, forKey key: Key) throws {
+    public func encode(_ value: UInt64, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: String, forKey key: Key) throws {
+    public func encode(_ value: String, forKey key: Key) throws {
         self.container[_converted(key).stringValue] = self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: Float, forKey key: Key) throws {
+    public func encode(_ value: Float, forKey key: Key) throws {
         // Since the float may be invalid and throw, the coding path needs to contain this key.
         self.encoder.codingPath.append(key)
         defer { self.encoder.codingPath.removeLast() }
         self.container[_converted(key).stringValue] = try self.encoder.box(value)
     }
 
-    public mutating func encode(_ value: Double, forKey key: Key) throws {
+    public func encode(_ value: Double, forKey key: Key) throws {
         // Since the double may be invalid and throw, the coding path needs to contain this key.
         self.encoder.codingPath.append(key)
         defer { self.encoder.codingPath.removeLast() }
         self.container[_converted(key).stringValue] = try self.encoder.box(value)
     }
 
-    public mutating func encode<T: Encodable>(_ value: T, forKey key: Key) throws {
+    public func encode<T: Encodable>(_ value: T, forKey key: Key) throws {
         self.encoder.codingPath.append(key)
         defer { self.encoder.codingPath.removeLast() }
         self.container[_converted(key).stringValue] = try self.encoder.box(value)
@@ -490,14 +503,14 @@ fileprivate struct DictionaryCodingKeyedEncodingContainer<K: CodingKey>: KeyedEn
         return _DictionaryUnkeyedEncodingContainer(referencing: self.encoder, codingPath: self.codingPath, wrapping: array)
     }
 
-    public mutating func superEncoder() -> Encoder {
+    public func superEncoder() -> Encoder {
         return _DictionaryReferencingEncoder(referencing: self.encoder,
                                              key: DatabaseCodingKey.super,
                                              convertedKey: _converted(DatabaseCodingKey.super),
                                              wrapping: self.container)
     }
 
-    public mutating func superEncoder(forKey key: Key) -> Encoder {
+    public func superEncoder(forKey key: Key) -> Encoder {
         return _DictionaryReferencingEncoder(referencing: self.encoder, key: key, convertedKey: _converted(key), wrapping: self.container)
     }
 }
@@ -528,47 +541,47 @@ fileprivate struct _DictionaryUnkeyedEncodingContainer: UnkeyedEncodingContainer
     }
 
     // MARK: - UnkeyedEncodingContainer Methods
-    public mutating func encodeNil() throws { self.container.append(nil as Any?) }
+    public func encodeNil() throws { self.container.append(nil as Any?) }
 
-    public mutating func encode(_ value: Bool) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: Bool) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: Int) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: Int) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: Int8) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: Int8) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: Int16) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: Int16) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: Int32) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: Int32) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: Int64) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: Int64) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: UInt) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: UInt) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: UInt8) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: UInt8) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: UInt16) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: UInt16) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: UInt32) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: UInt32) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: UInt64) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: UInt64) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: String) throws { self.container.append(self.encoder.box(value)) }
+    public func encode(_ value: String) throws { self.container.append(self.encoder.box(value)) }
 
-    public mutating func encode(_ value: Float) throws {
+    public func encode(_ value: Float) throws {
         // Since the float may be invalid and throw, the coding path needs to contain this key.
         self.encoder.codingPath.append(DatabaseCodingKey(index: self.count))
         defer { self.encoder.codingPath.removeLast() }
         self.container.append(try self.encoder.box(value))
     }
 
-    public mutating func encode(_ value: Double) throws {
+    public func encode(_ value: Double) throws {
         // Since the double may be invalid and throw, the coding path needs to contain this key.
         self.encoder.codingPath.append(DatabaseCodingKey(index: self.count))
         defer { self.encoder.codingPath.removeLast() }
         self.container.append(try self.encoder.box(value))
     }
 
-    public mutating func encode<T: Encodable>(_ value: T) throws {
+    public func encode<T: Encodable>(_ value: T) throws {
         self.encoder.codingPath.append(DatabaseCodingKey(index: self.count))
         defer { self.encoder.codingPath.removeLast() }
         self.container.append(try self.encoder.box(value))
@@ -596,7 +609,7 @@ fileprivate struct _DictionaryUnkeyedEncodingContainer: UnkeyedEncodingContainer
         return _DictionaryUnkeyedEncodingContainer(referencing: self.encoder, codingPath: self.codingPath, wrapping: array)
     }
 
-    public mutating func superEncoder() -> Encoder {
+    public func superEncoder() -> Encoder {
         return _DictionaryReferencingEncoder(referencing: self.encoder, at: self.container.count, wrapping: self.container)
     }
 }
@@ -900,14 +913,6 @@ extension _DictionaryEncoder {
         }
 
         let container = self.storage.popContainer()
-
-        if let box = container as? BoxedDictionary<String, Any?> {
-            return box.dictionary
-        }
-
-        if let box = container as? BoxedArray<Any?> {
-            return box.array
-        }
 
         return container
     }

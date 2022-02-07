@@ -26,6 +26,7 @@ internal class TestCollectionsModelContainer: Object, DatabaseContainer {
     @Persisted var anotherSet: Data
     @Persisted var someEnum: List<SomeEnum>
     @Persisted var someList: List<String>
+    @Persisted var codableEnums: Data
 }
 
 extension TestCollectionsModel: KeyPathConvertible {
@@ -45,6 +46,7 @@ extension TestCollectionsModel: KeyPathConvertible {
         case \TestCollectionsModel.anotherSet: return "anotherSet"
         case \TestCollectionsModel.someEnum: return "someEnum"
         case \TestCollectionsModel.someList: return "someList"
+        case \TestCollectionsModel.codableEnums: return "codableEnums"
         default:
             fatalError("Unhandled key path")
         }
@@ -80,6 +82,7 @@ internal class TestPrimitivesModelContainer: Object, DatabaseContainer {
     @Persisted var someEnumOpt: SomeEnum?
     @Persisted var stringEnum: String
     @Persisted var stringEnumOpt: String?
+    @Persisted var someComplexCodable: Data?
 }
 
 extension TestPrimitivesModel: KeyPathConvertible {
@@ -95,6 +98,7 @@ extension TestPrimitivesModel: KeyPathConvertible {
         case \TestPrimitivesModel.someEnumOpt: return "someEnumOpt"
         case \TestPrimitivesModel.stringEnum: return "stringEnum"
         case \TestPrimitivesModel.stringEnumOpt: return "stringEnumOpt"
+        case \TestPrimitivesModel.someComplexCodable: return "someComplexCodable"
         default:
             fatalError("Unhandled key path")
         }

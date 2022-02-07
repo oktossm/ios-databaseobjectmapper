@@ -161,6 +161,7 @@ struct TestPrimitivesModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, Aut
     let someEnumOpt: SomeEnum?
     let stringEnum: SomeStringEnum
     let stringEnumOpt: SomeStringEnum?
+    let someComplexCodable: SomeComplexCodable?
 }
 
 
@@ -179,6 +180,7 @@ struct TestCollectionsModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, Au
     let anotherSet: Set<SomeCodable?>
     let someEnum: [SomeEnum]
     let someList: [String]
+    let codableEnums: [Link]
 }
 
 
@@ -244,4 +246,88 @@ struct TestDateModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLense
 extension TestDateModel: UniquelyMappable {
     typealias Container = TestDateModelContainer
     static var idKey = \TestDateModel.id
+}
+
+
+struct SomeComplexCodable: Codable, Equatable, Hashable, DictionaryCodable {
+    let key: String
+    let index: Int
+    let link: Link?
+}
+
+
+enum Link: Hashable, Codable {
+    case chat(Int64)
+    case program(Int64)
+    case profile(Int64)
+
+    public var chatId: Int64? {
+        switch self {
+        case .chat(let id): return id
+        default: return nil
+        }
+    }
+    public var programId: Int64? {
+        switch self {
+        case .program(let id): return id
+        default: return nil
+        }
+    }
+    public var profileId: Int64? {
+        switch self {
+        case .profile(let id): return id
+        default: return nil
+        }
+    }
+}
+
+
+extension Link {
+
+    enum CodingKeys: String, CodingKey {
+        case chat
+        case program
+        case profile
+    }
+
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        if container.allKeys.contains(.chat), try container.decodeNil(forKey: .chat) == false {
+            var associatedValues = try container.nestedUnkeyedContainer(forKey: .chat)
+            let associatedValue0 = try associatedValues.decode(Int64.self)
+            self = .chat(associatedValue0)
+            return
+        }
+        if container.allKeys.contains(.program), try container.decodeNil(forKey: .program) == false {
+            var associatedValues = try container.nestedUnkeyedContainer(forKey: .program)
+            let associatedValue0 = try associatedValues.decode(Int64.self)
+            self = .program(associatedValue0)
+            return
+        }
+        if container.allKeys.contains(.profile), try container.decodeNil(forKey: .profile) == false {
+            var associatedValues = try container.nestedUnkeyedContainer(forKey: .profile)
+            let associatedValue0 = try associatedValues.decode(Int64.self)
+            self = .profile(associatedValue0)
+            return
+        }
+        throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown enum case"))
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .chat(associatedValue0):
+            var associatedValues = container.nestedUnkeyedContainer(forKey: .chat)
+            try associatedValues.encode(associatedValue0)
+        case let .program(associatedValue0):
+            var associatedValues = container.nestedUnkeyedContainer(forKey: .program)
+            try associatedValues.encode(associatedValue0)
+        case let .profile(associatedValue0):
+            var associatedValues = container.nestedUnkeyedContainer(forKey: .profile)
+            try associatedValues.encode(associatedValue0)
+        }
+    }
 }
