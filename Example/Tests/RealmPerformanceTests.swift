@@ -91,20 +91,23 @@ class RealmPerformanceTests: XCTestCase {
 
     func testCollectionsPerformance() {
         let codable = SomeCodable(key: "k", index: 4)
-        let url = URL(string: "https://google.com")
+        let persistable = SomePersistable(persistedValue: 3)
+        let url = URL(string: "https://google.com")!
         let testModel = TestCollectionsModel(id: 1,
                                              strings: ["one", "two"],
                                              intValues: [0, 3],
                                              doubleValues: nil,
                                              dates: [Date()],
                                              codable: [codable],
+                                             persistable: [persistable],
                                              urls: [url],
-                                             dict: [1: codable],
-                                             anotherDict: [codable: 2],
+                                             dict: ["key3": persistable],
+                                             anotherDict: [codable: .thirdCase],
                                              set: [url],
                                              anotherSet: [codable],
                                              someEnum: [.thirdCase],
-                                             someList: ["Test", "Test1"])
+                                             someList: ["Test", "Test1"],
+                                             codableEnums: [.chat(32), .program(22)])
 
         service.save(models: Array(0..<1000).map { testModel.idLens.set($0) })
 

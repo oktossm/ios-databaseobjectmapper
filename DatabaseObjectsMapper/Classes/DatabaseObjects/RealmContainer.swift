@@ -12,9 +12,9 @@ public final class RealmContainer: Object, DatabaseContainer {
 
     @objc dynamic var _value: Data? = nil
 
-    public var encodedValue: [String: Any] {
+    public var encodedValue: [String: Any?] {
         get {
-            return _value.flatMap { Dictionary<String, Any>(archive: $0) } ?? [:]
+            _value.flatMap { Dictionary<String, Any?>(archive: $0) } ?? [:]
         }
         set {
             _value = newValue.archived
@@ -25,10 +25,10 @@ public final class RealmContainer: Object, DatabaseContainer {
     @objc public dynamic var _id = ""
 
     public override class func primaryKey() -> String? {
-        return "_id"
+        "_id"
     }
 
     public override class func indexedProperties() -> [String] {
-        return []
+        []
     }
 }

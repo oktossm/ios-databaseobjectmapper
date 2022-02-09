@@ -1,6 +1,5 @@
-// Generated using Sourcery 1.0.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 1.6.1 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
-
 // MARK: - AutoObjectDiff
 import Foundation
 import DatabaseObjectsMapper
@@ -222,17 +221,19 @@ extension TestCollectionsModel {
     enum Updates: DictionaryElementRepresentable {
         case id(Int)
         case strings([String])
-        case intValues([Int64?]?)
+        case intValues([Int64?])
         case doubleValues([Double]?)
         case dates([Date]?)
         case codable([SomeCodable])
-        case urls(Array<URL?>)
-        case dict([Int: SomeCodable])
-        case anotherDict([SomeCodable: Int])
-        case set(Set<URL?>)
-        case anotherSet(Set<SomeCodable>?)
+        case persistable([SomePersistable])
+        case urls(Array<URL>)
+        case dict([String: SomePersistable])
+        case anotherDict([SomeCodable: SomeStringEnum])
+        case set(Set<URL>)
+        case anotherSet(Set<SomeCodable?>)
         case someEnum([SomeEnum])
         case someList([String])
+        case codableEnums([Link])
         var key: String {
             switch self {
                 case .id: return "id"
@@ -241,6 +242,7 @@ extension TestCollectionsModel {
                 case .doubleValues: return "doubleValues"
                 case .dates: return "dates"
                 case .codable: return "codable"
+                case .persistable: return "persistable"
                 case .urls: return "urls"
                 case .dict: return "dict"
                 case .anotherDict: return "anotherDict"
@@ -248,6 +250,7 @@ extension TestCollectionsModel {
                 case .anotherSet: return "anotherSet"
                 case .someEnum: return "someEnum"
                 case .someList: return "someList"
+                case .codableEnums: return "codableEnums"
             }
         }
         var value: Any? {
@@ -258,6 +261,7 @@ extension TestCollectionsModel {
             case .doubleValues(let newValue): return newValue
             case .dates(let newValue): return newValue
             case .codable(let newValue): return newValue
+            case .persistable(let newValue): return newValue
             case .urls(let newValue): return newValue
             case .dict(let newValue): return newValue
             case .anotherDict(let newValue): return newValue
@@ -265,6 +269,7 @@ extension TestCollectionsModel {
             case .anotherSet(let newValue): return newValue
             case .someEnum(let newValue): return newValue
             case .someList(let newValue): return newValue
+            case .codableEnums(let newValue): return newValue
             }
         }
         init?(key: String, value: Any?) {
@@ -278,7 +283,7 @@ extension TestCollectionsModel {
                     self = .strings(value)
                 } else { return nil }
             case "intValues":
-                if let value = value as? [Int64?]? {
+                if let value = value as? [Int64?] {
                     self = .intValues(value)
                 } else { return nil }
             case "doubleValues":
@@ -293,24 +298,28 @@ extension TestCollectionsModel {
                 if let value = value as? [SomeCodable] {
                     self = .codable(value)
                 } else { return nil }
+            case "persistable":
+                if let value = value as? [SomePersistable] {
+                    self = .persistable(value)
+                } else { return nil }
             case "urls":
-                if let value = value as? Array<URL?> {
+                if let value = value as? Array<URL> {
                     self = .urls(value)
                 } else { return nil }
             case "dict":
-                if let value = value as? [Int: SomeCodable] {
+                if let value = value as? [String: SomePersistable] {
                     self = .dict(value)
                 } else { return nil }
             case "anotherDict":
-                if let value = value as? [SomeCodable: Int] {
+                if let value = value as? [SomeCodable: SomeStringEnum] {
                     self = .anotherDict(value)
                 } else { return nil }
             case "set":
-                if let value = value as? Set<URL?> {
+                if let value = value as? Set<URL> {
                     self = .set(value)
                 } else { return nil }
             case "anotherSet":
-                if let value = value as? Set<SomeCodable>? {
+                if let value = value as? Set<SomeCodable?> {
                     self = .anotherSet(value)
                 } else { return nil }
             case "someEnum":
@@ -320,6 +329,10 @@ extension TestCollectionsModel {
             case "someList":
                 if let value = value as? [String] {
                     self = .someList(value)
+                } else { return nil }
+            case "codableEnums":
+                if let value = value as? [Link] {
+                    self = .codableEnums(value)
                 } else { return nil }
             default: return nil
             }
@@ -340,6 +353,7 @@ extension TestCollectionsModel {
         updates.append(.doubleValues(doubleValues))
         updates.append(.dates(dates))
         updates.append(.codable(codable))
+        updates.append(.persistable(persistable))
         updates.append(.urls(urls))
         updates.append(.dict(dict))
         updates.append(.anotherDict(anotherDict))
@@ -347,6 +361,7 @@ extension TestCollectionsModel {
         updates.append(.anotherSet(anotherSet))
         updates.append(.someEnum(someEnum))
         updates.append(.someList(someList))
+        updates.append(.codableEnums(codableEnums))
         return updates
     }
 
@@ -368,6 +383,8 @@ extension TestCollectionsModel {
                 return TestCollectionsModel.datesLens.set(newValue, self)
             case .codable(let newValue):
                 return TestCollectionsModel.codableLens.set(newValue, self)
+            case .persistable(let newValue):
+                return TestCollectionsModel.persistableLens.set(newValue, self)
             case .urls(let newValue):
                 return TestCollectionsModel.urlsLens.set(newValue, self)
             case .dict(let newValue):
@@ -382,6 +399,8 @@ extension TestCollectionsModel {
                 return TestCollectionsModel.someEnumLens.set(newValue, self)
             case .someList(let newValue):
                 return TestCollectionsModel.someListLens.set(newValue, self)
+            case .codableEnums(let newValue):
+                return TestCollectionsModel.codableEnumsLens.set(newValue, self)
         }
     }
     func updated(_ _updates: [Updates]) -> TestCollectionsModel {
@@ -395,6 +414,7 @@ extension TestCollectionsModel {
         if doubleValues != _model.doubleValues { updates.append(.doubleValues(doubleValues)) }
         if dates != _model.dates { updates.append(.dates(dates)) }
         if codable != _model.codable { updates.append(.codable(codable)) }
+        if persistable != _model.persistable { updates.append(.persistable(persistable)) }
         if urls != _model.urls { updates.append(.urls(urls)) }
         if dict != _model.dict { updates.append(.dict(dict)) }
         if anotherDict != _model.anotherDict { updates.append(.anotherDict(anotherDict)) }
@@ -402,6 +422,7 @@ extension TestCollectionsModel {
         if anotherSet != _model.anotherSet { updates.append(.anotherSet(anotherSet)) }
         if someEnum != _model.someEnum { updates.append(.someEnum(someEnum)) }
         if someList != _model.someList { updates.append(.someList(someList)) }
+        if codableEnums != _model.codableEnums { updates.append(.codableEnums(codableEnums)) }
         return updates
     }
 }
@@ -610,6 +631,7 @@ extension TestPrimitivesModel {
         case someEnumOpt(SomeEnum?)
         case stringEnum(SomeStringEnum)
         case stringEnumOpt(SomeStringEnum?)
+        case someComplexCodable(SomeComplexCodable?)
         var key: String {
             switch self {
                 case .id: return "id"
@@ -622,6 +644,7 @@ extension TestPrimitivesModel {
                 case .someEnumOpt: return "someEnumOpt"
                 case .stringEnum: return "stringEnum"
                 case .stringEnumOpt: return "stringEnumOpt"
+                case .someComplexCodable: return "someComplexCodable"
             }
         }
         var value: Any? {
@@ -636,6 +659,7 @@ extension TestPrimitivesModel {
             case .someEnumOpt(let newValue): return newValue
             case .stringEnum(let newValue): return newValue
             case .stringEnumOpt(let newValue): return newValue
+            case .someComplexCodable(let newValue): return newValue
             }
         }
         init?(key: String, value: Any?) {
@@ -680,6 +704,10 @@ extension TestPrimitivesModel {
                 if let value = value as? SomeStringEnum? {
                     self = .stringEnumOpt(value)
                 } else { return nil }
+            case "someComplexCodable":
+                if let value = value as? SomeComplexCodable? {
+                    self = .someComplexCodable(value)
+                } else { return nil }
             default: return nil
             }
         }
@@ -703,6 +731,7 @@ extension TestPrimitivesModel {
         updates.append(.someEnumOpt(someEnumOpt))
         updates.append(.stringEnum(stringEnum))
         updates.append(.stringEnumOpt(stringEnumOpt))
+        updates.append(.someComplexCodable(someComplexCodable))
         return updates
     }
 
@@ -732,6 +761,8 @@ extension TestPrimitivesModel {
                 return TestPrimitivesModel.stringEnumLens.set(newValue, self)
             case .stringEnumOpt(let newValue):
                 return TestPrimitivesModel.stringEnumOptLens.set(newValue, self)
+            case .someComplexCodable(let newValue):
+                return TestPrimitivesModel.someComplexCodableLens.set(newValue, self)
         }
     }
     func updated(_ _updates: [Updates]) -> TestPrimitivesModel {
@@ -749,6 +780,7 @@ extension TestPrimitivesModel {
         if someEnumOpt != _model.someEnumOpt { updates.append(.someEnumOpt(someEnumOpt)) }
         if stringEnum != _model.stringEnum { updates.append(.stringEnum(stringEnum)) }
         if stringEnumOpt != _model.stringEnumOpt { updates.append(.stringEnumOpt(stringEnumOpt)) }
+        if someComplexCodable != _model.someComplexCodable { updates.append(.someComplexCodable(someComplexCodable)) }
         return updates
     }
 }

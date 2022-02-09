@@ -20,6 +20,6 @@ public struct SortDescriptor<Model: KeyPathConvertible>: AnySortDescriptor {
     }
 
     public var sortDescriptor: NSSortDescriptor {
-        return NSSortDescriptor(key: Model.key(for: keyPath), ascending: ascending)
+        NSSortDescriptor(key: Model.key(for: keyPath), ascending: ascending)
     }
 }

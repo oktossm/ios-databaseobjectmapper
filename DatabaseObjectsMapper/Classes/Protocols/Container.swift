@@ -5,9 +5,9 @@
 import Foundation
 
 
-public protocol AnyDatabaseContainer: class {
+public protocol AnyDatabaseContainer: AnyObject {
     /// `Data` stored in Container properties for `DatabaseMappable`.
-    var encodedValue: [String: Any] { get set }
+    var encodedValue: [String: Any?] { get set }
 }
 
 

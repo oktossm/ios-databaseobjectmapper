@@ -46,9 +46,7 @@ public enum CoreDataObjectModel {
         case .url(let url):
             return NSManagedObjectModel(contentsOf: url)
         }
-
     }
-
 }
 
 
@@ -77,7 +75,6 @@ public enum CoreDataOptions {
             return options
         }
     }
-
 }
 
 
@@ -100,28 +97,28 @@ public class CoreDataStorage {
         self.migrate = migrate
 
         if case .custom(let coordinator, let externalContext) = store {
-            self.persistentStoreCoordinator = coordinator
+            persistentStoreCoordinator = coordinator
             self.externalContext = externalContext
 
-            self.externalObserver = self.externalContext?.addContextDidSaveNotificationObserver {
+            externalObserver = self.externalContext?.addContextDidSaveNotificationObserver {
                 [weak self] notification in
                 self?.rootContext.performMergeChanges(from: notification)
             }
 
-            self.internalObserver = self.rootContext.addContextDidSaveNotificationObserver {
+            internalObserver = rootContext.addContextDidSaveNotificationObserver {
                 [weak self] notification in
                 self?.externalContext?.performMergeChanges(from: notification)
             }
         } else {
-            let _ = self.rootContext
+            let _ = rootContext
         }
     }
 
     deinit {
-        if let observer = self.externalObserver {
+        if let observer = externalObserver {
             NotificationCenter.default.removeObserver(observer)
         }
-        if let observer = self.internalObserver {
+        if let observer = internalObserver {
             NotificationCenter.default.removeObserver(observer)
         }
     }
@@ -209,7 +206,7 @@ public class CoreDataStorage {
     /// Use it for background save operations
     public var newSavingContext: NSManagedObjectContext {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.parent = self.rootContext
+        context.parent = rootContext
         context.automaticallyMergesChangesFromParent = true
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         return context
@@ -247,7 +244,6 @@ public class CoreDataStorage {
                 CoreDataStorage.printError("Background NSManagedObjectContext save exception: \(String(describing: exception.userInfo))")
             }
         }
-        return
     }
 
     /// Save all contexts and wait
@@ -293,7 +289,6 @@ public class CoreDataStorage {
         try FileManager.default.removeItem(at: store.path())
         _ = try? FileManager.default.removeItem(atPath: "\(store.path().absoluteString)-shm")
         _ = try? FileManager.default.removeItem(atPath: "\(store.path().absoluteString)-wal")
-
     }
 
     internal func cleanStoreFilesAfterFailedMigration(store: CoreDataStore) throws {

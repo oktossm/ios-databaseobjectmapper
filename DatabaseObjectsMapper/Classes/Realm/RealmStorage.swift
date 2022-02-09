@@ -9,7 +9,7 @@ import Realm
 
 
 extension AnyRealmCollection {
-    func sort(_ sort: DatabaseSortType) -> AnyRealmCollection<Element> {
+    func sort(_ sort: DatabaseSortType) -> AnyRealmCollection<Element> where Element: KeypathSortable {
         switch sort {
         case .unsorted: return self
         case .byKeyPath(let path, let ascending): return AnyRealmCollection(self.sorted(byKeyPath: path, ascending: ascending))
@@ -23,11 +23,12 @@ extension AnyRealmCollection {
         }
     }
 
-    func filter(_ filter: DatabaseFilterType) -> AnyRealmCollection<Element> {
+    func filter<T: DatabaseMappable>(_ filter: DatabaseFilterType<T>) -> AnyRealmCollection<Element> where Element == T.Container {
         switch filter {
         case .unfiltered: return self
         case .query(let query): return AnyRealmCollection(self.filter(query))
         case .predicate(let predicate): return AnyRealmCollection(self.filter(predicate))
+        case .safeQuery(let query): return AnyRealmCollection(self.where(query))
         }
     }
 
@@ -115,7 +116,16 @@ public struct RealmWriteTransaction {
                                             updates: [String: Any?]) where T.Container: Object {
         let updates: [String: Any?] = updates.mapValues {
             value in
-            if let mappable = value as? DictionaryCodableCollection {
+            if let mappable = value as? [_ObjcBridgeable] {
+                return mappable.map { $0._rlmObjcValue }
+            } else if let mappable = value as? Set<AnyHashable>,
+                      let array = Array(mappable) as? [_ObjcBridgeable] {
+                return array.map { $0._rlmObjcValue }
+            } else if let mappable = value as? Dictionary<String, _ObjcBridgeable> {
+                return mappable.mapValues { $0._rlmObjcValue }
+            } else if let mappable = value as? _ObjcBridgeable {
+                return mappable._rlmObjcValue
+            } else if let mappable = value as? DictionaryCodableCollection {
                 return mappable.encodedCollectionValue
             } else if let mappable = value as? Encodable {
                 return mappable.encodedValue
@@ -291,7 +301,7 @@ class RealmOperator: NSObject {
     /// - parameter keyPath: KeyPath for relation.
     /// - returns: A `QPResults` containing all the values.
     func relationValues<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T)
-            -> AnyRealmCollection<R.Container>? where T.Container: Object, R.Container: Object {
+        -> AnyRealmCollection<R.Container>? where T.Container: Object, R.Container: Object {
         guard let key = Mirror(reflecting: model).children.first(where: { relation === (unwrapUsingProtocol($0.value) as AnyObject) })?.label,
               let object = realm.object(ofType: T.Container.self, forPrimaryKey: model.objectKeyValue) else { return nil }
         switch relation.type {

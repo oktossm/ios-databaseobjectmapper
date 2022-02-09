@@ -16,15 +16,15 @@ public struct ContextDidSaveNotification {
     }
 
     public var insertedObjects: AnyIterator<NSManagedObject> {
-        return iterator(forKey: NSInsertedObjectsKey)
+        iterator(forKey: NSInsertedObjectsKey)
     }
 
     public var updatedObjects: AnyIterator<NSManagedObject> {
-        return iterator(forKey: NSUpdatedObjectsKey)
+        iterator(forKey: NSUpdatedObjectsKey)
     }
 
     public var deletedObjects: AnyIterator<NSManagedObject> {
-        return iterator(forKey: NSDeletedObjectsKey)
+        iterator(forKey: NSDeletedObjectsKey)
     }
 
     public var managedObjectContext: NSManagedObjectContext {
@@ -42,9 +42,8 @@ public struct ContextDidSaveNotification {
             return AnyIterator { nil }
         }
         var innerIterator = set.makeIterator()
-        return AnyIterator { return innerIterator.next() as? NSManagedObject }
+        return AnyIterator { innerIterator.next() as? NSManagedObject }
     }
-
 }
 
 
@@ -77,7 +76,6 @@ public struct ContextWillSaveNotification {
     // MARK: Private
 
     fileprivate let notification: Notification
-
 }
 
 
@@ -89,27 +87,27 @@ public struct ObjectsDidChangeNotification {
     }
 
     public var insertedObjects: Set<NSManagedObject> {
-        return objects(forKey: NSInsertedObjectsKey)
+        objects(forKey: NSInsertedObjectsKey)
     }
 
     public var updatedObjects: Set<NSManagedObject> {
-        return objects(forKey: NSUpdatedObjectsKey)
+        objects(forKey: NSUpdatedObjectsKey)
     }
 
     public var deletedObjects: Set<NSManagedObject> {
-        return objects(forKey: NSDeletedObjectsKey)
+        objects(forKey: NSDeletedObjectsKey)
     }
 
     public var refreshedObjects: Set<NSManagedObject> {
-        return objects(forKey: NSRefreshedObjectsKey)
+        objects(forKey: NSRefreshedObjectsKey)
     }
 
     public var invalidatedObjects: Set<NSManagedObject> {
-        return objects(forKey: NSInvalidatedObjectsKey)
+        objects(forKey: NSInvalidatedObjectsKey)
     }
 
     public var invalidatedAllObjects: Bool {
-        return (notification as Notification).userInfo?[NSInvalidatedAllObjectsKey] != nil
+        (notification as Notification).userInfo?[NSInvalidatedAllObjectsKey] != nil
     }
 
     public var managedObjectContext: NSManagedObjectContext {
@@ -123,9 +121,8 @@ public struct ObjectsDidChangeNotification {
     fileprivate let notification: Notification
 
     fileprivate func objects(forKey key: String) -> Set<NSManagedObject> {
-        return ((notification as Notification).userInfo?[key] as? Set<NSManagedObject>) ?? Set()
+        ((notification as Notification).userInfo?[key] as? Set<NSManagedObject>) ?? Set()
     }
-
 }
 
 
@@ -182,7 +179,6 @@ extension NSManagedObjectContext {
             _ = try? s.obtainPermanentIDs(for: Array(s.insertedObjects))
         })
     }
-
 }
 
 

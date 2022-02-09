@@ -7,7 +7,7 @@
 import CoreData
 
 
-public protocol Managed: class, NSFetchRequestResult {
+public protocol Managed: NSFetchRequestResult {
     static var entity: NSEntityDescription { get }
     static var entityName: String { get }
     static var defaultSortDescriptors: [NSSortDescriptor] { get }
@@ -17,7 +17,6 @@ public protocol Managed: class, NSFetchRequestResult {
 
 
 extension NSManagedObject: Managed {
-
 }
 
 
@@ -63,7 +62,6 @@ extension Managed {
     public static func predicate(_ predicate: NSPredicate) -> NSPredicate {
         return NSCompoundPredicate(andPredicateWithSubpredicates: [defaultPredicate, predicate])
     }
-
 }
 
 
@@ -96,7 +94,8 @@ extension Managed where Self: NSManagedObject {
                 request.sortDescriptors = sortDescriptors
                 request.returnsObjectsAsFaults = false
                 request.fetchLimit = 1
-            }.first
+            }
+                    .first
         }
         return object
     }
@@ -147,7 +146,6 @@ extension Managed where Self: NSManagedObject {
         }
         return (sortDescriptors.flatMap { (objects as NSArray).sortedArray(using: $0) }?.first ?? objects.first) as? Self
     }
-
 }
 
 

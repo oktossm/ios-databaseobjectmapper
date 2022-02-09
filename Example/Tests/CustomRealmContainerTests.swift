@@ -360,11 +360,11 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let models = self.service.syncFetch(\TestSomeModel.userName == "rt")
+            let models: [TestSomeModel] = self.service.syncFetch { $0.userName == "rt" }
             XCTAssertTrue(models == [testModel])
-            let models2 = self.service.syncFetch(\TestSomeModel.userId > 1)
+            let models2: [TestSomeModel] = self.service.syncFetch { $0.userId > 1 }
             XCTAssertTrue(models2 == [testModel2])
-            let models3 = self.service.syncFetch(\TestSomeModel.title != "pl")
+            let models3: [TestSomeModel] = self.service.syncFetch { $0.title != "pl" }
             XCTAssertTrue(models3 == [testModel])
             expectation.fulfill()
         }
@@ -382,13 +382,13 @@ class CustomRealmContainerTests: XCTestCase {
         let expectation = XCTestExpectation()
         expectation.expectedFulfillmentCount = 2
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.service.fetch(\TestSomeModel.userName == "rt" && \TestSomeModel.count == 2) {
+            self.service.fetch({ $0.userName == "rt" && $0.count == 2 }) {
                 (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all == [testModel])
                 expectation.fulfill()
             }
-            self.service.fetch(\TestSomeModel.userName == "rt" || \TestSomeModel.userAvatar == "rw") {
+            self.service.fetch({ $0.userName == "rt" || $0.userAvatar == "rw" }) {
                 (all: [TestSomeModel]) in
 
                 XCTAssertTrue(all.count == 2)
@@ -842,20 +842,23 @@ class CustomRealmContainerTests: XCTestCase {
 
     func testCollectionsStoring() {
         let codable = SomeCodable(key: "k", index: 4)
-        let url = URL(string: "https://google.com")
+        let persistable = SomePersistable(persistedValue: 2)
+        let url = URL(string: "https://google.com")!
         let testModel = TestCollectionsModel(id: 1,
                                              strings: ["one", "two"],
                                              intValues: [0, 3],
                                              doubleValues: nil,
                                              dates: [Date()],
                                              codable: [codable],
+                                             persistable: [persistable],
                                              urls: [url],
-                                             dict: [1: codable],
-                                             anotherDict: [codable: 2],
+                                             dict: ["key": persistable],
+                                             anotherDict: [codable: .secondCase],
                                              set: [url],
                                              anotherSet: [codable],
                                              someEnum: [.secondCase, .thirdCase],
-                                             someList: ["Test", "Test1"])
+                                             someList: ["Test", "Test1"],
+                                             codableEnums: [.chat(32), .program(22)])
 
         service.save(model: testModel)
 
@@ -882,7 +885,8 @@ class CustomRealmContainerTests: XCTestCase {
                                             someEnum: .secondCase,
                                             someEnumOpt: .thirdCase,
                                             stringEnum: .firstCase,
-                                            stringEnumOpt: .secondCase)
+                                            stringEnumOpt: .secondCase,
+                                            someComplexCodable: SomeComplexCodable(key: "key", index: 24, link: .profile(399)))
         let testModel2 = TestPrimitivesModel(id: 2,
                                              value: 5,
                                              doubleValue: 4.5909,
@@ -892,7 +896,8 @@ class CustomRealmContainerTests: XCTestCase {
                                              someEnum: .firstCase,
                                              someEnumOpt: nil,
                                              stringEnum: .secondCase,
-                                             stringEnumOpt: nil)
+                                             stringEnumOpt: nil,
+                                             someComplexCodable: SomeComplexCodable(key: "key22", index: 74, link: .chat(223)))
 
         service.save(models: [testModel, testModel2])
 
@@ -921,7 +926,8 @@ class CustomRealmContainerTests: XCTestCase {
                                             someEnum: .secondCase,
                                             someEnumOpt: .thirdCase,
                                             stringEnum: .firstCase,
-                                            stringEnumOpt: .secondCase)
+                                            stringEnumOpt: .secondCase,
+                                            someComplexCodable: SomeComplexCodable(key: "key", index: 78, link: .chat(226)))
 
         service.save(models: [testModel])
 
@@ -929,7 +935,7 @@ class CustomRealmContainerTests: XCTestCase {
 
         service.update(modelOf: TestPrimitivesModel.self,
                        with: testModel.id,
-                       updates: ["doubleValue": 5,
+                       updates: ["doubleValue": 5.0,
                                  "someEnum": SomeEnum.firstCase,
                                  "someEnumOpt": nil,
                                  "stringEnumOpt": SomeStringEnum.thirdCase,
@@ -960,7 +966,8 @@ class CustomRealmContainerTests: XCTestCase {
                                             someEnum: .secondCase,
                                             someEnumOpt: .thirdCase,
                                             stringEnum: .firstCase,
-                                            stringEnumOpt: .secondCase)
+                                            stringEnumOpt: .secondCase,
+                                            someComplexCodable: SomeComplexCodable(key: "key", index: 24, link: .profile(399)))
 
         service.save(models: [testModel])
 
@@ -992,28 +999,33 @@ class CustomRealmContainerTests: XCTestCase {
     func testCollectionsUpdate() {
         let codable = SomeCodable(key: "k", index: 4)
         let newCodable = SomeCodable(key: "b", index: 5)
-        let url = URL(string: "https://google.com")
-        let url2 = URL(string: "https://yahoo.com")
+        let persistable = SomePersistable(persistedValue: 6)
+        let newPersistable = SomePersistable(persistedValue: 7)
+        let url = URL(string: "https://google.com")!
+        let url2 = URL(string: "https://yahoo.com")!
         let testModel = TestCollectionsModel(id: 1,
                                              strings: ["one", "two"],
                                              intValues: [0, 3],
                                              doubleValues: nil,
                                              dates: [Date()],
                                              codable: [codable],
+                                             persistable: [persistable],
                                              urls: [url],
-                                             dict: [1: codable],
-                                             anotherDict: [codable: 2],
+                                             dict: ["key": persistable],
+                                             anotherDict: [codable: .firstCase],
                                              set: [url],
                                              anotherSet: [codable],
                                              someEnum: [.secondCase, .thirdCase],
-                                             someList: ["Test3", "Test4"])
+                                             someList: ["Test3", "Test4"],
+                                             codableEnums: [.chat(32), .program(22)])
 
         service.save(models: [testModel])
         let updates: [RootKeyPathUpdate<TestCollectionsModel>] = [\TestCollectionsModel.intValues <- [0, 5],
                                                                   \TestCollectionsModel.codable <- [newCodable, codable],
                                                                   \TestCollectionsModel.urls <- [url, url2],
-                                                                  \TestCollectionsModel.dict <- [2: newCodable],
-                                                                  \TestCollectionsModel.someList <- ["Test1", "Test2"]]
+                                                                  \TestCollectionsModel.dict <- ["key2": newPersistable],
+                                                                  \TestCollectionsModel.someList <- ["Test1", "Test2"],
+                                                                  \TestCollectionsModel.codableEnums <- [.profile(31), .chat(21)]]
 
         service.update(modelOf: TestCollectionsModel.self, with: testModel.id, updates: updates)
 
@@ -1025,8 +1037,9 @@ class CustomRealmContainerTests: XCTestCase {
             XCTAssertTrue(all.first?.intValues == [0, 5], "\(all)")
             XCTAssertTrue(all.first?.codable == [newCodable, codable], "\(all)")
             XCTAssertTrue(all.first?.urls == [url, url2], "\(all)")
-            XCTAssertTrue(all.first?.dict == [2: newCodable], "\(all)")
+            XCTAssertTrue(all.first?.dict == ["key2": newPersistable], "\(all)")
             XCTAssertTrue(all.first?.someList == ["Test1", "Test2"], "\(all)")
+            XCTAssertTrue(all.first?.codableEnums == [.profile(31), .chat(21)], "\(all)")
 
             expectation.fulfill()
         }
@@ -1069,7 +1082,8 @@ class CustomRealmContainerTests: XCTestCase {
                                             someEnum: .secondCase,
                                             someEnumOpt: .thirdCase,
                                             stringEnum: .firstCase,
-                                            stringEnumOpt: .secondCase)
+                                            stringEnumOpt: .secondCase,
+                                            someComplexCodable: SomeComplexCodable(key: "key", index: 24, link: .profile(399)))
         let testModel2 = TestPrimitivesModel(id: 2,
                                              value: 5,
                                              doubleValue: 4.5909,
@@ -1079,7 +1093,8 @@ class CustomRealmContainerTests: XCTestCase {
                                              someEnum: .firstCase,
                                              someEnumOpt: nil,
                                              stringEnum: .secondCase,
-                                             stringEnumOpt: nil)
+                                             stringEnumOpt: nil,
+                                             someComplexCodable: nil)
         let testModel3 = TestPrimitivesModel(id: 3,
                                              value: nil,
                                              doubleValue: 4.5909,
@@ -1089,7 +1104,8 @@ class CustomRealmContainerTests: XCTestCase {
                                              someEnum: .firstCase,
                                              someEnumOpt: nil,
                                              stringEnum: .secondCase,
-                                             stringEnumOpt: nil)
+                                             stringEnumOpt: nil,
+                                             someComplexCodable: nil)
 
         service.save(models: [testModel, testModel2, testModel3])
 
@@ -1160,10 +1176,32 @@ class CustomRealmContainerTests: XCTestCase {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
-        service.beginBatchWrites()
+        let service = service.startBatchService()
         service.save(model: testModel)
         service.save(model: testModel2)
         service.commitBatchWrites()
+
+        let expectation = XCTestExpectation()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let all: [TestSomeModel] = self.service.syncFetch()
+
+            XCTAssertTrue(all.sorted { $0.userId < $1.userId } == [testModel, testModel2])
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testBatchStoreBlockWithKey() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
+
+        let service = service.withBatchWrites { service in
+            service.save(model: testModel)
+            service.save(model: testModel2)
+        }
 
         let expectation = XCTestExpectation()
 
@@ -1182,7 +1220,7 @@ class CustomRealmContainerTests: XCTestCase {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
-        service.beginBatchWrites()
+        let service = service.startBatchService()
         service.save(model: testModel)
         //Test duplicate
         service.save(model: testModel)
@@ -1200,7 +1238,7 @@ class CustomRealmContainerTests: XCTestCase {
         let testModel3 = TestSomeModel(userId: 1, userName: "rt", userAvatar: "ab", title: "po", count: 3, nestedModel: nil)
         let testModel4 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "ad", title: "pl", count: 3, nestedModel: nil)
 
-        service.beginBatchWrites()
+        let service = service.startBatchService()
         service.save(models: [testModel, testModel2])
         service.update(models: [testModel3, testModel4])
         service.commitBatchWrites()

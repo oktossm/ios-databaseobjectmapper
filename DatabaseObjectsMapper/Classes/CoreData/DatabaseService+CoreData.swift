@@ -8,7 +8,7 @@ import CoreData
 
 public extension DatabaseMappable where Container: NSManagedObject {
     func container(with userInfo: Any?) throws -> Container {
-        return try self.managedObject(with: userInfo)
+        try managedObject(with: userInfo)
     }
 
     func managedObject(with userInfo: Any?) throws -> Container {
@@ -25,17 +25,17 @@ public extension DatabaseMappable where Container: NSManagedObject {
 
 public extension DatabaseMappable where Container: NSManagedObject & SharedDatabaseContainer {
     func container(with userInfo: Any?) throws -> Container {
-        return try self.managedObject(with: userInfo)
+        try managedObject(with: userInfo)
     }
 
-    func update(_ container: Container, updates: [String: Any]) {
+    func update(_ container: Container, updates: [String: Any?]) {
         container.typeName = Self.typeName
         defaultUpdate(container, updates: updates)
         updateId(for: container)
     }
 
     static func internalPredicate() -> NSPredicate? {
-        return NSPredicate(format: "typeName == %@", argumentArray: [Self.typeName])
+        NSPredicate(format: "typeName == %@", argumentArray: [Self.typeName])
     }
 }
 
@@ -43,11 +43,11 @@ public extension DatabaseMappable where Container: NSManagedObject & SharedDatab
 public extension UniquelyMappable where Container: NSManagedObject {
     func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
         guard let context = userInfo as? NSManagedObjectContext else { return nil }
-        let container: Container? = context.findFirst(with: self.objectKeyValue)
+        let container: Container? = context.findFirst(with: objectKeyValue)
         return container
     }
-    
-    func update(_ container: Container, updates: [String: Any]) {
+
+    func update(_ container: Container, updates: [String: Any?]) {
         defaultUpdate(container, updates: updates)
         updateId(for: container)
     }
@@ -60,7 +60,7 @@ public extension UniquelyMappable where Container: NSManagedObject {
 
 
 public extension UniquelyMappable where Container: NSManagedObject & SharedDatabaseContainer {
-    func update(_ container: Container, updates: [String: Any]) {
+    func update(_ container: Container, updates: [String: Any?]) {
         container.typeName = Self.typeName
         defaultUpdate(container, updates: updates)
         updateId(for: container)
@@ -74,12 +74,12 @@ public extension UniquelyMappable where Container: NSManagedObject & SharedDatab
 
 
 public extension DatabaseMappable where Container: NSManagedObject {
-    func update(_ container: Container, updates: [String: Any]) {
+    func update(_ container: Container, updates: [String: Any?]) {
         defaultUpdate(container, updates: updates)
         updateId(for: container)
     }
 
-    internal func defaultUpdate(_ container: Container, updates: [String: Any]) {
+    internal func defaultUpdate(_ container: Container, updates: [String: Any?]) {
         updateProperties(for: container, updates: updates)
         if let context = container.managedObjectContext {
             updateRelationships(for: container, updates: updates, in: context)
@@ -93,11 +93,11 @@ public extension DatabaseMappable where Container: NSManagedObject {
         container.setValue(UUID().uuidString, forKey: keyPath)
     }
 
-    internal func updateProperties(for container: Container, updates: [String: Any]) {
+    internal func updateProperties(for container: Container, updates: [String: Any?]) {
         container.encodedValue = updates
     }
 
-    internal func updateRelationships(for container: Container, updates: [String: Any], in writeContext: NSManagedObjectContext) {
+    internal func updateRelationships(for container: Container, updates: [String: Any?], in writeContext: NSManagedObjectContext) {
         let relations = Set(container.entity.relationshipsByName.values.filter { !$0.isToMany }.map { $0.name })
         guard !relations.isEmpty else { return }
         let reflection = Dictionary(uniqueKeysWithValues: Mirror(reflecting: self).children.compactMap {
@@ -119,9 +119,9 @@ public extension DatabaseMappable where Container: NSManagedObject {
 
 
 public extension DatabaseContainer where Self: NSManagedObject {
-    var encodedValue: [String: Any] {
+    var encodedValue: [String: Any?] {
         get {
-            var encoded: [String: Any] = entity.attributesByName.compactMapValues { value(forKey: $0.name) }
+            var encoded: [String: Any?] = entity.attributesByName.compactMapValues { value(forKey: $0.name) }
             entity.relationshipsByName.values.filter { !$0.isToMany }.forEach {
                 if let object = value(forKey: $0.name) as? AnyDatabaseContainer {
                     encoded[$0.name] = object.encodedValue

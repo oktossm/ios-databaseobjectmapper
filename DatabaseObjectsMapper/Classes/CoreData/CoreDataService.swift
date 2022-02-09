@@ -14,10 +14,10 @@ open class CoreDataService {
     private var storage: CoreDataStorage
 
     private lazy var writeContext: NSManagedObjectContext = {
-        return self.storage.newSavingContext
+        self.storage.newSavingContext
     }()
     private var readContext: NSManagedObjectContext {
-        return self.storage.rootContext
+        storage.rootContext
     }
 
     public init(storage: CoreDataStorage = CoreDataStorage()) {
@@ -31,8 +31,8 @@ open class CoreDataService {
 
 extension CoreDataService {
     public func deleteAll() {
-        try? self.storage.destroyStore()
-        self.storage = CoreDataStorage()
+        try? storage.destroyStore()
+        storage = CoreDataStorage()
     }
 
     public func simpleSave<T: DatabaseMappable>(model: T) where T.Container: CoreDataObject {
@@ -40,7 +40,7 @@ extension CoreDataService {
     }
 
     public func simpleSave<T: DatabaseMappable>(models: [T]) where T.Container: CoreDataObject {
-        self.writeContext.perform {
+        writeContext.perform {
             [weak self] in
             guard let s = self else { return }
             models.forEach {
@@ -62,7 +62,7 @@ extension CoreDataService {
     }
 
     public func save<T: UniquelyMappable>(models: [T], update: Bool = true) where T.Container: CoreDataObject {
-        self.writeContext.perform {
+        writeContext.perform {
             [weak self] in
             guard let s = self else { return }
             guard models.isEmpty == false else { return }
@@ -89,7 +89,7 @@ extension CoreDataService {
     }
 
     public func update<T: UniquelyMappable>(models: [T]) where T.Container: CoreDataObject {
-        self.writeContext.perform {
+        writeContext.perform {
             [weak self] in
             guard let s = self else { return }
             let managed: [T.Container.ID: T.Container] = s.writeContext.findAll(with: models.map { $0.objectKeyValue })
@@ -102,7 +102,7 @@ extension CoreDataService {
     }
 
     public func update<T: UniquelyMappable>(modelOf type: T.Type, with key: T.ID, updates: [String: Any?]) where T.Container: CoreDataObject {
-        self.writeContext.perform {
+        writeContext.perform {
             [weak self] in
             guard let s = self,
                   let managed: T.Container = s.writeContext.findFirst(with: T.idMapping(key)) else { return }
@@ -147,7 +147,7 @@ extension CoreDataService {
     }
 
     public func deleteAll<T: DatabaseMappable>(modelOf type: T.Type) where T.Container: CoreDataObject {
-        self.writeContext.perform {
+        writeContext.perform {
             [weak self] in
             guard let s = self else { return }
             try? T.Container.delete(in: s.writeContext) {
@@ -158,10 +158,10 @@ extension CoreDataService {
         }
     }
 
-    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T> = .unfiltered,
                                            sorted sort: DatabaseSortType = .unsorted,
                                            callback: @escaping (Array<T>) -> Void) where T.Container: CoreDataObject {
-        self.readContext.perform {
+        readContext.perform {
             [weak self] in
             guard let s = self else { return }
             let predicate: NSPredicate?
@@ -176,11 +176,11 @@ extension CoreDataService {
         }
     }
 
-    public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+    public func syncFetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T> = .unfiltered,
                                                sorted sort: DatabaseSortType = .unsorted) -> Array<T> where T.Container: CoreDataObject {
         var result = [T]()
 
-        self.readContext.performAndWait {
+        readContext.performAndWait {
             [weak self] in
             guard let s = self else { return }
             let predicate: NSPredicate?
@@ -197,13 +197,13 @@ extension CoreDataService {
         return result
     }
 
-    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType = .unfiltered,
+    public func fetch<T: DatabaseMappable>(with filter: DatabaseFilterType<T> = .unfiltered,
                                            sorted sort: DatabaseSortType = .unsorted,
                                            callback: @escaping (Array<T>) -> Void,
                                            updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.Container: CoreDataObject {
         let token = DatabaseUpdatesToken()
 
-        self.readContext.perform {
+        readContext.perform {
             [weak self] in
             guard let s = self else { return }
 
@@ -247,7 +247,7 @@ extension CoreDataService {
     }
 
     public func fetchUnique<T: UniquelyMappable>(with key: T.ID, callback: @escaping (T?) -> Void) where T.Container: CoreDataObject {
-        self.readContext.perform {
+        readContext.perform {
             [weak self] in
             guard let s = self else { return }
             let object: T.Container? = s.readContext.findFirst(with: T.idMapping(key))
@@ -260,7 +260,7 @@ extension CoreDataService {
 
         var result: T? = nil
 
-        self.readContext.performAndWait {
+        readContext.performAndWait {
             [weak self] in
             guard let s = self else { return }
             let object: T.Container? = s.readContext.findFirst(with: T.idMapping(key))
@@ -276,7 +276,7 @@ extension CoreDataService {
                                            updates: @escaping (DatabaseModelUpdate<T>) -> Void) -> DatabaseUpdatesToken where T.Container: CoreDataObject {
         let token = DatabaseUpdatesToken()
 
-        self.readContext.perform {
+        readContext.perform {
             [weak self] in
             guard let s = self else { return }
 
@@ -317,14 +317,14 @@ extension CoreDataService {
     public func fetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
                                                          sorted sort: [SortDescriptor<T>] = [],
                                                          callback: @escaping ([T]) -> Void)
-            where T.Container: CoreDataObject, P.ModelType == T {
+        where T.Container: CoreDataObject, P.ModelType == T {
         fetch(with: .predicate(predicate: predicate.predicate),
               sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
               callback: callback)
     }
 
     public func fetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = [], callback: @escaping ([T]) -> Void)
-            where T.Container: CoreDataObject {
+        where T.Container: CoreDataObject {
         fetch(with: .unfiltered,
               sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
               callback: callback)
@@ -332,14 +332,14 @@ extension CoreDataService {
 
     public func syncFetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
                                                              sorted sort: [SortDescriptor<T>] = []) -> [T]
-            where T.Container: CoreDataObject, P.ModelType == T {
-        return syncFetch(with: .predicate(predicate: predicate.predicate),
-                         sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort))
+        where T.Container: CoreDataObject, P.ModelType == T {
+        syncFetch(with: .predicate(predicate: predicate.predicate),
+                  sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort))
     }
 
     public func syncFetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = []) -> [T] where T.Container: CoreDataObject {
-        return syncFetch(with: .unfiltered,
-                         sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort))
+        syncFetch(with: .unfiltered,
+                  sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort))
     }
 
     public func fetch<T: DatabaseMappable, P: Predicate>(_ predicate: P,
@@ -347,21 +347,21 @@ extension CoreDataService {
                                                          callback: @escaping ([T]) -> Void,
                                                          next: (([T], Bool) -> Void)? = nil,
                                                          updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
-            where T.Container: CoreDataObject, P.ModelType == T {
-        return fetch(with: .predicate(predicate: predicate.predicate),
-                     sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
-                     callback: callback,
-                     updates: updates)
+        where T.Container: CoreDataObject, P.ModelType == T {
+        fetch(with: .predicate(predicate: predicate.predicate),
+              sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+              callback: callback,
+              updates: updates)
     }
 
     public func fetch<T: DatabaseMappable & KeyPathConvertible>(sorted sort: [SortDescriptor<T>] = [],
                                                                 callback: @escaping ([T]) -> Void,
                                                                 next: (([T], Bool) -> Void)? = nil,
                                                                 updates: @escaping (DatabaseObserveUpdate<T>) -> Void) -> DatabaseUpdatesToken
-            where T.Container: CoreDataObject {
-        return fetch(with: .unfiltered,
-                     sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
-                     callback: callback,
-                     updates: updates)
+        where T.Container: CoreDataObject {
+        fetch(with: .unfiltered,
+              sorted: sort.isEmpty ? .unsorted : .init(sortDescriptors: sort),
+              callback: callback,
+              updates: updates)
     }
 }

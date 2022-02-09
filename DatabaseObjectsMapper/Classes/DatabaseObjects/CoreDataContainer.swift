@@ -10,9 +10,9 @@ open class CoreDataContainer: NSManagedObject, SharedDatabaseContainer {
 
     @NSManaged var value: Data?
 
-    public var encodedValue: [String: Any] {
+    public var encodedValue: [String: Any?] {
         get {
-            return value.flatMap { Dictionary<String, Any>(archive: $0) } ?? [:]
+            value.flatMap { Dictionary<String, Any?>(archive: $0) } ?? [:]
         }
         set {
             value = newValue.archived

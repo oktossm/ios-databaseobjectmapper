@@ -1,5 +1,6 @@
 import Foundation
 
+
 public enum StringPredicateRightHandExpression {
 
     /**
@@ -28,34 +29,35 @@ public enum StringPredicateRightHandExpression {
     case `in`(_ possibleValues: [CustomStringConvertible])
 }
 
+
 public func ~<Model: KeyPathConvertible, Property: StringEquatableProperty>(lhs: KeyPath<Model, Property>,
                                                                             rhs: StringPredicateRightHandExpression) -> AnyPredicate<Model> {
     switch rhs {
     case .hasPrefix(let prefix):
         return BasicPredicate<Model>(format: "%K BEGINSWITH %@",
                                      arguments: [Model.key(for: lhs), prefix ?? NSNull()])
-            .anyPredicate
+                .anyPredicate
     case .hasSuffix(let suffix):
         return BasicPredicate<Model>(format: "%K ENDSWITH %@",
                                      arguments: [Model.key(for: lhs), suffix ?? NSNull()])
-            .anyPredicate
+                .anyPredicate
     case .contains(let substring):
         return BasicPredicate<Model>(format: "%K CONTAINS %@",
                                      arguments: [Model.key(for: lhs), substring ?? NSNull()])
-            .anyPredicate
+                .anyPredicate
     case .like(let wildcardPatternString):
         return BasicPredicate<Model>(format: "%K LIKE %@",
                                      arguments: [Model.key(for: lhs), wildcardPatternString ?? NSNull()])
-            .anyPredicate
+                .anyPredicate
     case .in(let possibleValues):
         let inValues = possibleValues.lazy
-            .map {
-                $0.description
-                    .replacingOccurrences(of: "\\", with: "\\\\") // replace \ -> \\
-                    .replacingOccurrences(of: "'", with: "\\'") // escape ' -> \'
-            }
-            .map { "'\($0)'" }
-            .joined(separator: ", ")
+                                     .map {
+                                         $0.description
+                                           .replacingOccurrences(of: "\\", with: "\\\\") // replace \ -> \\
+                                           .replacingOccurrences(of: "'", with: "\\'") // escape ' -> \'
+                                     }
+                                     .map { "'\($0)'" }
+                                     .joined(separator: ", ")
 
         return BasicPredicate<Model>(
             format: "%K IN {\(inValues)}",
@@ -63,6 +65,6 @@ public func ~<Model: KeyPathConvertible, Property: StringEquatableProperty>(lhs:
                 Model.key(for: lhs)
             ]
         )
-            .anyPredicate
+                .anyPredicate
     }
 }

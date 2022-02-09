@@ -27,7 +27,7 @@ class DatePredicateTests: XCTestCase {
                     // Realm will automatically detect new properties and removed properties
                     // And will update the schema on disk automatically
                 }
-        },
+            },
             deleteRealmIfMigrationNeeded: true)
 
         // Tell Realm to use this new configuration object for the default Realm
@@ -50,6 +50,7 @@ class DatePredicateTests: XCTestCase {
     var nowMinusOneMonthTestModel: TestDateModel!
 
     var savedModels: [TestDateModel] = []
+
     func saveModels() {
         nowDateModel = TestDateModel(id: 1, date: Date())
 
@@ -80,11 +81,11 @@ class DatePredicateTests: XCTestCase {
     func testDateQueries() {
         saveModels()
 
-        var models = self.service.syncFetch(\TestDateModel.date > self.nowDateModel.date,
+        var models = self.service.syncFetch({ $0.date > self.nowDateModel.date },
                                             sorted: [SortDescriptor(\TestDateModel.date, ascending: true)])
         XCTAssertTrue([self.nowPlusOneDayTestModel, self.nowPlusOneMonthTestModel] == models)
 
-        models = self.service.syncFetch(\TestDateModel.date <= self.nowDateModel.date,
+        models = self.service.syncFetch({ $0.date <= self.nowDateModel.date },
                                         sorted: [SortDescriptor(\TestDateModel.date, ascending: true)])
         XCTAssertTrue([self.nowMinusOneMonthTestModel, self.nowMinusOneDayTestModel, self.nowDateModel] == models)
     }
