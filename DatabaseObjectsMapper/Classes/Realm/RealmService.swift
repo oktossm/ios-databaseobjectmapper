@@ -434,11 +434,11 @@ extension RealmService {
                 })
     }
 
-    public func average<T: DatabaseMappable & KeyPathConvertible, R: AddableType>
+    public func average<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
         (with filter: DatabaseFilterType<T> = .unfiltered,
          for keyPath: KeyPath<T, R>,
          callback: @escaping (Double?) -> Void)
-        where T.Container: RealmObject {
+        where T.Container: RealmObject, R.PersistedType: AddableType {
 
         readWorker.execute {
             realmOperator in
@@ -1284,10 +1284,10 @@ extension RealmService {
         }
     }
 
-    public func average<T: DatabaseMappable & KeyPathConvertible, R: AddableType>
+    public func average<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
         (with filter: DatabaseFilterType<T> = .unfiltered,
          for keyPath: KeyPath<T, R?>,
-         callback: @escaping (Double?) -> Void) where T.Container: RealmObject {
+         callback: @escaping (Double?) -> Void) where T.Container: RealmObject, R.PersistedType: AddableType {
 
         readWorker.execute {
             realmOperator in
