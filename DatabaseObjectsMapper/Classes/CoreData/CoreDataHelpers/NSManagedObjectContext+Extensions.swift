@@ -237,12 +237,12 @@ extension NSManagedObjectContext {
     /// - Parameters:
     ///   - key: key to find object
     /// - Returns: object or nil
-    func findFirst<A: DatabaseContainer>(with key: A.ID) -> A? where A: NSManagedObject {
+    func findFirst<A: UniqueDatabaseContainer>(with key: A.ID) -> A? where A: NSManagedObject {
         guard let keyPath = A.idKey._kvcKeyPathString else { return nil }
         return self.findFirst(with: NSPredicate(format: "%K = %@", argumentArray: [keyPath, key]))
     }
 
-    func findAll<A: DatabaseContainer>(with keys: [A.ID]) -> [A.ID: A] where A: NSManagedObject {
+    func findAll<A: UniqueDatabaseContainer>(with keys: [A.ID]) -> [A.ID: A] where A: NSManagedObject {
         guard let keyPath = A.idKey._kvcKeyPathString else { return [A.ID: A]() }
         let values: [A] = self.findAll(with: NSPredicate(format: "%K IN %@", argumentArray: [keyPath, keys]))
         var result = [A.ID: A]()

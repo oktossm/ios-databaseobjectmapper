@@ -7,7 +7,7 @@ import RealmSwift
 
 
 /// A RealmContainer allows any Codable type to be persisted to a Realm.
-public final class RealmContainer: Object, DatabaseContainer {
+public final class RealmContainer: Object, UniqueDatabaseContainer {
     public static var idKey: WritableKeyPath<RealmContainer, String> = \RealmContainer._id
 
     @objc dynamic var _value: Data? = nil

@@ -494,6 +494,85 @@ extension TestDateModel {
         return updates
     }
 }
+// MARK: TestERRModel ObjectDiff
+extension TestERRModel {
+
+    enum Updates: DictionaryElementRepresentable {
+        case name(String)
+        case someCount(Int)
+        case url(URL?)
+        var key: String {
+            switch self {
+                case .name: return "name"
+                case .someCount: return "someCount"
+                case .url: return "url"
+            }
+        }
+        var value: Any? {
+            switch self {
+            case .name(let newValue): return newValue
+            case .someCount(let newValue): return newValue
+            case .url(let newValue): return newValue
+            }
+        }
+        init?(key: String, value: Any?) {
+            switch key {
+            case "name":
+                if let value = value as? String {
+                    self = .name(value)
+                } else { return nil }
+            case "someCount":
+                if let value = value as? Int {
+                    self = .someCount(value)
+                } else { return nil }
+            case "url":
+                if let value = value as? URL? {
+                    self = .url(value)
+                } else { return nil }
+            default: return nil
+            }
+        }
+    }
+
+    static func updatesDict(_ _updates: [Updates]) -> [String: Any] {
+        var dict = [String: Any]()
+        _updates.forEach { dict[$0.key] = $0.value }
+        return dict
+    }
+
+    func allUpdates() -> [Updates] {
+        var updates = [Updates]()
+        updates.append(.name(name))
+        updates.append(.someCount(someCount))
+        updates.append(.url(url))
+        return updates
+    }
+
+    func updated(_ _updates: [String: Any]) -> TestERRModel {
+        guard let updates = [Updates].init(dictionary: _updates) else { return self }
+        return updated(updates)
+    }
+    func updated(_ _update: Updates) -> TestERRModel {
+        switch _update {
+            case .name(let newValue):
+                return TestERRModel.nameLens.set(newValue, self)
+            case .someCount(let newValue):
+                return TestERRModel.someCountLens.set(newValue, self)
+            case .url(let newValue):
+                return TestERRModel.urlLens.set(newValue, self)
+        }
+    }
+    func updated(_ _updates: [Updates]) -> TestERRModel {
+        return _updates.reduce(self) { (value, update) in value.updated(update) }
+    }
+    func difference(from _model: TestERRModel) -> [Updates] {
+        var updates = [Updates]()
+        if name != _model.name { updates.append(.name(name)) }
+        if someCount != _model.someCount { updates.append(.someCount(someCount)) }
+        if url != _model.url { updates.append(.url(url)) }
+        return updates
+    }
+}
 // MARK: TestModel ObjectDiff
 extension TestModel {
 
@@ -870,13 +949,17 @@ extension TestRRModel {
         case id(Int)
         case name(String)
         case owner(TestSomeModel?)
+        case user(TestERRModel?)
         case users(Relation<TestRRModel>)
+        case owners(EmbeddedRelation<TestERRModel>)
         var key: String {
             switch self {
                 case .id: return "id"
                 case .name: return "name"
                 case .owner: return "owner"
+                case .user: return "user"
                 case .users: return "users"
+                case .owners: return "owners"
             }
         }
         var value: Any? {
@@ -884,7 +967,9 @@ extension TestRRModel {
             case .id(let newValue): return newValue
             case .name(let newValue): return newValue
             case .owner(let newValue): return newValue
+            case .user(let newValue): return newValue
             case .users(let newValue): return newValue
+            case .owners(let newValue): return newValue
             }
         }
         init?(key: String, value: Any?) {
@@ -901,9 +986,17 @@ extension TestRRModel {
                 if let value = value as? TestSomeModel? {
                     self = .owner(value)
                 } else { return nil }
+            case "user":
+                if let value = value as? TestERRModel? {
+                    self = .user(value)
+                } else { return nil }
             case "users":
                 if let value = value as? Relation<TestRRModel> {
                     self = .users(value)
+                } else { return nil }
+            case "owners":
+                if let value = value as? EmbeddedRelation<TestERRModel> {
+                    self = .owners(value)
                 } else { return nil }
             default: return nil
             }
@@ -921,7 +1014,9 @@ extension TestRRModel {
         updates.append(.id(id))
         updates.append(.name(name))
         updates.append(.owner(owner))
+        updates.append(.user(user))
         updates.append(.users(users))
+        updates.append(.owners(owners))
         return updates
     }
 
@@ -937,8 +1032,12 @@ extension TestRRModel {
                 return TestRRModel.nameLens.set(newValue, self)
             case .owner(let newValue):
                 return TestRRModel.ownerLens.set(newValue, self)
+            case .user(let newValue):
+                return TestRRModel.userLens.set(newValue, self)
             case .users(let newValue):
                 return TestRRModel.usersLens.set(newValue, self)
+            case .owners(let newValue):
+                return TestRRModel.ownersLens.set(newValue, self)
         }
     }
     func updated(_ _updates: [Updates]) -> TestRRModel {
@@ -949,6 +1048,8 @@ extension TestRRModel {
         if id != _model.id { updates.append(.id(id)) }
         if name != _model.name { updates.append(.name(name)) }
         if owner != _model.owner { updates.append(.owner(owner)) }
+        if user != _model.user { updates.append(.user(user)) }
+        if owners != _model.owners { updates.append(.owners(owners)) }
         return updates
     }
 }

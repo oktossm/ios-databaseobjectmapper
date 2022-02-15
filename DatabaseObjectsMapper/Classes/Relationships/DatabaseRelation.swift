@@ -38,8 +38,40 @@ public final class Relation<Related: UniquelyMappable>: Codable {
 }
 
 
+public final class EmbeddedRelation<Related: DatabaseMappable>: Codable {
+
+    public enum RelationType: Int, Codable {
+        case direct
+        case inverse
+    }
+
+
+    public enum Update {
+        /// Creates and sets new models to relation
+        case setModels(models: [Related])
+        /// Creates and adds new models to relation
+        case addModels(models: [Related])
+    }
+
+
+    public let type: RelationType
+    public internal(set) var cachedValue: [Related]?
+
+    public init(type: RelationType = .direct) {
+        self.type = type
+    }
+}
+
+
 extension Relation: Equatable {
     public static func ==(lhs: Relation<Related>, rhs: Relation<Related>) -> Bool {
+        lhs.type == rhs.type
+    }
+}
+
+
+extension EmbeddedRelation: Equatable {
+    public static func ==(lhs: EmbeddedRelation<Related>, rhs: EmbeddedRelation<Related>) -> Bool {
         lhs.type == rhs.type
     }
 }

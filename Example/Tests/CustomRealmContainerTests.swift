@@ -779,7 +779,7 @@ class CustomRealmContainerTests: XCTestCase {
 
     func testSimpleRelationship() {
         let someModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
-        let testModel = TestRRModel(id: 1, name: "ll", owner: someModel)
+        let testModel = TestRRModel(id: 1, name: "ll", owner: someModel, user: nil)
 
         service.save(models: [testModel])
 
@@ -1072,6 +1072,54 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testMaxMinUpdates() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 10, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 7, nestedModel: nil)
+
+        service.save(models: [testModel, testModel4])
+
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 4
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var tokenMax: DatabaseUpdatesToken?
+            tokenMax = self.service.max(with: .unfiltered, for: \TestSomeModel.count, callback: {
+                XCTAssertTrue($0 == 7)
+            }) {
+                tokenMax?.invalidate()
+
+                XCTAssertTrue($0 == 10)
+                expectation.fulfill()
+            }
+            self.service.max(with: .query(query: "userAvatar == 'we'"), for: \TestSomeModel.count, callback: {
+                XCTAssertTrue($0 == 2)
+                expectation.fulfill()
+            })
+
+            var tokenMin: DatabaseUpdatesToken?
+            tokenMin = self.service.min(with: .query(query: "userAvatar == 'rw'"), for: \TestSomeModel.count, callback: {
+                XCTAssertTrue($0 == 7)
+            }) {
+                tokenMin?.invalidate()
+
+                XCTAssertTrue($0 == 3)
+                expectation.fulfill()
+            }
+            self.service.min(with: .unfiltered, for: \TestSomeModel.count, callback: {
+                XCTAssertTrue($0 == 2)
+                expectation.fulfill()
+            })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.service.save(models: [testModel2, testModel3])
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testMaxMinOptional() {
         let testModel = TestPrimitivesModel(id: 1,
                                             value: 20,
@@ -1149,6 +1197,63 @@ class CustomRealmContainerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testSumAverageUpdates() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 3, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 4, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 10, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 7, nestedModel: nil)
+
+        service.save(models: [testModel, testModel4])
+
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 4
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var sumToken: DatabaseUpdatesToken?
+            sumToken = self.service.sum(with: .unfiltered, for: \TestSomeModel.count, callback: {
+                XCTAssertTrue($0 == 10)
+            }) {
+                sumToken?.invalidate()
+
+                XCTAssertTrue($0 == 24)
+                expectation.fulfill()
+            }
+            var sumFilteredToken: DatabaseUpdatesToken?
+            sumFilteredToken = self.service.sum(with: .query(query: "userAvatar == 'rw'"), for: \TestSomeModel.count, callback: {
+                XCTAssertTrue($0 == 7)
+            }) {
+                sumFilteredToken?.invalidate()
+
+                XCTAssertTrue($0 == 21)
+                expectation.fulfill()
+            }
+            var averageToken: DatabaseUpdatesToken?
+            averageToken = self.service.average(with: .unfiltered, for: \TestSomeModel.count, callback: {
+                XCTAssertTrue($0 == 5)
+            }) {
+                averageToken?.invalidate()
+
+                XCTAssertTrue($0 == 6)
+                expectation.fulfill()
+            }
+            var averageFilteredToken: DatabaseUpdatesToken?
+            averageFilteredToken = self.service.average(with: .query(query: "userAvatar == 'rw'"), for: \TestSomeModel.count, callback: {
+                XCTAssertTrue($0 == 7)
+            }) {
+                averageFilteredToken?.invalidate()
+
+                XCTAssertTrue($0 == 7)
+                expectation.fulfill()
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.service.save(models: [testModel2, testModel3])
+            }
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testCount() {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
@@ -1167,6 +1272,43 @@ class CustomRealmContainerTests: XCTestCase {
             XCTAssertTrue(countFiltered == 3)
 
             expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testCountUpdates() {
+        let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
+        let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 3, nestedModel: nil)
+        let testModel3 = TestSomeModel(userId: 3, userName: "ki", userAvatar: "rw", title: "pl", count: 10, nestedModel: nil)
+        let testModel4 = TestSomeModel(userId: 4, userName: "ki", userAvatar: "rw", title: "pl", count: 7, nestedModel: nil)
+
+        service.save(models: [testModel, testModel4])
+
+        let expectation = XCTestExpectation()
+        expectation.expectedFulfillmentCount = 2
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            var countToken: DatabaseUpdatesToken?
+            countToken = self.service.count(for: TestSomeModel.self, callback: {
+                XCTAssertTrue($0 == 2)
+            }) {
+                countToken?.invalidate()
+                XCTAssertTrue($0 == 4)
+                expectation.fulfill()
+            }
+            var countFilteredToken: DatabaseUpdatesToken?
+            countFilteredToken = self.service.count(for: TestSomeModel.self, with: .query(query: "userAvatar == 'rw'"), callback: {
+                XCTAssertTrue($0 == 1)
+            }) {
+                countFilteredToken?.invalidate()
+                XCTAssertTrue($0 == 3)
+                expectation.fulfill()
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.service.save(models: [testModel2, testModel3])
+            }
         }
 
         wait(for: [expectation], timeout: 1)
@@ -1198,7 +1340,7 @@ class CustomRealmContainerTests: XCTestCase {
         let testModel = TestSomeModel(userId: 1, userName: "rt", userAvatar: "we", title: "po", count: 2, nestedModel: nil)
         let testModel2 = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
 
-        let service = service.withBatchWrites { service in
+        service.withBatchWrites { service in
             service.save(model: testModel)
             service.save(model: testModel2)
         }

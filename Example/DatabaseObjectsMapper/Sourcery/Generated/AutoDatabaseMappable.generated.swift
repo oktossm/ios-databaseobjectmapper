@@ -10,7 +10,7 @@ import DatabaseObjectsMapper
 
 // MARK: - AutoDatabaseMappable for classes, structs
 // MARK: - TestCollectionsModel generated container
-internal class TestCollectionsModelContainer: Object, DatabaseContainer {
+internal class TestCollectionsModelContainer: Object, UniqueDatabaseContainer {
     public static var idKey: WritableKeyPath<TestCollectionsModelContainer, Int> = \TestCollectionsModelContainer.id
     @Persisted(primaryKey: true) var id: Int
     @Persisted var strings: List<String>
@@ -53,7 +53,7 @@ extension TestCollectionsModel: KeyPathConvertible {
     }
 }
 // MARK: - TestDateModel generated container
-internal class TestDateModelContainer: Object, DatabaseContainer {
+internal class TestDateModelContainer: Object, UniqueDatabaseContainer {
     public static var idKey: WritableKeyPath<TestDateModelContainer, Int> = \TestDateModelContainer.id
     @Persisted(primaryKey: true) var id: Int
     @Persisted var date: Date
@@ -69,8 +69,26 @@ extension TestDateModel: KeyPathConvertible {
         }
     }
 }
+// MARK: - TestERRModel generated container
+internal class TestERRModelContainer: EmbeddedObject, DatabaseContainer {
+    @Persisted var name: String
+    @Persisted var someCount: Int
+    @Persisted var url: URL?
+}
+
+extension TestERRModel: KeyPathConvertible {
+    public static func key(for keyPath: PartialKeyPath<TestERRModel>) -> String {
+        switch keyPath {
+        case \TestERRModel.name: return "name"
+        case \TestERRModel.someCount: return "someCount"
+        case \TestERRModel.url: return "url"
+        default:
+            fatalError("Unhandled key path")
+        }
+    }
+}
 // MARK: - TestPrimitivesModel generated container
-internal class TestPrimitivesModelContainer: Object, DatabaseContainer {
+internal class TestPrimitivesModelContainer: Object, UniqueDatabaseContainer {
     public static var idKey: WritableKeyPath<TestPrimitivesModelContainer, Int> = \TestPrimitivesModelContainer.id
     @Persisted(primaryKey: true) var id: Int
     @Persisted var value: Int32?
@@ -105,7 +123,7 @@ extension TestPrimitivesModel: KeyPathConvertible {
     }
 }
 // MARK: - TestRNModel generated container
-internal class TestRNModelContainer: Object, DatabaseContainer {
+internal class TestRNModelContainer: Object, UniqueDatabaseContainer {
     public static var idKey: WritableKeyPath<TestRNModelContainer, Int> = \TestRNModelContainer.id
     @Persisted(primaryKey: true) var id: Int
     @Persisted var name: String
@@ -124,12 +142,14 @@ extension TestRNModel: KeyPathConvertible {
     }
 }
 // MARK: - TestRRModel generated container
-internal class TestRRModelContainer: Object, DatabaseContainer {
+internal class TestRRModelContainer: Object, UniqueDatabaseContainer {
     public static var idKey: WritableKeyPath<TestRRModelContainer, Int> = \TestRRModelContainer.id
     @Persisted(primaryKey: true) var id: Int
     @Persisted var name: String
     @Persisted var owner: TestSomeModelContainer?
+    @Persisted var user: TestERRModelContainer?
     @Persisted var users: List<TestRRModelContainer>
+    @Persisted var owners: List<TestERRModelContainer>
 }
 
 extension TestRRModel: KeyPathConvertible {
@@ -138,14 +158,16 @@ extension TestRRModel: KeyPathConvertible {
         case \TestRRModel.id: return "id"
         case \TestRRModel.name: return "name"
         case \TestRRModel.owner: return "owner"
+        case \TestRRModel.user: return "user"
         case \TestRRModel.users: return "users"
+        case \TestRRModel.owners: return "owners"
         default:
             fatalError("Unhandled key path")
         }
     }
 }
 // MARK: - TestSomeModel generated container
-internal class TestSomeModelContainer: Object, DatabaseContainer {
+internal class TestSomeModelContainer: Object, UniqueDatabaseContainer {
     public static var idKey: WritableKeyPath<TestSomeModelContainer, Int> = \TestSomeModelContainer.userId
     @Persisted(primaryKey: true) var userId: Int
     @Persisted(indexed: true) var userName: String

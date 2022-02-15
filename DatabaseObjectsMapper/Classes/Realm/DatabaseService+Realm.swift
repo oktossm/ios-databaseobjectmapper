@@ -7,7 +7,7 @@ import RealmSwift
 import Realm
 
 
-public extension DatabaseMappable where Container: Object {
+public extension DatabaseMappable where Container: AnyRealmObject {
     func container(with userInfo: Any?) throws -> Container {
         try realmObject(with: userInfo)
     }
@@ -20,7 +20,7 @@ public extension DatabaseMappable where Container: Object {
 }
 
 
-public extension DatabaseMappable where Container: Object & SharedDatabaseContainer {
+public extension DatabaseMappable where Container: AnyRealmObject & SharedDatabaseContainer {
     func container(with userInfo: Any?) throws -> Container {
         try realmObject(with: userInfo)
     }
@@ -50,8 +50,8 @@ public extension DatabaseMappable where Container: Object & SharedDatabaseContai
 }
 
 
-public extension UniquelyMappable where Container: Object {
-    func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? {
+public extension UniquelyMappable where Container: AnyRealmObject {
+    func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer? where Container: Object {
         guard let realm = (userInfo as? Realm) else { return nil }
         return realm.object(ofType: Container.self, forPrimaryKey: self.objectKeyValue)
     }
@@ -81,7 +81,7 @@ public extension UniquelyMappable where Container: Object {
 }
 
 
-public extension UniquelyMappable where Container: Object & SharedDatabaseContainer {
+public extension UniquelyMappable where Container: AnyRealmObject & SharedDatabaseContainer {
     func update(_ container: Container, updates: [String: Any?]) {
         container.typeName = Self.typeName
         updateProperties(for: container, updates: updates)
@@ -90,14 +90,14 @@ public extension UniquelyMappable where Container: Object & SharedDatabaseContai
     }
 
     internal func updateId(for container: Container) {
-        guard let keyPath = Container.primaryKey(),
+        guard let keyPath = container.objectSchema.primaryKeyProperty?.name,
               container.realm == nil else { return }
         container.setValue(objectKeyValue, forKey: keyPath)
     }
 }
 
 
-public extension DatabaseMappable where Container: Object {
+public extension DatabaseMappable where Container: AnyRealmObject {
     func update(_ container: Container, updates: [String: Any?]) {
         updateProperties(for: container, updates: updates)
         updateRelationships(for: container)
@@ -105,10 +105,7 @@ public extension DatabaseMappable where Container: Object {
     }
 
     internal func updateId(for container: Container) {
-        guard let keyPath = container.objectSchema.primaryKeyProperty?.name,
-              Container.ID.self == String.self,
-              container.realm == nil else { return }
-        container.setValue(UUID().uuidString, forKey: keyPath)
+        // update id required only for UniquelyMappable
     }
 
     internal func updateProperties(for container: Container, updates: [String: Any?]) {
@@ -142,7 +139,21 @@ public extension DatabaseMappable where Container: Object {
 typealias ObjCHashable = _ObjcBridgeable & Hashable
 
 
-public extension DatabaseContainer where Self: Object {
+public protocol AnyRealmObject: NSObject {
+    init()
+    var realm: Realm? { get }
+    var objectSchema: ObjectSchema { get }
+    subscript(key: String) -> Any? { get set }
+}
+
+
+extension Object: AnyRealmObject {}
+
+
+extension EmbeddedObject: AnyRealmObject {}
+
+
+public extension DatabaseContainer where Self: AnyRealmObject {
     var propertiesValue: [String: Any?] {
         let properties = objectSchema.properties
         let encoded: [String: Any?] = Dictionary(uniqueKeysWithValues: properties
