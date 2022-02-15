@@ -57,7 +57,7 @@ public extension DatabaseMappable {
 }
 
 
-public protocol UniquelyMappable: DatabaseMappable, Identifiable {
+public protocol UniquelyMappable: DatabaseMappable, Identifiable where Container: UniqueDatabaseContainer {
     /// The id mapped value. This used when retrieving values from a database. Database type can modify id before using it.
     /// Default containers add type name to key to store models of different types.
     /// Default implementation returns non modified key

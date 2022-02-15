@@ -87,10 +87,10 @@ public extension DatabaseMappable where Container: NSManagedObject {
     }
 
     internal func updateId(for container: Container) {
-        guard let keyPath = Container.idKey._kvcKeyPathString,
-              Container.ID.self == String.self,
-              container.entity.attributesByName[keyPath] != nil else { return }
-        container.setValue(UUID().uuidString, forKey: keyPath)
+//        guard let keyPath = Container.idKey._kvcKeyPathString,
+//              Container.ID.self == String.self,
+//              container.entity.attributesByName[keyPath] != nil else { return }
+//        container.setValue(UUID().uuidString, forKey: keyPath)
     }
 
     internal func updateProperties(for container: Container, updates: [String: Any?]) {
@@ -130,16 +130,18 @@ public extension DatabaseContainer where Self: NSManagedObject {
             return encoded
         }
         set {
-            let keyPath = Container.idKey._kvcKeyPathString
+//            let keyPath = Container.idKey._kvcKeyPathString
             let properties = Set(entity.attributesByName.map { $0.key })
 
             newValue.forEach {
-                if $0 != keyPath && properties.contains($0) {
+//                if $0 != keyPath && properties.contains($0) {
+                if properties.contains($0) {
                     setValue($1, forKey: $0)
                 }
             }
 
-            properties.filter { newValue[$0] == nil && $0 != keyPath }.forEach { setValue(nil, forKey: $0) }
+            properties.filter { newValue[$0] == nil }.forEach { setValue(nil, forKey: $0) }
+//            properties.filter { newValue[$0] == nil && $0 != keyPath }.forEach { setValue(nil, forKey: $0) }
         }
     }
 }

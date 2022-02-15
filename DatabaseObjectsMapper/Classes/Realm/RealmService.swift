@@ -254,6 +254,22 @@ extension RealmService {
         processRealmBlock(block, sync: sync)
     }
 
+    public func updateRelation<T: UniquelyMappable, R: DatabaseMappable>(_ relation: EmbeddedRelation<R>,
+                                                                         in model: T,
+                                                                         with update: EmbeddedRelation<R>.Update,
+                                                                         sync: Bool = false)
+        where T.Container: RealmObject, R.Container: ObjectBase & RealmCollectionValue {
+
+        let block: RealmBlock = {
+            realmOperator in
+            try? realmOperator.write {
+                transaction in
+                transaction.updateRelation(relation, in: model, with: update)
+            }
+        }
+        processRealmBlock(block, sync: sync)
+    }
+
     public func delete<T: UniquelyMappable>(model: T, sync: Bool = false) where T.Container: RealmObject {
         delete(models: [model], sync: sync)
     }
@@ -284,7 +300,6 @@ extension RealmService {
 
 
     // MARK: Fetching
-
     public func count<T: DatabaseMappable>
         (for model: T.Type,
          with filter: DatabaseFilterType<T> = .unfiltered,
@@ -297,6 +312,24 @@ extension RealmService {
                 callback(value)
             }
         }
+    }
+
+    public func count<T: DatabaseMappable>
+        (for model: T.Type,
+         with filter: DatabaseFilterType<T> = .unfiltered,
+         callback: @escaping (Int) -> Void,
+         updates: @escaping (Int) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject {
+        objects(for: model, with: filter, callback: {
+            let count = $0.count
+            DispatchQueue.main.async {
+                callback(count)
+            }
+        }, updates: {
+            let count = $0.count
+            DispatchQueue.main.async {
+                updates(count)
+            }
+        })
     }
 
     public func min<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
@@ -313,6 +346,26 @@ extension RealmService {
         }
     }
 
+    public func min<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
+        (with filter: DatabaseFilterType<T> = .unfiltered,
+         for keyPath: KeyPath<T, R>,
+         callback: @escaping (R?) -> Void,
+         updates: @escaping (R?) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject, R.PersistedType: MinMaxType {
+        objects(for: T.self, with: filter,
+                callback: {
+                    let value: R? = $0.min(ofProperty: T.key(for: keyPath))
+                    DispatchQueue.main.async {
+                        callback(value)
+                    }
+                },
+                updates: {
+                    let value: R? = $0.min(ofProperty: T.key(for: keyPath))
+                    DispatchQueue.main.async {
+                        updates(value)
+                    }
+                })
+    }
+
     public func max<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
         (with filter: DatabaseFilterType<T> = .unfiltered,
          for keyPath: KeyPath<T, R>,
@@ -325,6 +378,26 @@ extension RealmService {
                 callback(value)
             }
         }
+    }
+
+    public func max<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
+        (with filter: DatabaseFilterType<T> = .unfiltered,
+         for keyPath: KeyPath<T, R>,
+         callback: @escaping (R?) -> Void,
+         updates: @escaping (R?) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject, R.PersistedType: MinMaxType {
+        objects(for: T.self, with: filter,
+                callback: {
+                    let value: R? = $0.max(ofProperty: T.key(for: keyPath))
+                    DispatchQueue.main.async {
+                        callback(value)
+                    }
+                },
+                updates: {
+                    let value: R? = $0.max(ofProperty: T.key(for: keyPath))
+                    DispatchQueue.main.async {
+                        updates(value)
+                    }
+                })
     }
 
     public func sum<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
@@ -341,6 +414,26 @@ extension RealmService {
         }
     }
 
+    public func sum<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
+        (with filter: DatabaseFilterType<T> = .unfiltered,
+         for keyPath: KeyPath<T, R>,
+         callback: @escaping (R) -> Void,
+         updates: @escaping (R) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject, R.PersistedType: AddableType {
+        objects(for: T.self, with: filter,
+                callback: {
+                    let value: R = $0.sum(ofProperty: T.key(for: keyPath))
+                    DispatchQueue.main.async {
+                        callback(value)
+                    }
+                },
+                updates: {
+                    let value: R = $0.sum(ofProperty: T.key(for: keyPath))
+                    DispatchQueue.main.async {
+                        updates(value)
+                    }
+                })
+    }
+
     public func average<T: DatabaseMappable & KeyPathConvertible, R: AddableType>
         (with filter: DatabaseFilterType<T> = .unfiltered,
          for keyPath: KeyPath<T, R>,
@@ -354,6 +447,26 @@ extension RealmService {
                 callback(value)
             }
         }
+    }
+
+    public func average<T: DatabaseMappable & KeyPathConvertible, R: _HasPersistedType>
+        (with filter: DatabaseFilterType<T> = .unfiltered,
+         for keyPath: KeyPath<T, R>,
+         callback: @escaping (Double?) -> Void,
+         updates: @escaping (Double?) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject, R.PersistedType: AddableType {
+        objects(for: T.self, with: filter,
+                callback: {
+                    let value: Double? = $0.average(ofProperty: T.key(for: keyPath))
+                    DispatchQueue.main.async {
+                        callback(value)
+                    }
+                },
+                updates: {
+                    let value: Double? = $0.average(ofProperty: T.key(for: keyPath))
+                    DispatchQueue.main.async {
+                        updates(value)
+                    }
+                })
     }
 
     public func countSync<T: DatabaseMappable>(for model: T.Type,
@@ -552,6 +665,25 @@ extension RealmService {
         }
     }
 
+    public func count<T: UniquelyMappable, R: UniquelyMappable>
+        (_ relation: Relation<R>,
+         in model: T,
+         with filter: DatabaseFilterType<R> = .unfiltered,
+         callback: @escaping (Int) -> Void,
+         updates: @escaping (Int) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject, R.Container: RealmObject {
+        fetchRelationObjects(relation, in: model, with: filter, callback: {
+            let count = $0?.count ?? 0
+            DispatchQueue.main.async {
+                callback(count)
+            }
+        }, updates: {
+            let count = $0?.count ?? 0
+            DispatchQueue.main.async {
+                updates(count)
+            }
+        })
+    }
+
     public func min<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
@@ -566,6 +698,27 @@ extension RealmService {
                 callback(value)
             }
         }
+    }
+
+    public func min<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
+        (_ relation: Relation<R>,
+         in model: T,
+         with filter: DatabaseFilterType<R> = .unfiltered,
+         for keyPath: KeyPath<R, V>,
+         callback: @escaping (V?) -> Void,
+         updates: @escaping (V?) -> Void) -> DatabaseUpdatesToken
+        where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
+        fetchRelationObjects(relation, in: model, with: filter, callback: {
+            let value: V? = $0?.min(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }, updates: {
+            let value: V? = $0?.min(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                updates(value)
+            }
+        })
     }
 
     public func max<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
@@ -584,6 +737,27 @@ extension RealmService {
         }
     }
 
+    public func max<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
+        (_ relation: Relation<R>,
+         in model: T,
+         with filter: DatabaseFilterType<R> = .unfiltered,
+         for keyPath: KeyPath<R, V>,
+         callback: @escaping (V?) -> Void,
+         updates: @escaping (V?) -> Void) -> DatabaseUpdatesToken
+        where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: MinMaxType {
+        fetchRelationObjects(relation, in: model, with: filter, callback: {
+            let value: V? = $0?.max(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }, updates: {
+            let value: V? = $0?.max(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                updates(value)
+            }
+        })
+    }
+
     public func sum<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
@@ -600,6 +774,27 @@ extension RealmService {
         }
     }
 
+    public func sum<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
+        (_ relation: Relation<R>,
+         in model: T,
+         with filter: DatabaseFilterType<R> = .unfiltered,
+         for keyPath: KeyPath<R, V>,
+         callback: @escaping (V?) -> Void,
+         updates: @escaping (V?) -> Void) -> DatabaseUpdatesToken
+        where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
+        fetchRelationObjects(relation, in: model, with: filter, callback: {
+            let value: V? = $0?.sum(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }, updates: {
+            let value: V? = $0?.sum(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                updates(value)
+            }
+        })
+    }
+
     public func average<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
         (_ relation: Relation<R>,
          in model: T,
@@ -614,6 +809,27 @@ extension RealmService {
                 callback(value)
             }
         }
+    }
+
+    public func average<T: UniquelyMappable, R: UniquelyMappable & KeyPathConvertible, V: _HasPersistedType>
+        (_ relation: Relation<R>,
+         in model: T,
+         with filter: DatabaseFilterType<R> = .unfiltered,
+         for keyPath: KeyPath<R, V>,
+         callback: @escaping (Double?) -> Void,
+         updates: @escaping (Double?) -> Void) -> DatabaseUpdatesToken
+        where T.Container: RealmObject, R.Container: RealmObject, V.PersistedType: AddableType {
+        fetchRelationObjects(relation, in: model, with: filter, callback: {
+            let value: Double? = $0?.average(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                callback(value)
+            }
+        }, updates: {
+            let value: Double? = $0?.average(ofProperty: R.key(for: keyPath))
+            DispatchQueue.main.async {
+                updates(value)
+            }
+        })
     }
 
     public func countSync<T: UniquelyMappable, R: UniquelyMappable>
@@ -667,6 +883,34 @@ extension RealmService {
          sorted sort: DatabaseSortType = .unsorted,
          limit: Int? = nil,
          callback: @escaping ([R]) -> Void) where T.Container: Object, R.Container: Object {
+
+        readWorker.execute {
+            realmOperator in
+            guard let values = realmOperator.relationValues(relation, in: model)?
+                                            .filter(filter)
+                                            .sort(sort)
+                                            .limited(limit)
+                                            .compactMap({ try? R.mappable(for: $0) }) else {
+                DispatchQueue.main.async {
+                    callback([])
+                }
+                return
+            }
+            let result: Array<R> = Array(values)
+            DispatchQueue.main.async {
+                relation.cachedValue = result
+                callback(result)
+            }
+        }
+    }
+
+    public func fetchRelation<T: UniquelyMappable, R: DatabaseMappable>
+        (_ relation: EmbeddedRelation<R>,
+         in model: T,
+         with filter: DatabaseFilterType<R> = .unfiltered,
+         sorted sort: DatabaseSortType = .unsorted,
+         limit: Int? = nil,
+         callback: @escaping ([R]) -> Void) where T.Container: Object, R.Container: ObjectBase & RealmCollectionValue {
 
         readWorker.execute {
             realmOperator in
@@ -1185,6 +1429,108 @@ extension RealmService {
 
 
 extension RealmService {
+    private func objects<T: DatabaseMappable>
+        (for model: T.Type,
+         with filter: DatabaseFilterType<T> = .unfiltered,
+         callback: @escaping (AnyRealmCollection<T.Container>) -> Void,
+         updates: @escaping (AnyRealmCollection<T.Container>) -> Void) -> DatabaseUpdatesToken where T.Container: RealmObject {
+
+        let token = DatabaseUpdatesToken()
+
+        let worker = readWorker
+
+        worker.execute {
+            realmOperator in
+
+            if token.isInvalidated { return }
+
+            let results = realmOperator.values(ofType: T.self).filter(filter)
+
+            let rToken = results.observe {
+                change in
+
+                switch change {
+                case let .initial(newResults):
+                    let values = newResults
+                    callback(values)
+                case let .update(newResults, _, _, _):
+                    updates(newResults)
+                case .error(_):
+                    break
+                }
+            }
+
+            token.invalidation = { rToken.invalidate() }
+        }
+
+        return token
+    }
+
+    private func fetchRelationObjects<T: UniquelyMappable, R: UniquelyMappable>
+        (_ relation: Relation<R>,
+         in model: T,
+         with filter: DatabaseFilterType<R> = .unfiltered,
+         callback: @escaping (AnyRealmCollection<R.Container>?) -> Void,
+         updates: @escaping (AnyRealmCollection<R.Container>?) -> Void) -> DatabaseUpdatesToken where T.Container: Object, R.Container: Object {
+
+        let token = DatabaseUpdatesToken()
+
+        // Listen for item deletes
+        let innerToken = fetchUnique(with: model.idValue, callback: {
+            [weak token] (item: T?) in
+            guard item == nil else { return }
+            token?.invalidate()
+        }, updates: {
+            [weak token] update in
+            switch update {
+            case .delete:
+                updates(nil)
+                token?.invalidate()
+            default:
+                break
+            }
+        })
+
+        let worker = readWorker
+
+        worker.execute {
+            realmOperator in
+
+            if token.isInvalidated { return }
+
+            guard let results = realmOperator.relationValues(relation, in: model)?.filter(filter) else {
+                callback(nil)
+                return
+            }
+
+            let rToken = results.observe {
+                change in
+
+                if token.isInvalidated { return }
+
+                // Check if item still exists
+                guard let _: T.Container = realmOperator.value(ofType: T.self, with: model.idValue) else {
+                    return
+                }
+
+                switch change {
+                case let .initial(newResults):
+                    callback(newResults)
+                case let .update(newResults, _, _, _):
+                    updates(newResults)
+                case .error: break
+                }
+            }
+
+            token.invalidation = {
+                rToken.invalidate()
+                innerToken.invalidate()
+            }
+        }
+
+        return token
+    }
+
     private func setupLimitation<T: DatabaseMappable>(for token: DatabaseUpdatesToken,
                                                       worker: DatabaseRealmBackgroundWorker,
                                                       results: AnyRealmCollection<T.Container>,

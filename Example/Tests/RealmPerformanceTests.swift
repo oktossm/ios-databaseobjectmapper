@@ -128,7 +128,7 @@ class RealmPerformanceTests: XCTestCase {
 
     func testRelationPerformance() {
         let subModel = TestSomeModel(userId: 2, userName: "ki", userAvatar: "rw", title: "pl", count: 2, nestedModel: nil)
-        let testModel = TestRRModel(id: 1, name: "ll", owner: subModel)
+        let testModel = TestRRModel(id: 1, name: "ll", owner: subModel, user: nil)
 
         service.save(models: Array(0..<1000).map { testModel.idLens.set($0) })
 

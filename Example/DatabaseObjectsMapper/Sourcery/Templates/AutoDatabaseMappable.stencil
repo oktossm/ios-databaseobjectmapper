@@ -24,6 +24,7 @@ import {{ value }}
     {# Relations #}
     {% if var.typeName.name|hasPrefix:"Relation" and var.typeName.isGeneric and var.defaultValue|contains:"type: .inverse" %}@Persisted(originProperty: "{{var.annotations.inverseRelation}}") var {{ var.name }}: LinkingObjects<{{var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName}}Container>{% endif %}
     {% if var.typeName.name|hasPrefix:"Relation" and var.typeName.isGeneric and var.defaultValue|contains:"type: .direct" %}@Persisted var {{ var.name }}: List<{{var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName}}Container>{% endif %}
+    {% if var.typeName.name|hasPrefix:"EmbeddedRelation" and var.typeName.isGeneric and var.defaultValue|contains:"type: .direct" %}@Persisted var {{ var.name }}: List<{{var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName}}Container>{% endif %}
     {# Arrays -> List or Data #}
     {% if var.typeName.isArray %}
     {% set isIntType %}{% for intType in intTypes where intType == var.typeName.generic.typeParameters.first.typeName.unwrappedTypeName %}true{% endfor %}{% endset %}
@@ -64,7 +65,7 @@ import {{ value }}
 // MARK: - AutoDatabaseMappable for classes, structs
 {% for type in types.implementing.AutoDatabaseMappable|!enum|!protocol %}
 // MARK: - {{ type.name }} generated container
-{{ type.accessLevel }} class {{ type.name }}Container: Object, DatabaseContainer {
+{{ type.accessLevel }} class {{ type.name }}Container: {% if type.annotations.embedded %}Embedded{% endif %}Object, {% if type.based.UniquelyMappable %}Unique{% endif %}DatabaseContainer {
 {% for variable in type.staticVariables where variable.name == "idKey" %}
 {% set idName variable.defaultValue|replace:"\",""|replace:type.name,""|replace:".","" %}
 {% for var in type.storedVariables where var.name == idName %}
@@ -73,6 +74,9 @@ import {{ value }}
 {% endfor %}
 {% call iterateVariables type.storedVariables idName %}
 {% endfor %}
+{% if not type.based.UniquelyMappable %}
+{% call iterateVariables type.storedVariables "" %}
+{% endif %}
 }
 
 extension {{ type.name }}: KeyPathConvertible {

@@ -288,6 +288,35 @@ extension TestDateModel {
      return BoundLens<TestDateModel, Date>(instance: self, lens: TestDateModel.dateLens)
   }
 }
+extension TestERRModel {
+  static let nameLens = Lens<TestERRModel, String>(
+    get: { $0.name },
+    set: { name, testERRModel in
+       TestERRModel(name: name, someCount: testERRModel.someCount, url: testERRModel.url)
+    }
+  )
+  var nameLens: BoundLens<TestERRModel, String> {
+     return BoundLens<TestERRModel, String>(instance: self, lens: TestERRModel.nameLens)
+  }
+  static let someCountLens = Lens<TestERRModel, Int>(
+    get: { $0.someCount },
+    set: { someCount, testERRModel in
+       TestERRModel(name: testERRModel.name, someCount: someCount, url: testERRModel.url)
+    }
+  )
+  var someCountLens: BoundLens<TestERRModel, Int> {
+     return BoundLens<TestERRModel, Int>(instance: self, lens: TestERRModel.someCountLens)
+  }
+  static let urlLens = Lens<TestERRModel, URL?>(
+    get: { $0.url },
+    set: { url, testERRModel in
+       TestERRModel(name: testERRModel.name, someCount: testERRModel.someCount, url: url)
+    }
+  )
+  var urlLens: BoundLens<TestERRModel, URL?> {
+     return BoundLens<TestERRModel, URL?>(instance: self, lens: TestERRModel.urlLens)
+  }
+}
 extension TestModel {
   static let idLens = Lens<TestModel, Int>(
     get: { $0.id },
@@ -487,7 +516,7 @@ extension TestRRModel {
   static let idLens = Lens<TestRRModel, Int>(
     get: { $0.id },
     set: { id, testRRModel in
-       TestRRModel(id: id, name: testRRModel.name, owner: testRRModel.owner)
+       TestRRModel(id: id, name: testRRModel.name, owner: testRRModel.owner, user: testRRModel.user)
     }
   )
   var idLens: BoundLens<TestRRModel, Int> {
@@ -496,7 +525,7 @@ extension TestRRModel {
   static let nameLens = Lens<TestRRModel, String>(
     get: { $0.name },
     set: { name, testRRModel in
-       TestRRModel(id: testRRModel.id, name: name, owner: testRRModel.owner)
+       TestRRModel(id: testRRModel.id, name: name, owner: testRRModel.owner, user: testRRModel.user)
     }
   )
   var nameLens: BoundLens<TestRRModel, String> {
@@ -505,20 +534,38 @@ extension TestRRModel {
   static let ownerLens = Lens<TestRRModel, TestSomeModel?>(
     get: { $0.owner },
     set: { owner, testRRModel in
-       TestRRModel(id: testRRModel.id, name: testRRModel.name, owner: owner)
+       TestRRModel(id: testRRModel.id, name: testRRModel.name, owner: owner, user: testRRModel.user)
     }
   )
   var ownerLens: BoundLens<TestRRModel, TestSomeModel?> {
      return BoundLens<TestRRModel, TestSomeModel?>(instance: self, lens: TestRRModel.ownerLens)
   }
+  static let userLens = Lens<TestRRModel, TestERRModel?>(
+    get: { $0.user },
+    set: { user, testRRModel in
+       TestRRModel(id: testRRModel.id, name: testRRModel.name, owner: testRRModel.owner, user: user)
+    }
+  )
+  var userLens: BoundLens<TestRRModel, TestERRModel?> {
+     return BoundLens<TestRRModel, TestERRModel?>(instance: self, lens: TestRRModel.userLens)
+  }
   static let usersLens = Lens<TestRRModel, Relation<TestRRModel>>(
     get: { $0.users },
     set: { users, testRRModel in
-       TestRRModel(id: testRRModel.id, name: testRRModel.name, owner: testRRModel.owner)
+       TestRRModel(id: testRRModel.id, name: testRRModel.name, owner: testRRModel.owner, user: testRRModel.user)
     }
   )
   var usersLens: BoundLens<TestRRModel, Relation<TestRRModel>> {
      return BoundLens<TestRRModel, Relation<TestRRModel>>(instance: self, lens: TestRRModel.usersLens)
+  }
+  static let ownersLens = Lens<TestRRModel, EmbeddedRelation<TestERRModel>>(
+    get: { $0.owners },
+    set: { owners, testRRModel in
+       TestRRModel(id: testRRModel.id, name: testRRModel.name, owner: testRRModel.owner, user: testRRModel.user)
+    }
+  )
+  var ownersLens: BoundLens<TestRRModel, EmbeddedRelation<TestERRModel>> {
+     return BoundLens<TestRRModel, EmbeddedRelation<TestERRModel>>(instance: self, lens: TestRRModel.ownersLens)
   }
 }
 extension TestSimpleModel {

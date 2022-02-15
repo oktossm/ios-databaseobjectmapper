@@ -189,6 +189,24 @@ public struct RealmWriteTransaction {
         }
     }
 
+    public func updateRelation<T: UniquelyMappable, R: DatabaseMappable>(_ relation: EmbeddedRelation<R>,
+                                                                         in model: T,
+                                                                         with update: EmbeddedRelation<R>.Update)
+        where T.Container: Object, R.Container: ObjectBase & RealmCollectionValue {
+        guard let key = Mirror(reflecting: model).children.first(where: { relation === (unwrapUsingProtocol($0.value) as AnyObject) })?.label,
+              let object = realm.object(ofType: T.Container.self, forPrimaryKey: model.objectKeyValue) else { return }
+        guard relation.type == .direct, let list = object[key] as? List<R.Container> else { return }
+        switch update {
+        case .addModels(let models):
+            let objects = models.compactMap { try? $0.container(with: nil) }
+            list.append(objectsIn: objects)
+        case .setModels(let models):
+            let objects = models.compactMap { try? $0.container(with: nil) }
+            list.removeAll()
+            list.append(objectsIn: objects)
+        }
+    }
+
 
     /// Adds or updates an existing sequence of DatabaseMappable types into the Realm.
     /// - parameter values: The sequence of values to be added to the realm.
@@ -302,6 +320,20 @@ class RealmOperator: NSObject {
     /// - returns: A `QPResults` containing all the values.
     func relationValues<T: UniquelyMappable, R: UniquelyMappable>(_ relation: Relation<R>, in model: T)
         -> AnyRealmCollection<R.Container>? where T.Container: Object, R.Container: Object {
+        guard let key = Mirror(reflecting: model).children.first(where: { relation === (unwrapUsingProtocol($0.value) as AnyObject) })?.label,
+              let object = realm.object(ofType: T.Container.self, forPrimaryKey: model.objectKeyValue) else { return nil }
+        switch relation.type {
+        case .direct:
+            guard let list = object[key] as? List<R.Container> else { return nil }
+            return AnyRealmCollection(list)
+        case .inverse:
+            guard let linked = object[key] as? LinkingObjects<R.Container> else { return nil }
+            return AnyRealmCollection(linked)
+        }
+    }
+
+    func relationValues<T: UniquelyMappable, R: DatabaseMappable>(_ relation: EmbeddedRelation<R>, in model: T)
+        -> AnyRealmCollection<R.Container>? where T.Container: Object, R.Container: ObjectBase & RealmCollectionValue {
         guard let key = Mirror(reflecting: model).children.first(where: { relation === (unwrapUsingProtocol($0.value) as AnyObject) })?.label,
               let object = realm.object(ofType: T.Container.self, forPrimaryKey: model.objectKeyValue) else { return nil }
         switch relation.type {

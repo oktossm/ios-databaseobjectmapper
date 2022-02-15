@@ -102,8 +102,18 @@ struct TestRRModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses 
     let name: String
 
     let owner: TestSomeModel?
+    let user: TestERRModel?
     // sourcery: skipLens, skipDifference, skipUpdatesEquality
     let users = Relation<TestRRModel>(type: .direct)
+    let owners = EmbeddedRelation<TestERRModel>(type: .direct)
+}
+
+
+// sourcery: embedded
+struct TestERRModel: AutoDatabaseMappable, Equatable, AutoObjectDiff, AutoLenses {
+    let name: String
+    let someCount: Int
+    let url: URL?
 }
 
 
@@ -227,6 +237,11 @@ extension TestCDSimpleModel: DatabaseMappable {
 extension TestRRModel: UniquelyMappable {
     typealias Container = TestRRModelContainer
     static var idKey = \TestRRModel.id
+}
+
+
+extension TestERRModel: DatabaseMappable {
+    typealias Container = TestERRModelContainer
 }
 
 
