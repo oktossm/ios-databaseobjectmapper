@@ -84,3 +84,37 @@ extension RealmEncodableDatabaseMappable {
         return (try? encoder.encode(self)) ?? [:]
     }
 }
+
+
+extension Encodable {
+    public var realmEncodedValue: Any? {
+        let encoder = DatabaseEncoder()
+        encoder.valueEncodingStrategy = .asIs(DatabaseMappingEncodingStrategyHelper())
+        let dictionary: [String: Self] = ["value": self]
+        let result: [String: Any?]? = try? encoder.encode(dictionary)
+        return result?["value"] ?? nil
+    }
+}
+
+
+protocol RealmDictionaryCodableCollection {
+    var realmEncodedCollectionValue: Any? { get }
+}
+
+
+extension Array: RealmDictionaryCodableCollection where Element: Codable {}
+
+
+extension Set: RealmDictionaryCodableCollection where Element: Codable {}
+
+
+extension Collection where Element: Codable {
+    var realmEncodedCollectionValue: Any? {
+        let encoder = DatabaseEncoder()
+        encoder.valueEncodingStrategy = .asIs(DatabaseMappingEncodingStrategyHelper())
+        //fixes issue that DictionaryEncoder can not encode arrays/sets as top level elements
+        let dictionary: [String: [Element]] = ["value": self.map { $0 }]
+        let result: [String: Any?]? = try? encoder.encode(dictionary)
+        return result?["value"] ?? []
+    }
+}

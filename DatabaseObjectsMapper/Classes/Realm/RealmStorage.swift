@@ -125,12 +125,12 @@ public struct RealmWriteTransaction {
                 return mappable.mapValues { $0._rlmObjcValue }
             } else if let mappable = value as? _ObjcBridgeable {
                 return mappable._rlmObjcValue
-            } else if let mappable = value as? DictionaryCodableCollection {
-                return mappable.encodedCollectionValue
+            } else if let mappable = value as? RealmDictionaryCodableCollection {
+                return mappable.realmEncodedCollectionValue
             } else if let mappable = value as? RealmEncodableDatabaseMappable {
                 return mappable.realmEncodedValue
             } else if let mappable = value as? Encodable {
-                return mappable.encodedValue
+                return mappable.realmEncodedValue
             } else {
                 return value
             }
