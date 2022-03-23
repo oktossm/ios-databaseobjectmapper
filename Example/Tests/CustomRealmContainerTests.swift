@@ -1021,27 +1021,42 @@ class CustomRealmContainerTests: XCTestCase {
 
         service.save(models: [testModel])
         let updates: [RootKeyPathUpdate<TestCollectionsModel>] = [\TestCollectionsModel.intValues <- [0, 5],
+                                                                  \TestCollectionsModel.doubleValues <- [0.0, 0.7],
                                                                   \TestCollectionsModel.codable <- [newCodable, codable],
                                                                   \TestCollectionsModel.urls <- [url, url2],
                                                                   \TestCollectionsModel.dict <- ["key2": newPersistable],
+                                                                  \TestCollectionsModel.anotherDict <- [codable: .secondCase],
                                                                   \TestCollectionsModel.someList <- ["Test1", "Test2"],
                                                                   \TestCollectionsModel.codableEnums <- [.profile(31), .chat(21)]]
-
-        service.update(modelOf: TestCollectionsModel.self, with: testModel.id, updates: updates)
 
         let expectation = XCTestExpectation()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let all: [TestCollectionsModel] = self.service.syncFetch()
+            var token: DatabaseUpdatesToken?
+            token = self.service.fetch(with: .unfiltered, sorted: .unsorted, callback: {
+                (models: [TestCollectionsModel]) in
+            }, updates: {
+                updates in
 
-            XCTAssertTrue(all.first?.intValues == [0, 5], "\(all)")
-            XCTAssertTrue(all.first?.codable == [newCodable, codable], "\(all)")
-            XCTAssertTrue(all.first?.urls == [url, url2], "\(all)")
-            XCTAssertTrue(all.first?.dict == ["key2": newPersistable], "\(all)")
-            XCTAssertTrue(all.first?.someList == ["Test1", "Test2"], "\(all)")
-            XCTAssertTrue(all.first?.codableEnums == [.profile(31), .chat(21)], "\(all)")
+                let all = updates.values
 
-            expectation.fulfill()
+                token?.invalidate()
+
+                XCTAssertTrue(all.first?.intValues == [0, 5], "\(all)")
+                XCTAssertTrue(all.first?.doubleValues == [0.0, 0.7], "\(all)")
+                XCTAssertTrue(all.first?.codable == [newCodable, codable], "\(all)")
+                XCTAssertTrue(all.first?.urls == [url, url2], "\(all)")
+                XCTAssertTrue(all.first?.dict == ["key2": newPersistable], "\(all)")
+                XCTAssertTrue(all.first?.anotherDict == [codable: .secondCase], "\(all)")
+                XCTAssertTrue(all.first?.someList == ["Test1", "Test2"], "\(all)")
+                XCTAssertTrue(all.first?.codableEnums == [.profile(31), .chat(21)], "\(all)")
+
+                expectation.fulfill()
+            })
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.service.update(modelOf: TestCollectionsModel.self, with: testModel.id, updates: updates)
+            }
         }
 
         wait(for: [expectation], timeout: 1)

@@ -94,7 +94,7 @@ public extension UniquelyMappable where Container.ID == String, Container: Share
 
 
 /// Helper protocol to support relationships
-public protocol AnyDatabaseMappable {
+public protocol AnyDatabaseMappable: RealmEncodableDatabaseMappable {
     func existingContainer(with userInfo: Any?) throws -> AnyDatabaseContainer?
     func container(with userInfo: Any?) throws -> AnyDatabaseContainer
     func update(_ container: AnyDatabaseContainer)

@@ -127,6 +127,8 @@ public struct RealmWriteTransaction {
                 return mappable._rlmObjcValue
             } else if let mappable = value as? DictionaryCodableCollection {
                 return mappable.encodedCollectionValue
+            } else if let mappable = value as? RealmEncodableDatabaseMappable {
+                return mappable.realmEncodedValue
             } else if let mappable = value as? Encodable {
                 return mappable.encodedValue
             } else {

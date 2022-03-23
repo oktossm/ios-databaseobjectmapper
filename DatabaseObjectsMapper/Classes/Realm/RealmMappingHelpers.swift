@@ -72,3 +72,15 @@ extension DatabaseMappable where Container: Object {
         return (try? encoder.encode(self)) ?? [:]
     }
 }
+
+
+public protocol RealmEncodableDatabaseMappable: Codable {}
+
+
+extension RealmEncodableDatabaseMappable {
+    var realmEncodedValue: [String: Any?] {
+        let encoder = DatabaseEncoder()
+        encoder.valueEncodingStrategy = .asIs(DatabaseMappingEncodingStrategyHelper())
+        return (try? encoder.encode(self)) ?? [:]
+    }
+}
